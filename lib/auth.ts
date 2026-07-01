@@ -14,14 +14,13 @@ export async function signUp(email: string, password: string, userData: {
 
   if (error) throw error
 
-  // Create user profile
   const { error: profileError } = await supabase
     .from('users')
     .insert({
       id: data.user?.id,
       email,
       ...userData,
-      approved: userData.user_type === 'agent', // Agents auto-approved
+      approved: userData.user_type === 'agent',
     })
 
   if (profileError) throw profileError
@@ -39,6 +38,18 @@ export async function signIn(email: string, password: string) {
   return data
 }
 
+export async function signInWithOAuth(provider: 'google' | 'github') {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
+    },
+  })
+
+  if (error) throw error
+  return data
+}
+
 export async function signOut() {
   const { error } = await supabase.auth.signOut()
   if (error) throw error
@@ -50,7 +61,6 @@ export async function getCurrentUser() {
   return data.user
 }
 
-// Request listing agent approval for buyer
 export async function requestBuyerApproval(
   buyerId: string,
   propertyId: string,
@@ -69,7 +79,6 @@ export async function requestBuyerApproval(
   return data
 }
 
-// Listing agent approves buyer
 export async function approveBuyer(approvalId: string) {
   const { data, error } = await supabase
     .from('agent_approvals')
