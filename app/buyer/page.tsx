@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { getCurrentUser } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
