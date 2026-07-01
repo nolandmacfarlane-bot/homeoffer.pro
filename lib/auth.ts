@@ -40,23 +40,24 @@ export async function signIn(email: string, password: string) {
 
 export async function signInWithOAuth(provider: 'google' | 'facebook') {
   try {
+    // Cast provider to any to avoid TypeScript issues with facebook provider
+    const providerType = provider === 'facebook' ? ('facebook' as any) : ('google' as any)
+    
     const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: provider === 'facebook' ? 'facebook' : 'google',
+      provider: providerType,
       options: {
         redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
-        skipBrowserRedirect: false,
       },
     })
 
     if (error) {
-      console.error(`OAuth error (${provider}):`, error)
-      throw error
+      throw new Error(`OAuth error: ${error.message}`)
     }
 
-    // Supabase handles the redirect automatically
+    // Supabase handles the redirect
     return data
   } catch (err: any) {
-    console.error(`Sign in with ${provider} failed:`, err)
+    console.error(`Sign in with ${provider} failed:`, err.message)
     throw err
   }
 }
