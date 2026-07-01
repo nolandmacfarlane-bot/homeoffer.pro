@@ -92,38 +92,13 @@ export default function Home() {
           Clear bidding. Simple rules. Fair competition.
         </p>
 
-        {/* Three Main Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {/* Listing Agents */}
-          <Link
-            href="/signup?role=agent"
-            className="bg-white text-indigo-600 hover:bg-gray-100 font-bold py-6 px-8 rounded-lg text-xl transition transform hover:scale-105"
-          >
-            <div className="text-4xl mb-2">📋</div>
-            Listing Agents<br />
-            <span className="text-sm text-gray-600">Post properties & manage offers</span>
-          </Link>
-
-          {/* Buyer Agents */}
-          <Link
-            href="/signup?role=buyer-agent"
-            className="bg-white text-indigo-600 hover:bg-gray-100 font-bold py-6 px-8 rounded-lg text-xl transition transform hover:scale-105"
-          >
-            <div className="text-4xl mb-2">🤝</div>
-            Buyer Agents<br />
-            <span className="text-sm text-gray-600">Submit offers on behalf of buyers</span>
-          </Link>
-
-          {/* Independent Buyers */}
-          <Link
-            href="/signup?role=buyer"
-            className="bg-white text-indigo-600 hover:bg-gray-100 font-bold py-6 px-8 rounded-lg text-xl transition transform hover:scale-105"
-          >
-            <div className="text-4xl mb-2">🏠</div>
-            Buyers (No Agent)<br />
-            <span className="text-sm text-gray-600">Submit your own offers directly</span>
-          </Link>
-        </div>
+        {/* One Big Get Started Button */}
+        <Link
+          href="/signup"
+          className="inline-block bg-white text-indigo-600 hover:bg-gray-100 font-bold py-4 px-12 rounded-lg text-2xl transition transform hover:scale-105 mb-16"
+        >
+          Get Started →
+        </Link>
 
         {/* How It Works */}
         <div className="bg-white/10 backdrop-blur-md rounded-lg p-8 mb-16">

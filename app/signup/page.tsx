@@ -13,9 +13,6 @@ export default function SignupPage() {
     password_confirm: '',
     first_name: '',
     last_name: '',
-    user_type: 'buyer',
-    agent_license: '',
-    agent_state: '',
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -37,12 +34,11 @@ export default function SignupPage() {
       await signUp(formData.email, formData.password, {
         first_name: formData.first_name,
         last_name: formData.last_name,
-        user_type: formData.user_type as 'buyer' | 'seller' | 'agent',
-        agent_license: formData.agent_license || undefined,
-        agent_state: formData.agent_state || undefined,
+        user_type: 'buyer', // Default, will be changed on next page
       })
 
-      router.push('/properties')
+      // Redirect to role selection
+      router.push('/select-role')
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -54,7 +50,7 @@ export default function SignupPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Home Offer</h1>
-        <p className="text-gray-600 mb-6">Create an account</p>
+        <p className="text-gray-600 mb-6">Create your account</p>
 
         <form onSubmit={handleSignup} className="space-y-4">
           {error && (
@@ -109,55 +105,6 @@ export default function SignupPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              I am a...
-            </label>
-            <select
-              value={formData.user_type}
-              onChange={(e) =>
-                setFormData({ ...formData, user_type: e.target.value })
-              }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="buyer">Buyer</option>
-              <option value="seller">Seller</option>
-              <option value="agent">Agent</option>
-            </select>
-          </div>
-
-          {formData.user_type === 'agent' && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  License Number
-                </label>
-                <input
-                  type="text"
-                  value={formData.agent_license}
-                  onChange={(e) =>
-                    setFormData({ ...formData, agent_license: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  License State
-                </label>
-                <input
-                  type="text"
-                  value={formData.agent_state}
-                  onChange={(e) =>
-                    setFormData({ ...formData, agent_state: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="CA"
-                />
-              </div>
-            </>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
               Password
             </label>
             <input
@@ -191,7 +138,7 @@ export default function SignupPage() {
             disabled={loading}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition disabled:opacity-50"
           >
-            {loading ? 'Creating account...' : 'Create Account'}
+            {loading ? 'Creating account...' : 'Continue'}
           </button>
         </form>
 
