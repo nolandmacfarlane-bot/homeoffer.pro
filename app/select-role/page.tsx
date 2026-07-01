@@ -11,7 +11,6 @@ export default function SelectRolePage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    // Check if user is logged in
     getCurrentUser().catch(() => router.push('/login'))
   }, [router])
 
@@ -47,31 +46,41 @@ export default function SelectRolePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-900 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-2xl">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2 text-center">What's your role?</h1>
-        <p className="text-gray-600 text-center mb-8">Choose how you'll use Home Offer</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-900 flex items-center justify-center p-4 sm:p-6">
+      <div className="bg-white rounded-lg shadow-2xl p-6 sm:p-8 w-full max-w-4xl">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 text-center">What's your role?</h1>
+        <p className="text-gray-600 text-center mb-8 sm:mb-10">Choose how you'll use Home Offer</p>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 text-sm" role="alert">
             {error}
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Listing Agent */}
           <button
             onClick={() => selectRole('agent')}
             disabled={loading}
-            className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 hover:border-blue-600 rounded-lg p-8 text-center transition hover:scale-105 disabled:opacity-50"
+            className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 rounded-lg p-6 sm:p-8 text-center transition hover:scale-105 disabled:opacity-50 min-h-64"
+            aria-pressed="false"
           >
-            <div className="text-6xl mb-4">📋</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Listing Agent</h3>
-            <p className="text-gray-700 mb-4">Post properties and manage offers</p>
-            <ul className="text-sm text-gray-600 space-y-1 text-left">
-              <li>✓ Create listings</li>
-              <li>✓ Approve buyers</li>
-              <li>✓ Track offers</li>
+            <div className="text-5xl sm:text-6xl mb-4">📋</div>
+            <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-2">Listing Agent</h3>
+            <p className="text-gray-700 mb-4 text-sm sm:text-base">Post properties and manage offers</p>
+            <ul className="text-xs sm:text-sm text-gray-600 space-y-2 text-left">
+              <li className="flex items-start">
+                <span className="mr-2" aria-hidden="true">✓</span>
+                <span>Create listings</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2" aria-hidden="true">✓</span>
+                <span>Approve buyers</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2" aria-hidden="true">✓</span>
+                <span>Track offers</span>
+              </li>
             </ul>
           </button>
 
@@ -79,15 +88,25 @@ export default function SelectRolePage() {
           <button
             onClick={() => selectRole('buyer-agent')}
             disabled={loading}
-            className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 hover:border-green-600 rounded-lg p-8 text-center transition hover:scale-105 disabled:opacity-50"
+            className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 hover:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 rounded-lg p-6 sm:p-8 text-center transition hover:scale-105 disabled:opacity-50 min-h-64"
+            aria-pressed="false"
           >
-            <div className="text-6xl mb-4">🤝</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Buyer Agent</h3>
-            <p className="text-gray-700 mb-4">Submit offers on behalf of your clients</p>
-            <ul className="text-sm text-gray-600 space-y-1 text-left">
-              <li>✓ Browse properties</li>
-              <li>✓ Submit offers</li>
-              <li>✓ Track bids</li>
+            <div className="text-5xl sm:text-6xl mb-4">🤝</div>
+            <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-2">Buyer Agent</h3>
+            <p className="text-gray-700 mb-4 text-sm sm:text-base">Submit offers on behalf of your clients</p>
+            <ul className="text-xs sm:text-sm text-gray-600 space-y-2 text-left">
+              <li className="flex items-start">
+                <span className="mr-2" aria-hidden="true">✓</span>
+                <span>Browse properties</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2" aria-hidden="true">✓</span>
+                <span>Submit offers</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2" aria-hidden="true">✓</span>
+                <span>Track bids</span>
+              </li>
             </ul>
           </button>
 
@@ -95,22 +114,36 @@ export default function SelectRolePage() {
           <button
             onClick={() => selectRole('buyer')}
             disabled={loading}
-            className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300 hover:border-purple-600 rounded-lg p-8 text-center transition hover:scale-105 disabled:opacity-50"
+            className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300 hover:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 rounded-lg p-6 sm:p-8 text-center transition hover:scale-105 disabled:opacity-50 min-h-64"
+            aria-pressed="false"
           >
-            <div className="text-6xl mb-4">🏠</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Buyer (No Agent)</h3>
-            <p className="text-gray-700 mb-4">Submit your own offers directly</p>
-            <ul className="text-sm text-gray-600 space-y-1 text-left">
-              <li>✓ Browse properties</li>
-              <li>✓ Submit offers</li>
-              <li>✓ Track bids</li>
+            <div className="text-5xl sm:text-6xl mb-4">🏠</div>
+            <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-2">Buyer (No Agent)</h3>
+            <p className="text-gray-700 mb-4 text-sm sm:text-base">Submit your own offers directly</p>
+            <ul className="text-xs sm:text-sm text-gray-600 space-y-2 text-left">
+              <li className="flex items-start">
+                <span className="mr-2" aria-hidden="true">✓</span>
+                <span>Browse properties</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2" aria-hidden="true">✓</span>
+                <span>Submit offers</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2" aria-hidden="true">✓</span>
+                <span>Track bids</span>
+              </li>
             </ul>
           </button>
         </div>
 
-        <p className="text-center text-gray-600 mt-8 text-sm">
+        <p className="text-center text-gray-600 mt-8 sm:mt-10 text-xs sm:text-sm">
           You can change this anytime in your account settings
         </p>
+
+        <div className="mt-8 pt-8 border-t text-center text-xs text-gray-500">
+          <p>ADA Compliant ♿</p>
+        </div>
       </div>
     </div>
   )
