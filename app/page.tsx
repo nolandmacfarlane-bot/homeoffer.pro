@@ -19,20 +19,12 @@ export default function HomePage() {
                 A transparent marketplace where buyers submit offers, sellers receive offers, and agents coordinate everything. No hidden offers. No surprises.
               </p>
 
-              <div className="flex gap-4 flex-wrap">
-                <Link
-                  href="/signup"
-                  className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-lg transition transform hover:scale-105"
-                >
-                  Get Started Free →
-                </Link>
-                <Link
-                  href="/properties"
-                  className="px-8 py-4 bg-white hover:bg-gray-100 text-indigo-600 border-2 border-indigo-600 rounded-lg font-bold text-lg transition"
-                >
-                  Browse Properties
-                </Link>
-              </div>
+              <Link
+                href="/signup"
+                className="inline-block px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-lg transition transform hover:scale-105"
+              >
+                Get Started Free →
+              </Link>
             </div>
 
             <div className="hidden md:block">
