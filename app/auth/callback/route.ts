@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@supabase/ssr'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -7,57 +7,52 @@ export async function GET(request: NextRequest) {
   const error = searchParams.get('error')
   const error_description = searchParams.get('error_description')
 
-  // Handle errors from Supabase
+  // Handle errors from Supabase/OAuth providers
   if (error) {
     return NextResponse.redirect(
       new URL(`/login?error=${error}&error_description=${error_description}`, request.url)
     )
   }
 
-  // Exchange the code for a session
-  if (code) {
-    try {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  // Create a Supabase client to check session
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-      if (!supabaseUrl || !supabaseAnonKey) {
-        throw new Error('Missing Supabase configuration')
-      }
-
-      const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
-      // Exchange the code for a session
-      const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
-
-      if (sessionError || !data.session) {
-        console.error('Session exchange error:', sessionError)
-        return NextResponse.redirect(
-          new URL('/login?error=session_error', request.url)
-        )
-      }
-
-      // Create response and set the auth cookies
-      const response = NextResponse.redirect(new URL('/select-role', request.url))
-
-      // Set session cookies for auth persistence
-      if (data.session) {
-        response.cookies.set('sb-auth-token', data.session.access_token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'lax',
-          maxAge: data.session.expires_in,
-        })
-      }
-
-      return response
-    } catch (err: any) {
-      console.error('Auth callback error:', err)
-      return NextResponse.redirect(
-        new URL(`/login?error=callback_error&message=${encodeURIComponent(err.message)}`, request.url)
-      )
-    }
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('Missing Supabase configuration')
+    return NextResponse.redirect(new URL('/login?error=config_error', request.url))
   }
 
-  // Fallback - no code provided
-  return NextResponse.redirect(new URL('/login', request.url))
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getSetCookie()
+      },
+      setAll(cookiesToSet) {
+        const response = NextResponse.redirect(new URL('/select-role', request.url))
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options)
+        })
+        return response
+      },
+    },
+  })
+
+  // Check if user is authenticated (session exists from OAuth or email confirmation)
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    console.error('Auth error:', authError)
+    return NextResponse.redirect(new URL('/login?error=auth_error', request.url))
+  }
+
+  // User is authenticated! Redirect to role selection
+  const response = NextResponse.redirect(new URL('/select-role', request.url))
+  
+  // Preserve any auth cookies that were set
+  request.cookies.getSetCookie().forEach((cookie) => {
+    response.headers.append('set-cookie', cookie)
+  })
+
+  return response
 }
