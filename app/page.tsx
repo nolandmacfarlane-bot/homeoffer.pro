@@ -1,257 +1,247 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { getCurrentUser } from '@/lib/auth'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
-  const [chatOpen, setChatOpen] = useState(false)
-  const [chatMessages, setChatMessages] = useState<Array<{ type: 'user' | 'bot'; text: string }>>([])
-  const [chatInput, setChatInput] = useState('')
+  const router = useRouter()
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-  const faqs = [
-    {
-      q: 'How does Home Offer work?',
-      a: 'Sellers post properties with a starting offer price. Buyers submit offers in $1,000 increments over a 12-day period. If offers come in during the final 15 minutes, the period auto-extends another 15 minutes. Highest offer wins when the period closes.',
-    },
-    {
-      q: 'Who can use Home Offer?',
-      a: 'Listing agents post properties. Buyer agents and independent buyers submit offers. All must be approved by the listing agent before making offers.',
-    },
-    {
-      q: 'What are the offer increments?',
-      a: 'All offers must be in $1,000 increments and must exceed the current highest offer or starting price.',
-    },
-    {
-      q: 'How long is the offer period?',
-      a: '12 days from listing. If an offer arrives in the final 15 minutes, the period extends 15 more minutes. This repeats until 15 minutes of silence.',
-    },
-    {
-      q: 'Do you handle payments?',
-      a: 'No. Home Offer is transparent bidding only. Banks, lenders, and title companies handle all financing and closing.',
-    },
-    {
-      q: 'How do I get approved as a buyer?',
-      a: 'Sign up, then the listing agent approves you via email/SMS before you can submit offers.',
-    },
-  ]
+  useEffect(() => {
+    checkAuth()
+  }, [])
 
-  const navigationItems = [
-    'How it works',
-    'Who can use it', 
-    'Offer increments',
-    'The 12-day period',
-    'Payments',
-    'Getting approved'
-  ]
+  async function checkAuth() {
+    const currentUser = await getCurrentUser()
+    setUser(currentUser)
+    setLoading(false)
+  }
 
-  const handleChatSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!chatInput.trim()) return
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    )
+  }
 
-    const userMessage = chatInput.trim().toLowerCase()
-    setChatMessages(prev => [...prev, { type: 'user', text: chatInput }])
-
-    let botReply = "I'm not sure about that. Here are some topics I can help with: How it works, Who can use it, Offer increments, Offer period, Payments, or Getting approved."
-
-    const faq = faqs.find(f => userMessage.includes(f.q.toLowerCase().split(' ').slice(0, 2).join(' ')))
-    if (faq) {
-      botReply = faq.a
-    } else if (userMessage.includes('how') || userMessage.includes('work')) {
-      botReply = faqs[0].a
-    } else if (userMessage.includes('who') || userMessage.includes('use')) {
-      botReply = faqs[1].a
-    } else if (userMessage.includes('increment') || userMessage.includes('offer amount')) {
-      botReply = faqs[2].a
-    } else if (userMessage.includes('period') || userMessage.includes('day')) {
-      botReply = faqs[3].a
-    } else if (userMessage.includes('payment') || userMessage.includes('pay')) {
-      botReply = faqs[4].a
-    } else if (userMessage.includes('approv') || userMessage.includes('signup')) {
-      botReply = faqs[5].a
+  if (user) {
+    // Redirect to dashboard based on user type
+    if (user.user_type === 'seller' || user.user_type === 'agent') {
+      router.push('/seller')
+    } else {
+      router.push('/buyer')
     }
-
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, { type: 'bot', text: botReply }])
-    }, 300)
-
-    setChatInput('')
+    return null
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Navigation */}
-      <nav className="bg-white/10 backdrop-blur-md sticky top-0 z-10" role="navigation" aria-label="Main navigation">
-        <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Home Offer</h1>
-          <Link
-            href="/login"
-            className="text-white hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 rounded px-3 py-2 transition"
-            aria-label="Sign in to your account"
-          >
-            Sign In
-          </Link>
+      <nav className="bg-white shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="text-2xl font-bold text-indigo-600">🏠 Home Offer</div>
+          <div className="space-x-4">
+            <Link href="/login" className="text-gray-600 hover:text-gray-900 font-semibold">
+              Sign In
+            </Link>
+            <Link
+              href="/signup"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold"
+            >
+              Get Started
+            </Link>
+          </div>
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="flex-1">
-        {/* Hero Section */}
-        <div className="max-w-6xl mx-auto px-4 py-10 sm:py-20 text-center">
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
-            The Transparent Real Estate Offer Marketplace
-          </h2>
-          <p className="text-lg sm:text-xl lg:text-2xl text-blue-100 mb-8 sm:mb-12">
-            Simple. Transparent. Offers.
-          </p>
-
-          {/* One Big Get Started Button */}
+      {/* Hero Section */}
+      <div className="max-w-6xl mx-auto px-4 py-20 text-center">
+        <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+          The Transparent Real Estate Offer Marketplace
+        </h1>
+        <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          Submit offers with confidence. Watch the bidding in real-time. Close the deal with clarity.
+        </p>
+        <div className="flex gap-4 justify-center flex-wrap">
           <Link
             href="/signup"
-            className="inline-block bg-white text-indigo-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 font-bold py-3 sm:py-4 px-8 sm:px-12 rounded-lg text-lg sm:text-2xl transition transform hover:scale-105 active:scale-95"
-            aria-label="Get started with Home Offer"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-bold text-lg"
           >
-            Get Started →
+            Start Bidding
+          </Link>
+          <Link
+            href="/properties"
+            className="bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 px-8 py-3 rounded-lg font-bold text-lg"
+          >
+            Browse Properties
           </Link>
         </div>
-
-        {/* How It Works */}
-        <section className="bg-white/10 backdrop-blur-md py-12 sm:py-16" aria-labelledby="how-it-works">
-          <div className="max-w-6xl mx-auto px-4">
-            <h3 id="how-it-works" className="text-2xl sm:text-3xl font-bold text-white mb-8 sm:mb-12 text-center">
-              How It Works
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-white">
-              <div className="bg-white/10 rounded-lg p-4 sm:p-6">
-                <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">1️⃣</div>
-                <h4 className="font-bold text-base sm:text-lg mb-2">Post</h4>
-                <p className="text-sm sm:text-base text-blue-100">Listing agent posts property with starting offer</p>
-              </div>
-              <div className="bg-white/10 rounded-lg p-4 sm:p-6">
-                <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">2️⃣</div>
-                <h4 className="font-bold text-base sm:text-lg mb-2">Approve</h4>
-                <p className="text-sm sm:text-base text-blue-100">Agent approves qualified buyers</p>
-              </div>
-              <div className="bg-white/10 rounded-lg p-4 sm:p-6">
-                <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">3️⃣</div>
-                <h4 className="font-bold text-base sm:text-lg mb-2">Offer</h4>
-                <p className="text-sm sm:text-base text-blue-100">Buyers submit offers ($1,000 increments)</p>
-              </div>
-              <div className="bg-white/10 rounded-lg p-4 sm:p-6">
-                <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">4️⃣</div>
-                <h4 className="font-bold text-base sm:text-lg mb-2">Win</h4>
-                <p className="text-sm sm:text-base text-blue-100">Highest offer wins after 12 days</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
-        <section className="py-12 sm:py-16" aria-labelledby="faq-heading">
-          <div className="max-w-4xl mx-auto px-4">
-            <h3 id="faq-heading" className="text-2xl sm:text-3xl font-bold text-white mb-8 sm:mb-12 text-center">
-              Frequently Asked Questions
-            </h3>
-
-            <div className="space-y-3 sm:space-y-4">
-              {faqs.map((faq, idx) => (
-                <details
-                  key={idx}
-                  className="bg-white/10 rounded-lg p-4 sm:p-5 cursor-pointer hover:bg-white/20 transition focus-within:ring-2 focus-within:ring-white"
-                >
-                  <summary className="text-white font-bold text-base sm:text-lg flex justify-between items-center cursor-pointer select-none">
-                    {faq.q}
-                    <span className="ml-4 flex-shrink-0" aria-hidden="true">+</span>
-                  </summary>
-                  <p className="text-blue-100 mt-3 sm:mt-4 text-sm sm:text-base">{faq.a}</p>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-      </main>
-
-      {/* Chatbot */}
-      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
-        {!chatOpen ? (
-          <button
-            onClick={() => setChatOpen(true)}
-            className="bg-white text-indigo-600 font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-full shadow-lg hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 transition text-base sm:text-lg min-h-12 min-w-12"
-            aria-label="Open chatbot for questions"
-          >
-            💬
-          </button>
-        ) : (
-          <div className="bg-white rounded-lg shadow-2xl w-full sm:w-96 max-w-sm flex flex-col h-96">
-            {/* Chat Header */}
-            <div className="bg-indigo-600 text-white p-3 sm:p-4 rounded-t-lg flex justify-between items-center">
-              <h4 className="font-bold text-sm sm:text-base">Home Offer Assistant</h4>
-              <button
-                onClick={() => setChatOpen(false)}
-                className="text-white hover:bg-indigo-700 p-1 rounded focus:outline-none focus:ring-2 focus:ring-white"
-                aria-label="Close chatbot"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3" role="log" aria-label="Chat messages">
-              {chatMessages.length === 0 && (
-                <div className="text-gray-500 text-xs sm:text-sm">
-                  <p className="font-bold mb-2">👋 Ask me about:</p>
-                  <ul className="text-xs space-y-1">
-                    {navigationItems.map((item, i) => (
-                      <li key={i}>• {item}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {chatMessages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`p-2 sm:p-3 rounded text-sm sm:text-base ${
-                    msg.type === 'user'
-                      ? 'bg-indigo-600 text-white ml-auto w-fit max-w-xs'
-                      : 'bg-gray-100 text-gray-800 mr-auto w-fit max-w-xs'
-                  }`}
-                >
-                  {msg.text}
-                </div>
-              ))}
-            </div>
-
-            {/* Input */}
-            <form onSubmit={handleChatSubmit} className="border-t p-3 sm:p-4 flex gap-2">
-              <input
-                type="text"
-                value={chatInput}
-                onChange={e => setChatInput(e.target.value)}
-                placeholder="Ask..."
-                className="flex-1 border rounded px-2 sm:px-3 py-1 sm:py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                aria-label="Chat input"
-              />
-              <button
-                type="submit"
-                className="bg-indigo-600 text-white px-3 py-1 sm:py-2 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 text-sm font-medium"
-                aria-label="Send message"
-              >
-                Send
-              </button>
-            </form>
-          </div>
-        )}
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 py-6 sm:py-8 mt-12 sm:mt-16" role="contentinfo">
-        <div className="max-w-6xl mx-auto px-4 text-center text-blue-100 text-sm sm:text-base">
-          <p className="mb-4">&copy; 2026 Home Offer. Transparent offer marketplace for real estate.</p>
-          <div className="flex justify-center items-center gap-2">
-            <span className="text-xs">ADA Compliant</span>
-            <span role="img" aria-label="Accessibility symbol">♿</span>
+      {/* How It Works */}
+      <div className="bg-white py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-4xl font-bold text-gray-900 text-center mb-16">How It Works</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Step 1 */}
+            <div className="text-center">
+              <div className="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-indigo-600">1</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Browse</h3>
+              <p className="text-gray-600">
+                Explore properties in our marketplace. See details, photos, and starting prices.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="text-center">
+              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-green-600">2</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Request Access</h3>
+              <p className="text-gray-600">
+                Find a property you love. Request approval from the listing agent to bid.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="text-center">
+              <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-blue-600">3</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Submit Offers</h3>
+              <p className="text-gray-600">
+                Once approved, submit your offer in $1,000 increments. Compete transparently.
+              </p>
+            </div>
+
+            {/* Step 4 */}
+            <div className="text-center">
+              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-purple-600">4</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Win</h3>
+              <p className="text-gray-600">
+                12-day bidding period. Highest offer wins. Close with confidence.
+              </p>
+            </div>
           </div>
         </div>
-      </footer>
+      </div>
+
+      {/* Features Section */}
+      <div className="py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-4xl font-bold text-gray-900 text-center mb-16">Why Home Offer?</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition">
+              <div className="text-4xl mb-4">🔒</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Transparent Bidding</h3>
+              <p className="text-gray-600">
+                See real-time highest offers. No hidden bids. Fair competition for everyone.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition">
+              <div className="text-4xl mb-4">⏰</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Timed Auctions</h3>
+              <p className="text-gray-600">
+                12-day bidding period with real-time countdowns. Auto-extends in final 15 minutes.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition">
+              <div className="text-4xl mb-4">📱</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">SMS Notifications</h3>
+              <p className="text-gray-600">
+                Get instant alerts when outbid. Never miss an opportunity to place a counter-offer.
+              </p>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition">
+              <div className="text-4xl mb-4">👥</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Privacy First</h3>
+              <p className="text-gray-600">
+                Other bidders' identities remain private. You only see the current highest offer.
+              </p>
+            </div>
+
+            {/* Feature 5 */}
+            <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition">
+              <div className="text-4xl mb-4">⚖️</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Legal Compliance</h3>
+              <p className="text-gray-600">
+                TCPA, GDPR, CCPA compliant. Your privacy and data are protected by law.
+              </p>
+            </div>
+
+            {/* Feature 6 */}
+            <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition">
+              <div className="text-4xl mb-4">⚡</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Fast & Easy</h3>
+              <p className="text-gray-600">
+                Sign up in seconds. Verify with Google or Meta. Start bidding immediately.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="bg-indigo-600 py-20">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold text-white mb-6">Ready to Start?</h2>
+          <p className="text-xl text-indigo-100 mb-8">
+            Join the marketplace. Find your next property. Bid with confidence.
+          </p>
+          <div className="flex gap-4 justify-center flex-wrap">
+            <Link
+              href="/signup"
+              className="bg-white text-indigo-600 hover:bg-indigo-50 px-8 py-3 rounded-lg font-bold text-lg"
+            >
+              Create Account
+            </Link>
+            <Link
+              href="/terms"
+              className="bg-indigo-500 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-bold text-lg"
+            >
+              View Terms
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Links */}
+      <div className="bg-gray-900 text-gray-400 py-12">
+        <div className="max-w-6xl mx-auto px-4 flex justify-between items-center flex-wrap gap-6">
+          <p className="text-sm">© 2026 California Probate & Trust. All rights reserved.</p>
+          <div className="flex gap-6 text-sm">
+            <Link href="/terms" className="hover:text-white">
+              Terms
+            </Link>
+            <Link href="/privacy" className="hover:text-white">
+              Privacy
+            </Link>
+            <Link href="/sms-policy" className="hover:text-white">
+              SMS
+            </Link>
+            <Link href="/data-deletion" className="hover:text-white">
+              Delete Data
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
