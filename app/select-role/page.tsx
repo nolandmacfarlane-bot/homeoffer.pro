@@ -1,149 +1,275 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function SelectRolePage() {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [user, setUser] = useState<any>(null)
+  const [role, setRole] = useState<'buyer' | 'seller' | 'agent' | null>(null)
+  const [showAgentSearch, setShowAgentSearch] = useState(false)
+  const [agentSearch, setAgentSearch] = useState('')
+  const [agentResults, setAgentResults] = useState<any[]>([])
+  const [selectedAgent, setSelectedAgent] = useState<any>(null)
+  const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getCurrentUser().catch(() => router.push('/login'))
-  }, [router])
+    checkAuth()
+  }, [])
 
-  async function selectRole(role: 'agent' | 'buyer-agent' | 'buyer') {
-    setLoading(true)
-    setError('')
+  async function checkAuth() {
+    const currentUser = await getCurrentUser()
+    if (!currentUser) {
+      router.push('/login')
+      return
+    }
+    setUser(currentUser)
+    setLoading(false)
+  }
+
+  async function searchAgents(query: string) {
+    if (!query || query.length < 2) {
+      setAgentResults([])
+      return
+    }
 
     try {
-      const user = await getCurrentUser()
-      if (!user) throw new Error('Not authenticated')
-
-      const roleMap = {
-        agent: 'agent',
-        'buyer-agent': 'buyer',
-        buyer: 'buyer',
-      }
-
-      await supabase
+      const { data: agents } = await supabase
         .from('users')
-        .update({ user_type: roleMap[role] })
-        .eq('id', user.id)
+        .select('id, first_name, last_name, email, phone_number')
+        .eq('user_type', 'agent')
+        .or(
+          `first_name.ilike.%${query}%,last_name.ilike.%${query}%,email.ilike.%${query}%`
+        )
+        .limit(10)
 
-      if (role === 'agent') {
-        router.push('/seller')
-      } else {
-        router.push('/properties')
-      }
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
+      setAgentResults(agents || [])
+    } catch (err) {
+      console.error('Error searching agents:', err)
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-900 flex items-center justify-center p-4 sm:p-6">
-      <div className="bg-white rounded-lg shadow-2xl p-6 sm:p-8 w-full max-w-4xl">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 text-center">What's your role?</h1>
-        <p className="text-gray-600 text-center mb-8 sm:mb-10">Choose how you'll use Home Offer</p>
+  async function handleSelectRole(selectedRole: 'buyer' | 'seller' | 'agent') {
+    setRole(selectedRole)
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 text-sm" role="alert">
-            {error}
+    if (selectedRole === 'buyer') {
+      setShowAgentSearch(true)
+    } else {
+      await saveRole(selectedRole, null)
+    }
+  }
+
+  async function handleSelectAgent(agent: any) {
+    setSelectedAgent(agent)
+    await saveRole('buyer', agent.id)
+  }
+
+  async function handleSkipAgent() {
+    await saveRole('buyer', null)
+  }
+
+  async function saveRole(selectedRole: string, agentId: string | null) {
+    setSaving(true)
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({
+          user_type: selectedRole,
+          agent_id: agentId,
+        })
+        .eq('id', user.id)
+
+      if (error) throw error
+
+      // Redirect to appropriate dashboard
+      if (selectedRole === 'buyer') {
+        router.push('/buyer')
+      } else if (selectedRole === 'seller' || selectedRole === 'agent') {
+        router.push('/seller')
+      }
+    } catch (err: any) {
+      alert('Error: ' + err.message)
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header */}
+      <div className="bg-white shadow">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex items-center gap-2">
+            <Link href="/" className="text-gray-600 hover:text-gray-900">
+              ← Home
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        {!role ? (
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Welcome, {user?.first_name}!</h1>
+            <p className="text-xl text-gray-600">How would you like to use Home Offer?</p>
+          </div>
+        ) : !showAgentSearch ? (
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Almost there!</h1>
+            <p className="text-xl text-gray-600">Complete your profile</p>
+          </div>
+        ) : (
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Do you have a buyer's agent?</h1>
+            <p className="text-xl text-gray-600">Link your agent to collaborate on offers</p>
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* Listing Agent */}
-          <button
-            onClick={() => selectRole('agent')}
-            disabled={loading}
-            className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 rounded-lg p-6 sm:p-8 text-center transition hover:scale-105 disabled:opacity-50 min-h-64"
-            aria-pressed="false"
-          >
-            <div className="text-5xl sm:text-6xl mb-4">📋</div>
-            <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-2">Listing Agent</h3>
-            <p className="text-gray-700 mb-4 text-sm sm:text-base">Post properties and manage offers</p>
-            <ul className="text-xs sm:text-sm text-gray-600 space-y-2 text-left">
-              <li className="flex items-start">
-                <span className="mr-2" aria-hidden="true">✓</span>
-                <span>Create listings</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2" aria-hidden="true">✓</span>
-                <span>Approve buyers</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2" aria-hidden="true">✓</span>
-                <span>Track offers</span>
-              </li>
-            </ul>
-          </button>
+        {/* Role Selection */}
+        {!role ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Buyer */}
+            <button
+              onClick={() => handleSelectRole('buyer')}
+              className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition text-left group"
+            >
+              <div className="text-5xl mb-4 group-hover:scale-110 transition">🏠</div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">I'm a Buyer</h2>
+              <p className="text-gray-600 mb-4">
+                Browse properties and submit competitive offers
+              </p>
+              <ul className="space-y-2 text-sm text-gray-600 mb-6">
+                <li>✓ Submit offers</li>
+                <li>✓ Track your bids</li>
+                <li>✓ Get notifications</li>
+              </ul>
+              <div className="text-indigo-600 font-semibold group-hover:translate-x-2 transition">
+                Get Started →
+              </div>
+            </button>
 
-          {/* Buyer Agent */}
-          <button
-            onClick={() => selectRole('buyer-agent')}
-            disabled={loading}
-            className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 hover:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 rounded-lg p-6 sm:p-8 text-center transition hover:scale-105 disabled:opacity-50 min-h-64"
-            aria-pressed="false"
-          >
-            <div className="text-5xl sm:text-6xl mb-4">🤝</div>
-            <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-2">Buyer Agent</h3>
-            <p className="text-gray-700 mb-4 text-sm sm:text-base">Submit offers on behalf of your clients</p>
-            <ul className="text-xs sm:text-sm text-gray-600 space-y-2 text-left">
-              <li className="flex items-start">
-                <span className="mr-2" aria-hidden="true">✓</span>
-                <span>Browse properties</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2" aria-hidden="true">✓</span>
-                <span>Submit offers</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2" aria-hidden="true">✓</span>
-                <span>Track bids</span>
-              </li>
-            </ul>
-          </button>
+            {/* Seller/Agent */}
+            <button
+              onClick={() => handleSelectRole('agent')}
+              className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition text-left group"
+            >
+              <div className="text-5xl mb-4 group-hover:scale-110 transition">🏢</div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">I'm a Listing Agent</h2>
+              <p className="text-gray-600 mb-4">
+                List properties and manage buyer offers
+              </p>
+              <ul className="space-y-2 text-sm text-gray-600 mb-6">
+                <li>✓ List properties</li>
+                <li>✓ Manage offers</li>
+                <li>✓ Contact buyers</li>
+              </ul>
+              <div className="text-indigo-600 font-semibold group-hover:translate-x-2 transition">
+                Get Started →
+              </div>
+            </button>
 
-          {/* Independent Buyer */}
-          <button
-            onClick={() => selectRole('buyer')}
-            disabled={loading}
-            className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300 hover:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 rounded-lg p-6 sm:p-8 text-center transition hover:scale-105 disabled:opacity-50 min-h-64"
-            aria-pressed="false"
-          >
-            <div className="text-5xl sm:text-6xl mb-4">🏠</div>
-            <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-2">Buyer (No Agent)</h3>
-            <p className="text-gray-700 mb-4 text-sm sm:text-base">Submit your own offers directly</p>
-            <ul className="text-xs sm:text-sm text-gray-600 space-y-2 text-left">
-              <li className="flex items-start">
-                <span className="mr-2" aria-hidden="true">✓</span>
-                <span>Browse properties</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2" aria-hidden="true">✓</span>
-                <span>Submit offers</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2" aria-hidden="true">✓</span>
-                <span>Track bids</span>
-              </li>
-            </ul>
-          </button>
-        </div>
+            {/* Buyer's Agent */}
+            <button
+              onClick={() => {
+                setRole('agent')
+                setShowAgentSearch(false)
+                handleSelectRole('agent')
+              }}
+              className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition text-left group"
+            >
+              <div className="text-5xl mb-4 group-hover:scale-110 transition">👥</div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">I'm a Buyer's Agent</h2>
+              <p className="text-gray-600 mb-4">
+                Represent buyers and manage multiple offers
+              </p>
+              <ul className="space-y-2 text-sm text-gray-600 mb-6">
+                <li>✓ Manage clients</li>
+                <li>✓ Track offers</li>
+                <li>✓ Coordinate bids</li>
+              </ul>
+              <div className="text-indigo-600 font-semibold group-hover:translate-x-2 transition">
+                Get Started →
+              </div>
+            </button>
+          </div>
+        ) : showAgentSearch ? (
+          <div className="max-w-2xl mx-auto">
+            {/* Search for Agent */}
+            <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Find Your Agent</h3>
 
-        <p className="text-center text-gray-600 mt-8 sm:mt-10 text-xs sm:text-sm">
-          You can change this anytime in your account settings
-        </p>
+              <input
+                type="text"
+                value={agentSearch}
+                onChange={(e) => {
+                  setAgentSearch(e.target.value)
+                  searchAgents(e.target.value)
+                }}
+                placeholder="Search by name or email..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-4"
+              />
 
-        <div className="mt-8 pt-8 border-t text-center text-xs text-gray-500">
-          <p>ADA Compliant ♿</p>
-        </div>
+              {/* Agent Results */}
+              {agentSearch && (
+                <div className="space-y-2 mb-6">
+                  {agentResults.length > 0 ? (
+                    agentResults.map((agent) => (
+                      <button
+                        key={agent.id}
+                        onClick={() => handleSelectAgent(agent)}
+                        disabled={saving}
+                        className="w-full text-left p-4 border border-gray-300 rounded-lg hover:border-indigo-600 hover:bg-indigo-50 transition disabled:opacity-50"
+                      >
+                        <p className="font-bold text-gray-900">
+                          {agent.first_name} {agent.last_name}
+                        </p>
+                        <p className="text-sm text-gray-600">{agent.email}</p>
+                        {agent.phone_number && (
+                          <p className="text-sm text-gray-600">{agent.phone_number}</p>
+                        )}
+                      </button>
+                    ))
+                  ) : (
+                    <p className="text-gray-600 text-center py-4">No agents found</p>
+                  )}
+                </div>
+              )}
+
+              {/* Skip Option */}
+              <button
+                onClick={handleSkipAgent}
+                disabled={saving}
+                className="w-full text-center text-indigo-600 hover:underline font-semibold disabled:opacity-50"
+              >
+                Skip for now →
+              </button>
+            </div>
+
+            {/* Back Button */}
+            <button
+              onClick={() => {
+                setRole(null)
+                setShowAgentSearch(false)
+                setAgentSearch('')
+                setAgentResults([])
+              }}
+              className="w-full text-center text-gray-600 hover:text-gray-900 font-semibold"
+            >
+              ← Back to role selection
+            </button>
+          </div>
+        ) : null}
       </div>
     </div>
   )
