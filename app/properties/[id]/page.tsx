@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { getPropertyWithOffers } from '@/lib/properties'
 import { submitOffer } from '@/lib/offers'
 import { getCurrentUser } from '@/lib/auth'
+import { supabase } from '@/lib/supabase'
 
 export default function PropertyDetailPage() {
   const params = useParams()
@@ -121,6 +122,9 @@ export default function PropertyDetailPage() {
   }
 
   const highestOffer = offers?.[0]
+  const isApproved = user?.user_type === 'buyer' 
+    ? offers?.some((o: any) => o.buyer_id === user?.id) || user?.id === user?.id
+    : true
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -262,14 +266,42 @@ export default function PropertyDetailPage() {
                 </p>
               </div>
 
-              {/* Submit Offer */}
+              {/* Approval Message or Offer Form */}
               {property.status === 'active' && (
-                <form onSubmit={handleSubmitOffer} className="space-y-4">
-                  {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
-                      {error}
+                <>
+                  {!user?.approved ? (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <p className="text-yellow-800 font-semibold mb-2">⏳ Awaiting Approval</p>
+                      <p className="text-yellow-700 text-sm mb-4">
+                        Your access to submit offers is pending approval from the listing agent.
+                      </p>
+                      <button
+                        onClick={async () => {
+                          if (!user?.id) return
+                          try {
+                            await supabase.from('agent_approvals').insert({
+                              property_id: propertyId,
+                              buyer_id: user.id,
+                              listing_agent_id: property.listing_agent_id,
+                            })
+                            alert('Approval request sent! The listing agent will review shortly.')
+                            await loadPropertyData()
+                          } catch (err: any) {
+                            alert('Error: ' + err.message)
+                          }
+                        }}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold text-sm"
+                      >
+                        Request Approval
+                      </button>
                     </div>
-                  )}
+                  ) : (
+                    <form onSubmit={handleSubmitOffer} className="space-y-4">
+                      {error && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+                          {error}
+                        </div>
+                      )}
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -302,10 +334,12 @@ export default function PropertyDetailPage() {
                     {submitting ? 'Submitting...' : 'Submit Offer'}
                   </button>
 
-                  <p className="text-xs text-gray-500 text-center">
-                    ✓ All offers must be approved by the listing agent first
-                  </p>
-                </form>
+                      <p className="text-xs text-gray-500 text-center">
+                        ✓ You are approved to submit offers
+                      </p>
+                    </form>
+                  )}
+                </>
               )}
 
               {property.status !== 'active' && (
