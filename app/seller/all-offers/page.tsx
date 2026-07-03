@@ -75,10 +75,10 @@ export default function AllOffersPage() {
       }
 
       // Filter by status
-      let filtered = allOffers
+      let filtered: any[] = allOffers || []
       if (filterStatus === 'active') {
         const now = new Date()
-        filtered = filtered.filter((o) => {
+        filtered = filtered.filter((o: any) => {
           const endDate = new Date(o.properties.offer_end_date)
           return endDate > now && o.properties.status === 'active'
         })
@@ -91,7 +91,7 @@ export default function AllOffersPage() {
       }
 
       // Sort
-      const sorted = filtered.sort((a, b) => {
+      const sorted = filtered.sort((a: any, b: any) => {
         if (sortBy === 'amount') return b.amount - a.amount
         if (sortBy === 'time') return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         if (sortBy === 'property') return a.properties.address.localeCompare(b.properties.address)

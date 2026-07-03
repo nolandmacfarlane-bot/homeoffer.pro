@@ -48,10 +48,10 @@ export default function PropertySearchPage() {
       if (error) throw error
 
       // Filter by search query
-      let filtered = props || []
+      let filtered: any[] = props || []
       if (searchQuery) {
         filtered = filtered.filter(
-          (p) =>
+          (p: any) =>
             p.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
             p.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
             p.state.toLowerCase().includes(searchQuery.toLowerCase())
@@ -59,7 +59,7 @@ export default function PropertySearchPage() {
       }
 
       setProperties(filtered)
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error loading properties:', err)
     } finally {
       setLoading(false)

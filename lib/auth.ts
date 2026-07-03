@@ -6,6 +6,7 @@ export async function signUp(email: string, password: string, userData: {
   user_type: 'buyer' | 'seller' | 'agent'
   agent_license?: string
   agent_state?: string
+  sms_opt_in?: boolean
 }) {
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -19,7 +20,12 @@ export async function signUp(email: string, password: string, userData: {
     .insert({
       id: data.user?.id,
       email,
-      ...userData,
+      first_name: userData.first_name,
+      last_name: userData.last_name,
+      user_type: userData.user_type,
+      agent_license: userData.agent_license,
+      agent_state: userData.agent_state,
+      sms_opt_in: userData.sms_opt_in ?? false,
       approved: userData.user_type === 'agent',
     })
 
@@ -70,7 +76,17 @@ export async function signOut() {
 export async function getCurrentUser() {
   const { data, error } = await supabase.auth.getUser()
   if (error) throw error
-  return data.user
+  
+  if (!data.user) return null
+  
+  // Get full user profile from users table
+  const { data: userProfile } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', data.user.id)
+    .single()
+  
+  return userProfile || data.user
 }
 
 export async function requestBuyerApproval(
