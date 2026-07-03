@@ -283,7 +283,7 @@ export default function PropertyDetailPage() {
                         onChange={(e) => setOfferAmount(e.target.value)}
                         step="1000"
                         min={Math.max(1000, (highestOffer?.amount || property.starting_offer) + 1000)}
-                        className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900"
                         placeholder="0"
                         required
                       />
