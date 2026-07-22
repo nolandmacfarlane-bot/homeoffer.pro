@@ -88,7 +88,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <p className="font-bold text-blue-900">3. Make an Offer</p>
-                    <p className="text-sm text-blue-800">Submit your offer in $1,000 increments.</p>
+                    <p className="text-sm text-blue-800">Submit your offer in $500 increments.</p>
                   </div>
                   <div>
                     <p className="font-bold text-blue-900">4. Track Activity</p>
@@ -111,7 +111,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <p className="font-bold text-green-900">2. List Your Property</p>
-                    <p className="text-sm text-green-800">Add address, photos, details. Set 12-day offering period.</p>
+                    <p className="text-sm text-green-800">Add address, photos, details. Set a 13-day offering period.</p>
                   </div>
                   <div>
                     <p className="font-bold text-green-900">3. Receive Offers</p>

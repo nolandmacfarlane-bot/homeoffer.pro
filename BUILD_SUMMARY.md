@@ -83,7 +83,7 @@ properties
   - description
   - listing_agent_id (links to agent)
   - status (active|closed|expired)
-  - offer_end_date (12-day period)
+  - offer_end_date (13-day period)
   - images (array)
   - created_at
 
@@ -113,7 +113,7 @@ agent_approvals
 - Smart (allowed, not blocking)
 
 **Offer Period System:**
-- 12-day bidding periods
+- 13-day bidding periods
 - 15-minute auto-extend when offer received near deadline
 - Countdown timers on all properties
 - Auto-close after period expires

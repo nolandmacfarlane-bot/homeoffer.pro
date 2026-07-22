@@ -83,11 +83,11 @@ export default function TermsPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Offer Submission & Requirements</h2>
           <ul className="list-disc pl-6 space-y-2 text-gray-700">
-            <li>All offers must be in $1,000 increments</li>
+            <li>All offers must be in $500 increments</li>
             <li>Offers are binding upon submission</li>
             <li>Offers must meet minimum specified amounts</li>
             <li>Sellers may accept, reject, or counter any offer</li>
-            <li>offering period: 12 days with 15-minute auto-extend functionality</li>
+            <li>Offering period: 13 days with 15-minute auto-extend functionality</li>
             <li>All transactions remain subject to applicable real estate laws</li>
           </ul>
         </section>

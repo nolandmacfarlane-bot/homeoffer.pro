@@ -6,9 +6,9 @@ export async function submitOffer(
   buyerId: string,
   amount: number
 ) {
-  // Validate offer is $1,000 increment
-  if (amount % 1000 !== 0) {
-    throw new Error('Offers must be in $1,000 increments')
+  // Validate offer is a $500 increment
+  if (amount % 500 !== 0) {
+    throw new Error('Offers must be in $500 increments')
   }
 
   // Check if buyer is approved for this property

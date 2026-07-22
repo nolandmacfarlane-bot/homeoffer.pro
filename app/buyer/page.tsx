@@ -209,9 +209,9 @@ export default function BuyerDashboard() {
           <ol className="list-decimal pl-6 space-y-2 text-blue-800">
             <li>Browse properties and find one you like</li>
             <li>Request approval from the listing agent</li>
-            <li>Once approved, submit your offer in $1,000 increments</li>
+            <li>Once approved, submit your offer in $500 increments</li>
             <li>If you're outoffer, you'll get an SMS notification</li>
-            <li>Keep offering until the 12-day period ends</li>
+            <li>Keep offering until the 13-day period ends</li>
             <li>Winner is announced automatically</li>
           </ol>
           <p className="text-sm text-blue-700 mt-4">

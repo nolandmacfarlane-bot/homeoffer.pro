@@ -13,7 +13,7 @@ export async function createProperty(data: {
   listing_agent_id: string
   offer_period_days?: number
 }) {
-  const offerPeriodDays = data.offer_period_days || 12
+  const offerPeriodDays = data.offer_period_days || 13
   const offerEndDate = new Date()
   offerEndDate.setDate(offerEndDate.getDate() + offerPeriodDays)
 
