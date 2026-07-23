@@ -61,7 +61,7 @@ export default function CreateListingPage() {
       }
 
       const offerEndDate = new Date()
-      offerEndDate.setDate(offerEndDate.getDate() + 13)
+      offerEndDate.setDate(offerEndDate.getDate() + 11)
 
       const { data, error } = await supabase
         .from('properties')
@@ -336,7 +336,7 @@ export default function CreateListingPage() {
             {/* Info Box */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-blue-900 text-sm">
-                <strong>Note:</strong> Your listing will be active for 13 days. After that, you can renew it or close it.
+                <strong>Note:</strong> Your listing will accept offers for 11 days. After that, you can renew it or close it.
               </p>
             </div>
 
