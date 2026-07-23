@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
+import AccessibilityMenu from "@/components/AccessibilityMenu";
 import type { Metadata } from "next";
 
 const geistSans = Geist({
@@ -69,8 +70,10 @@ export default function RootLayout({
         <meta name="theme-color" content="#4f46e5" />
       </head>
       <body className="min-h-full flex flex-col">
-        <div className="flex-1">{children}</div>
+        <a className="skip-link" href="#main-content">Skip to main content</a>
+        <div id="main-content" className="flex-1" tabIndex={-1}>{children}</div>
         <Footer />
+        <AccessibilityMenu />
       </body>
     </html>
   );
