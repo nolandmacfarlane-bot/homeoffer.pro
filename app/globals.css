@@ -24,3 +24,215 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+:focus-visible {
+  outline: 3px solid #f59e0b !important;
+  outline-offset: 3px !important;
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 10000;
+  transform: translateY(-160%);
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: #0b1220;
+  padding: 0.75rem 1rem;
+  font-weight: 800;
+  box-shadow: 0 8px 30px rgb(15 23 42 / 0.25);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.accessibility-widget {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 9999;
+  font-size: 16px;
+}
+
+.accessibility-trigger {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 0.55rem;
+  border: 3px solid #ffffff;
+  border-radius: 9999px;
+  background: #0756b3;
+  color: #ffffff;
+  padding: 0.55rem 1rem 0.55rem 0.6rem;
+  font-weight: 850;
+  box-shadow: 0 5px 24px rgb(15 23 42 / 0.28);
+  cursor: pointer;
+}
+
+.accessibility-trigger:hover {
+  background: #053f87;
+}
+
+.accessibility-trigger svg {
+  width: 31px;
+  height: 31px;
+  flex: none;
+}
+
+.accessibility-panel {
+  width: min(340px, calc(100vw - 2rem));
+  margin-bottom: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 1rem;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 1rem;
+  box-shadow: 0 18px 55px rgb(15 23 42 / 0.25);
+}
+
+.accessibility-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.8rem;
+}
+
+.accessibility-panel-heading h2 {
+  margin: 0.1rem 0 0;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.accessibility-eyebrow {
+  margin: 0;
+  color: #334155;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.accessibility-close {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 9999px;
+  background: #e2e8f0;
+  color: #0f172a;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.accessibility-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  padding: 0.9rem 0;
+}
+
+.accessibility-options button {
+  display: flex;
+  min-height: 82px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 2px solid #cbd5e1;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  color: #0f172a;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.accessibility-options button span {
+  font-size: 1.3rem;
+  font-weight: 900;
+}
+
+.accessibility-options button[aria-pressed='true'] {
+  border-color: #0756b3;
+  background: #dbeafe;
+  color: #073b78;
+}
+
+.accessibility-reset,
+.accessibility-statement-link {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #0756b3;
+  padding: 0.55rem;
+  text-align: center;
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.a11y-large-text {
+  font-size: 125%;
+}
+
+.a11y-underline-links a:not(.accessibility-trigger) {
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 0.18em;
+}
+
+.a11y-high-contrast body {
+  filter: contrast(1.25);
+}
+
+.a11y-high-contrast .accessibility-panel,
+.a11y-high-contrast .accessibility-trigger {
+  filter: none;
+}
+
+.a11y-reduce-motion *,
+.a11y-reduce-motion *::before,
+.a11y-reduce-motion *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .accessibility-trigger span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .accessibility-trigger {
+    width: 52px;
+    height: 52px;
+    justify-content: center;
+    padding: 0;
+  }
+}
