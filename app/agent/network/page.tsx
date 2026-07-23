@@ -50,6 +50,7 @@ export default function AgentNetworkPage() {
   const [billingLoading, setBillingLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [systemReady, setSystemReady] = useState(true)
+  const [publicPreview, setPublicPreview] = useState(false)
   const [sponsorCode, setSponsorCode] = useState('')
   const [tierOneModel, setTierOneModel] = useState(10)
   const [tierTwoModel, setTierTwoModel] = useState(20)
@@ -68,7 +69,7 @@ export default function AgentNetworkPage() {
     try {
       const currentUser = await getCurrentUser()
       if (!currentUser) {
-        router.push('/login')
+        setPublicPreview(true)
         return
       }
       if (currentUser.user_type !== 'agent') {
@@ -158,7 +159,7 @@ export default function AgentNetworkPage() {
     } catch (error) {
       console.error('Agent network error:', error)
       if (!authenticatedAgent) {
-        router.push('/login')
+        setPublicPreview(true)
         return
       }
       setMessage('We could not load the agent hub. Please try again.')
@@ -248,16 +249,31 @@ export default function AgentNetworkPage() {
                 <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-600">Agent hub</p>
                 <h1 className="mt-2 text-4xl font-black text-slate-950">Production, membership & network</h1>
                 <p className="mt-3 max-w-3xl text-lg text-slate-600">
-                  Track closed homes, your two-tier network, and broker-reviewed rewards in one place.
+                  {publicPreview
+                    ? 'Preview how agents track closed homes, their two-tier network, and broker-reviewed rewards.'
+                    : 'Track closed homes, your two-tier network, and broker-reviewed rewards in one place.'}
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
-                <Link href="/agent/dashboard" className="rounded-xl border-2 border-slate-300 px-5 py-3 font-black text-slate-900">
-                  Listing dashboard
-                </Link>
-                <Link href="/agent/profile" className="rounded-xl bg-slate-950 px-5 py-3 font-black text-white">
-                  Agent profile
-                </Link>
+                {publicPreview ? (
+                  <>
+                    <Link href="/signup?role=agent" className="rounded-xl bg-blue-600 px-5 py-3 font-black text-white">
+                      Join for $7/month
+                    </Link>
+                    <Link href="/login" className="rounded-xl border-2 border-slate-300 px-5 py-3 font-black text-slate-900">
+                      Agent sign in
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/agent/dashboard" className="rounded-xl border-2 border-slate-300 px-5 py-3 font-black text-slate-900">
+                      Listing dashboard
+                    </Link>
+                    <Link href="/agent/profile" className="rounded-xl bg-slate-950 px-5 py-3 font-black text-white">
+                      Agent profile
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -277,12 +293,19 @@ export default function AgentNetworkPage() {
             </div>
           )}
 
+          {publicPreview && (
+            <div className="rounded-xl border border-blue-200 bg-blue-50 px-5 py-4 text-blue-950">
+              <p className="font-black">Public preview</p>
+              <p className="mt-1 text-sm">The numbers below are examples. An agent’s real production, network, and reward information stays private after sign-in.</p>
+            </div>
+          )}
+
           <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             {[
-              ['Your closed homes', closedUnits.toString(), 'Recorded from your listings'],
-              ['Tier 1 agents', tierOne.length.toString(), `${tierOne.reduce((sum, agent) => sum + agent.closedUnits, 0)} closed homes`],
-              ['Tier 2 agents', tierTwo.length.toString(), `${tierTwo.reduce((sum, agent) => sum + agent.closedUnits, 0)} closed homes`],
-              ['Paid rewards', money.format(rewardTotals.paid), `${money.format(rewardTotals.pending)} pending review`],
+              ['Your closed homes', publicPreview ? '12' : closedUnits.toString(), publicPreview ? 'Example production record' : 'Recorded from your listings'],
+              ['Tier 1 agents', publicPreview ? '10' : tierOne.length.toString(), publicPreview ? '60 example closed homes' : `${tierOne.reduce((sum, agent) => sum + agent.closedUnits, 0)} closed homes`],
+              ['Tier 2 agents', publicPreview ? '20' : tierTwo.length.toString(), publicPreview ? '120 example closed homes' : `${tierTwo.reduce((sum, agent) => sum + agent.closedUnits, 0)} closed homes`],
+              ['Paid rewards', publicPreview ? '$24,000' : money.format(rewardTotals.paid), publicPreview ? 'Illustrative annual scenario' : `${money.format(rewardTotals.pending)} pending review`],
             ].map(([label, value, detail]) => (
               <article key={label} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <p className="text-sm font-bold text-slate-500">{label}</p>
@@ -316,16 +339,24 @@ export default function AgentNetworkPage() {
               )}
               <button
                 onClick={() =>
-                  openStripe(
-                    membershipActive
-                      ? '/api/stripe/create-portal-session'
-                      : '/api/stripe/create-checkout-session'
-                  )
+                  publicPreview
+                    ? router.push('/signup?role=agent')
+                    : openStripe(
+                        membershipActive
+                          ? '/api/stripe/create-portal-session'
+                          : '/api/stripe/create-checkout-session'
+                      )
                 }
-                disabled={billingLoading || !systemReady}
+                disabled={billingLoading || (!systemReady && !publicPreview)}
                 className="mt-6 w-full rounded-xl bg-blue-600 px-5 py-3 font-black text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {billingLoading ? 'Opening Stripe…' : membershipActive ? 'Manage billing' : 'Subscribe for $7/month'}
+                {billingLoading
+                  ? 'Opening Stripe…'
+                  : publicPreview
+                    ? 'Create agent account'
+                    : membershipActive
+                      ? 'Manage billing'
+                      : 'Subscribe for $7/month'}
               </button>
             </article>
 
@@ -335,9 +366,11 @@ export default function AgentNetworkPage() {
               <p className="mt-3 text-slate-600">Share your link with licensed agents or enter the code of the agent who invited you.</p>
               <div className="mt-5 rounded-xl bg-slate-100 p-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Your referral link</p>
-                <p className="mt-1 break-all font-bold text-slate-900">{shareUrl}</p>
+                <p className="mt-1 break-all font-bold text-slate-900">
+                  {publicPreview ? 'Created automatically after you join' : shareUrl}
+                </p>
               </div>
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+              {!publicPreview && <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                 <input
                   value={sponsorCode}
                   onChange={(event) => setSponsorCode(event.target.value.toUpperCase())}
@@ -351,7 +384,7 @@ export default function AgentNetworkPage() {
                 >
                   Connect sponsor
                 </button>
-              </div>
+              </div>}
             </article>
           </section>
 
@@ -431,7 +464,9 @@ export default function AgentNetworkPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="mt-5 rounded-xl bg-slate-50 p-5 text-slate-600">No agents recorded on this tier yet.</p>
+                  <p className="mt-5 rounded-xl bg-slate-50 p-5 text-slate-600">
+                    {publicPreview ? 'Your agents and their closed-home totals will appear here.' : 'No agents recorded on this tier yet.'}
+                  </p>
                 )}
               </article>
             ))}
