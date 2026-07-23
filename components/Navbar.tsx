@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getCurrentUser, signOut } from '@/lib/auth'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 
 export default function Navbar() {
@@ -88,30 +89,33 @@ export default function Navbar() {
   const dashboardLink = getDashboardLink()
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-blue-100 bg-white/95 backdrop-blur-xl">
+    <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-[72px] items-center justify-between">
+        <div className="flex h-[68px] items-center justify-between gap-6">
           {/* Logo - always clickable to go home/dashboard */}
           <Link 
             href={dashboardLink}
-            className="flex items-center gap-3 text-xl font-black tracking-[-0.04em] text-blue-700 transition hover:opacity-75"
+            className="shrink-0 transition hover:opacity-75"
           >
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-blue-600 text-sm font-bold text-white">
-              HO
-            </div>
-            <span className="hidden sm:inline">HomeOffer<span className="text-blue-400">.pro</span></span>
+            <Image src="/homeoffer-logo.svg" alt="HomeOffer.pro" width={180} height={52} className="h-11 w-auto" priority />
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden flex-1 items-center gap-1 lg:flex">
+            <Link href="/" className="rounded-lg px-3 py-2 text-sm font-extrabold text-blue-600">Homes</Link>
+            <Link href="/#buyers" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">Buyers</Link>
+            <Link href="/#sellers" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">Sellers</Link>
+            <Link href="/#how-it-works" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">How It Works</Link>
+            <Link href="/#submit-an-offer" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">Submit an Offer</Link>
+            <Link href="/#faq" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">FAQ</Link>
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={`px-4 py-2 rounded-lg font-semibold text-sm transition ${
                   pathname === link.href
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 {link.label}
@@ -145,7 +149,7 @@ export default function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="rounded-xl bg-blue-600 px-6 py-3 text-base font-black text-white transition hover:bg-blue-700"
+                  className="rounded-full bg-blue-600 px-6 py-2.5 text-base font-black text-white transition hover:bg-blue-700"
                 >
                   Sign In
                 </Link>
@@ -155,7 +159,7 @@ export default function Navbar() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100"
+              className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-gray-100 lg:hidden"
             >
               {menuOpen ? '✕' : '☰'}
             </button>
@@ -164,7 +168,13 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div className="md:hidden pb-4 space-y-2 border-t border-gray-200 pt-4">
+          <div className="space-y-2 border-t border-gray-200 pb-4 pt-4 lg:hidden">
+            <Link href="/" className="block rounded-lg px-4 py-2 font-bold text-blue-600" onClick={() => setMenuOpen(false)}>Homes</Link>
+            <Link href="/#buyers" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>Buyers</Link>
+            <Link href="/#sellers" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>Sellers</Link>
+            <Link href="/#how-it-works" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>How It Works</Link>
+            <Link href="/#submit-an-offer" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>Submit an Offer</Link>
+            <Link href="/#faq" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>FAQ</Link>
             {/* User info - Mobile */}
             {user && (
               <div className="px-4 py-2 bg-indigo-100 rounded-lg mb-2">
