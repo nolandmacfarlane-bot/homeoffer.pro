@@ -211,7 +211,7 @@ export default function BuyerDashboard() {
             <li>Request approval from the listing agent</li>
             <li>Once approved, submit your offer in $500 increments</li>
             <li>If you're outoffer, you'll get an SMS notification</li>
-            <li>Keep offering until the 13-day period ends</li>
+            <li>Keep offering until the 11-day period ends</li>
             <li>Winner is announced automatically</li>
           </ol>
           <p className="text-sm text-blue-700 mt-4">
