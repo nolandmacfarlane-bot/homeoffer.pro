@@ -18,10 +18,40 @@ export default function HomePage() {
     <main className="min-h-screen bg-white text-[#0b1220]">
       <Navbar />
 
-      <section className="mx-auto max-w-7xl px-5 py-6 sm:px-6 lg:px-8">
+      <section id="how-it-works" className="scroll-mt-24 border-b border-blue-100 bg-gradient-to-br from-blue-50 via-white to-slate-50 px-5 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Simple by design</p>
+              <h1 className="mt-2 text-3xl font-black tracking-[-0.035em] text-slate-950 sm:text-4xl">
+                How <span className="text-blue-600">HomeOffer.pro</span> works
+              </h1>
+              <p className="mt-3 max-w-lg leading-7 text-slate-600">
+                Browse openly, understand the full price and submit a clear offer when you&apos;re ready.
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              {[
+                ['01', 'Browse homes', 'See the leading offer, total price and time remaining.'],
+                ['02', 'Get approved', 'Review the property, financing and representation details.'],
+                ['03', 'Make an offer', 'Submit in clear $500 increments during the 11-day window.'],
+              ].map(([number, title, copy]) => (
+                <div key={number} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-black text-white">{number}</span>
+                  <h2 className="mt-4 text-lg font-black text-slate-950">{title}</h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{copy}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="homes" className="scroll-mt-24 mx-auto max-w-7xl px-5 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-col gap-4 border-b border-slate-200 pb-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="text-2xl font-black tracking-[-0.035em] text-slate-950">Live <span className="text-blue-600">listings</span></h1>
+            <h2 className="text-2xl font-black tracking-[-0.035em] text-slate-950">Live <span className="text-blue-600">listings</span></h2>
             <div className="mt-4 flex flex-wrap gap-2">
             <button className="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-black text-white">Ending soon</button>
             <button className="rounded-full px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100">Newly listed</button>
@@ -73,43 +103,6 @@ export default function HomePage() {
               </article>
             )
           })}
-        </div>
-      </section>
-
-      <section id="how-it-works" className="scroll-mt-24 bg-[#0b1220] px-5 py-16 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-400">Simple by design</p>
-          <h2 className="mt-2 text-3xl font-black tracking-tight">How <span className="text-blue-400">HomeOffer</span> works</h2>
-          <div className="mt-9 grid gap-8 md:grid-cols-3">
-            {[
-              ['01', 'Browse openly', 'Explore every active home and see the leading offer, premium, total price and time remaining without signing in.'],
-              ['02', 'Get ready to offer', 'Review the property, confirm your financing and representation, then complete bidding approval.'],
-              ['03', 'Submit confidently', 'Offers move in $500 increments during an 11-day window. Everything stays visible and organized.'],
-            ].map(([number, title, copy]) => (
-              <div key={number} className="border-t border-slate-700 pt-5">
-                <span className="text-sm font-black text-blue-400">{number}</span>
-                <h3 className="mt-3 text-xl font-black">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-300">{copy}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="buy-and-sell" className="scroll-mt-20 px-5 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200 p-7">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-600">For buyers</p>
-            <h2 className="mt-2 text-2xl font-black">See the competition clearly.</h2>
-            <p className="mt-3 leading-7 text-slate-600">Browse without an account, compare total prices and follow the homes you care about. Sign in only when you&apos;re ready to take action.</p>
-            <Link id="submit-an-offer" href="/properties" className="mt-6 inline-flex scroll-mt-24 rounded-full bg-blue-600 px-5 py-3 font-black text-white hover:bg-blue-700">Find a home</Link>
-          </div>
-          <div className="rounded-2xl border border-slate-200 p-7">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-600">For sellers</p>
-            <h2 className="mt-2 text-2xl font-black">Create focused competition.</h2>
-            <p className="mt-3 leading-7 text-slate-600">Launch an organized 11-day offer period, keep buyers informed and review every offer in one place.</p>
-            <Link href="/login" className="mt-6 inline-flex rounded-full bg-[#0b1220] px-5 py-3 font-black text-white hover:bg-blue-600">List a property</Link>
-          </div>
         </div>
       </section>
 

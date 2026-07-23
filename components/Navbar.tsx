@@ -12,10 +12,28 @@ export default function Navbar() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeMarketingTab, setActiveMarketingTab] = useState('homes')
 
   useEffect(() => {
     loadUser()
   }, [])
+
+  useEffect(() => {
+    const updateActiveTab = () => {
+      if (pathname.startsWith('/properties')) {
+        setActiveMarketingTab('homes')
+        return
+      }
+
+      if (pathname === '/') {
+        setActiveMarketingTab(window.location.hash.slice(1) || 'homes')
+      }
+    }
+
+    updateActiveTab()
+    window.addEventListener('hashchange', updateActiveTab)
+    return () => window.removeEventListener('hashchange', updateActiveTab)
+  }, [pathname])
 
   async function loadUser() {
     try {
@@ -87,6 +105,22 @@ export default function Navbar() {
 
   const navLinks = getNavLinks()
   const dashboardLink = getDashboardLink()
+  const marketingLinks = [
+    { key: 'homes', label: 'Homes', href: '/' },
+    { key: 'how-it-works', label: 'How It Works', href: '/#how-it-works' },
+    { key: 'list-property', label: 'List a Property', href: '/seller/create-listing' },
+    { key: 'agent-partners', label: 'Grow Your Network', href: '/#agent-partners' },
+    { key: 'faq', label: 'FAQ', href: '/#faq' },
+  ]
+
+  const marketingLinkClass = (key: string, mobile = false) => {
+    const isActive = activeMarketingTab === key
+    return `${mobile ? 'block' : ''} rounded-lg px-3 py-2 text-sm font-extrabold transition ${
+      isActive
+        ? 'bg-blue-50 text-blue-700'
+        : 'text-slate-950 hover:bg-slate-100 hover:text-blue-700'
+    }`
+  }
 
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
@@ -110,12 +144,17 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden flex-1 items-center gap-1 lg:flex">
-            <Link href="/" className="rounded-lg px-3 py-2 text-sm font-extrabold text-blue-600">Homes</Link>
-            <Link href="/#buy-and-sell" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">Buy &amp; Sell</Link>
-            <Link href="/#how-it-works" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">How It Works</Link>
-            <Link href="/#agent-partners" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">For Agents</Link>
-            <Link href="/#submit-an-offer" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">Submit an Offer</Link>
-            <Link href="/#faq" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">FAQ</Link>
+            {marketingLinks.map((link) => (
+              <Link
+                key={link.key}
+                href={link.href}
+                className={marketingLinkClass(link.key)}
+                aria-current={activeMarketingTab === link.key ? 'page' : undefined}
+                onClick={() => setActiveMarketingTab(link.key)}
+              >
+                {link.label}
+              </Link>
+            ))}
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -180,12 +219,20 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {menuOpen && (
           <div id="mobile-navigation" className="space-y-2 border-t border-gray-200 pb-4 pt-4 lg:hidden">
-            <Link href="/" className="block rounded-lg px-4 py-2 font-bold text-blue-600" onClick={() => setMenuOpen(false)}>Homes</Link>
-            <Link href="/#buy-and-sell" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>Buy &amp; Sell</Link>
-            <Link href="/#how-it-works" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>How It Works</Link>
-            <Link href="/#agent-partners" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>For Agents</Link>
-            <Link href="/#submit-an-offer" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>Submit an Offer</Link>
-            <Link href="/#faq" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>FAQ</Link>
+            {marketingLinks.map((link) => (
+              <Link
+                key={link.key}
+                href={link.href}
+                className={marketingLinkClass(link.key, true)}
+                aria-current={activeMarketingTab === link.key ? 'page' : undefined}
+                onClick={() => {
+                  setActiveMarketingTab(link.key)
+                  setMenuOpen(false)
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
             {/* User info - Mobile */}
             {user && (
               <div className="px-4 py-2 bg-indigo-100 rounded-lg mb-2">
