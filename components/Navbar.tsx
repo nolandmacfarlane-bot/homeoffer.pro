@@ -106,6 +106,7 @@ export default function Navbar() {
             <Link href="/" className="rounded-lg px-3 py-2 text-sm font-extrabold text-blue-600">Homes</Link>
             <Link href="/#buy-and-sell" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">Buy &amp; Sell</Link>
             <Link href="/#how-it-works" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">How It Works</Link>
+            <Link href="/#agent-partners" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">For Agents</Link>
             <Link href="/#submit-an-offer" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">Submit an Offer</Link>
             <Link href="/#faq" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">FAQ</Link>
             {navLinks.map((link) => (
@@ -172,6 +173,7 @@ export default function Navbar() {
             <Link href="/" className="block rounded-lg px-4 py-2 font-bold text-blue-600" onClick={() => setMenuOpen(false)}>Homes</Link>
             <Link href="/#buy-and-sell" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>Buy &amp; Sell</Link>
             <Link href="/#how-it-works" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>How It Works</Link>
+            <Link href="/#agent-partners" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>For Agents</Link>
             <Link href="/#submit-an-offer" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>Submit an Offer</Link>
             <Link href="/#faq" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>FAQ</Link>
             {/* User info - Mobile */}
