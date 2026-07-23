@@ -1,39 +1,25 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getCurrentUser } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 
 export default function PropertiesPage() {
-  const router = useRouter()
   const [properties, setProperties] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    checkAuth()
-  }, [])
-
-  async function checkAuth() {
-    const currentUser = await getCurrentUser()
-    if (!currentUser) {
-      router.push('/login')
-      return
-    }
-    setUser(currentUser)
     loadProperties()
-  }
+  }, [])
 
   async function loadProperties() {
     try {
       const { data } = await supabase
         .from('properties')
-        .select('*')
+        .select('*, offers(amount)')
         .eq('status', 'active')
-        .order('created_at', { ascending: false })
+        .order('offer_end_date', { ascending: true })
 
       setProperties(data || [])
     } catch (err) {
@@ -47,7 +33,7 @@ export default function PropertiesPage() {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-blue-50 flex items-center justify-center">
           <p className="text-gray-600">Loading properties...</p>
         </div>
       </>
@@ -57,12 +43,12 @@ export default function PropertiesPage() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-[#f5f7fb]">
         {/* Header */}
         <div className="bg-white shadow">
           <div className="max-w-6xl mx-auto px-4 py-6">
-            <h1 className="text-3xl font-bold text-gray-900">Browse Properties</h1>
-            <p className="text-gray-600 mt-1">Active listings on the marketplace</p>
+            <h1 className="text-4xl font-black tracking-tight text-gray-950">Homes open for offers</h1>
+            <p className="text-gray-600 mt-2">Ending soonest first. No account needed to browse.</p>
           </div>
         </div>
 
@@ -83,12 +69,15 @@ export default function PropertiesPage() {
                 const now = new Date()
                 const isActive = endDate > now && property.status === 'active'
                 const daysLeft = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+                const currentOffer = Math.max(property.starting_offer, ...(property.offers || []).map((offer: any) => offer.amount))
+                const platformFee = currentOffer * 0.005
+                const buyerAgentCommission = currentOffer * 0.025
 
                 return (
                   <Link
                     key={property.id}
                     href={`/properties/${property.id}`}
-                    className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition group"
+                    className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-xl transition group"
                   >
                     {/* Image */}
                     <div className="relative h-48 bg-gray-200 overflow-hidden group-hover:opacity-90 transition">
@@ -104,18 +93,7 @@ export default function PropertiesPage() {
                         </div>
                       )}
 
-                      {/* Status Badge */}
-                      <div className="absolute top-3 right-3">
-                        {isActive ? (
-                          <span className="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">
-                            🟢 Active
-                          </span>
-                        ) : (
-                          <span className="bg-gray-100 text-gray-800 text-xs font-bold px-3 py-1 rounded-full">
-                            ⚫ Closed
-                          </span>
-                        )}
-                      </div>
+                      {isActive && <div className="absolute bottom-3 left-3 rounded-lg bg-slate-950/85 px-3 py-2 text-sm font-black text-white">{daysLeft}d left</div>}
                     </div>
 
                     {/* Info */}
@@ -129,9 +107,8 @@ export default function PropertiesPage() {
                       </p>
 
                       {/* Price */}
-                      <p className="text-2xl font-bold text-indigo-600 mb-3">
-                        ${property.starting_offer.toLocaleString()}
-                      </p>
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Current offer</p>
+                      <p className="text-2xl font-black text-blue-700 mb-3">${currentOffer.toLocaleString()}</p>
 
                       {/* Stats */}
                       <div className="grid grid-cols-3 gap-2 mb-3 pb-3 border-b border-gray-200 text-center">
@@ -151,14 +128,10 @@ export default function PropertiesPage() {
                         </div>
                       </div>
 
-                      {/* Countdown or Closed */}
-                      {isActive ? (
-                        <div className="text-xs text-orange-600 font-semibold text-center">
-                          ⏱️ {daysLeft}d left to offer
-                        </div>
-                      ) : (
-                        <div className="text-xs text-gray-500 text-center">Offering closed</div>
-                      )}
+                      <div className="space-y-1 rounded-lg bg-blue-50 p-3 text-xs">
+                        <div className="flex justify-between"><span className="text-slate-600">Platform fee (0.5%)</span><strong>${platformFee.toLocaleString()}</strong></div>
+                        <div className="flex justify-between"><span className="text-slate-600">Buyer&apos;s agent commission (2.5%)</span><strong>${buyerAgentCommission.toLocaleString()}</strong></div>
+                      </div>
                     </div>
                   </Link>
                 )
