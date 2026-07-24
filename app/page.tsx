@@ -14,7 +14,24 @@ const listings = [
 
 const money = (amount: number) => amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 
-export default function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ sort?: string }>
+}) {
+  const { sort = 'ending' } = await searchParams
+  const orderedListings = [...listings].sort((a, b) => {
+    if (sort === 'highest') return b.offer - a.offer
+    if (sort === 'newest') return b.hours - a.hours
+    return a.hours - b.hours
+  })
+  const sortLinkClass = (key: string) =>
+    `rounded-full px-5 py-2.5 text-sm font-black transition ${
+      sort === key
+        ? 'bg-blue-600 text-white'
+        : 'text-slate-600 hover:bg-slate-100 hover:text-blue-700'
+    }`
+
   return (
     <main className="min-h-screen bg-white text-[#0b1220]">
       <Navbar />
@@ -24,9 +41,9 @@ export default function HomePage() {
           <div>
             <h1 className="text-2xl font-black tracking-[-0.035em] text-slate-950">Live <span className="text-blue-600">listings</span></h1>
             <div className="mt-4 flex flex-wrap gap-2">
-            <button className="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-black text-white">Ending soon</button>
-            <button className="rounded-full px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100">Newly listed</button>
-            <button className="rounded-full px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100">Highest offer</button>
+            <Link href="/?sort=ending#homes" className={sortLinkClass('ending')} aria-current={sort === 'ending' ? 'true' : undefined}>Ending soon</Link>
+            <Link href="/?sort=newest#homes" className={sortLinkClass('newest')} aria-current={sort === 'newest' ? 'true' : undefined}>Newly listed</Link>
+            <Link href="/?sort=highest#homes" className={sortLinkClass('highest')} aria-current={sort === 'highest' ? 'true' : undefined}>Highest offer</Link>
             </div>
           </div>
           <div className="flex flex-col items-start gap-2 md:items-end">
@@ -36,7 +53,7 @@ export default function HomePage() {
         </div>
 
         <div className="grid gap-x-5 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
-          {listings.map((home) => {
+          {orderedListings.map((home) => {
             const buyerPremium = home.offer * 0.03
             const total = home.offer + buyerPremium
 
