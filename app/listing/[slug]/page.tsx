@@ -131,7 +131,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
           </div>
         </div>
 
-        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1fr_360px]">
+        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1fr_420px]">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.14em] text-blue-600">Open for offers</p>
             <h1 className="mt-2 text-4xl font-black tracking-[-0.04em] sm:text-5xl">{home.address}</h1>
@@ -163,15 +163,15 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             </section>
           </div>
 
-          <aside className="sticky top-28 rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-950/5">
-            <span className="inline-flex rounded-lg bg-blue-600 px-3 py-2 text-sm font-black text-white">◷ {home.time} left</span>
-            <dl className="mt-6 space-y-3 text-sm">
+          <aside className="sticky top-28 rounded-2xl border border-slate-200 bg-white p-8 shadow-lg shadow-slate-950/5">
+            <span className="inline-flex rounded-lg bg-blue-600 px-4 py-2.5 text-base font-black text-white">◷ {home.time} left</span>
+            <dl className="mt-7 space-y-4 text-base">
               <div className="flex justify-between gap-4"><dt className="font-bold text-slate-600">Leading offer</dt><dd className="font-black">{money(home.offer)}</dd></div>
               <div className="flex justify-between gap-4"><dt className="font-bold text-slate-600">Buyer&apos;s premium (3%)</dt><dd className="font-black">{money(premium)}</dd></div>
-              <div className="flex justify-between gap-4 border-t border-slate-200 pt-3 text-base"><dt className="font-black">Total price</dt><dd className="font-black text-blue-700">{money(total)}</dd></div>
+              <div className="flex justify-between gap-4 border-t border-slate-200 pt-4 text-lg"><dt className="font-black">Total price</dt><dd className="font-black text-blue-700">{money(total)}</dd></div>
             </dl>
-            <Link href="/login" className="mt-6 block rounded-full bg-slate-950 px-5 py-3 text-center font-black text-white hover:bg-blue-600">Get approved to offer</Link>
-            <p className="mt-4 text-center text-xs leading-5 text-slate-500">Property details shown are for the current marketplace preview and should be independently verified.</p>
+            <Link href="/login" className="mt-7 block rounded-full bg-red-600 px-6 py-4 text-center text-lg font-black text-white transition hover:bg-red-700">Get approved to offer</Link>
+            <p className="mt-5 text-center text-sm leading-6 text-slate-500">Property details shown are for the current marketplace preview and should be independently verified.</p>
           </aside>
         </div>
       </div>
