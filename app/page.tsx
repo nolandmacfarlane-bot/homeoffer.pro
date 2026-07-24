@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import Navbar from '@/components/Navbar'
+import AgentEarningsCalculator from '@/components/AgentEarningsCalculator'
 
 const listings = [
   { city: 'Granite Bay, CA', address: '8575 Hidden Lakes Drive', beds: 5, baths: 4, sqft: '4,218', offer: 612500, time: '18h 42m', hours: 18, crop: 'object-[70%_center]' },
@@ -98,6 +99,9 @@ export default function HomePage() {
                 <Link href="/#agent-program-details" className="rounded-full border border-slate-300 bg-white px-6 py-3 font-black text-slate-900 transition hover:border-blue-300 hover:text-blue-700">
                   See how rewards work
                 </Link>
+                <Link href="/#agent-earnings-calculator" className="rounded-full bg-slate-950 px-6 py-3 font-black text-white transition hover:bg-blue-600">
+                  Calculate Your Earnings
+                </Link>
               </div>
 
               <div className="mt-8 grid max-w-lg grid-cols-3 gap-3">
@@ -177,6 +181,8 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+
+          <AgentEarningsCalculator />
         </div>
       </section>
 
