@@ -130,8 +130,8 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-[92px] items-center justify-between gap-5">
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        <div className="flex h-[74px] items-center justify-between gap-2 sm:h-[92px] sm:gap-5">
           {/* Logo - always clickable to go home/dashboard */}
           <Link 
             href={dashboardLink}
@@ -143,7 +143,7 @@ export default function Navbar() {
               alt="HomeOffer.pro"
               width={1549}
               height={358}
-              className="h-[72px] w-auto"
+              className="h-12 w-auto max-w-[58vw] object-contain sm:h-[72px] sm:max-w-none"
               priority
             />
           </Link>
@@ -177,7 +177,7 @@ export default function Navbar() {
           </div>
 
           {/* Right side - Sign Out / Sign In */}
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
             {loading ? (
               <div className="w-10 h-10 animate-pulse bg-gray-300 rounded-lg" />
             ) : user ? (
@@ -202,7 +202,7 @@ export default function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="rounded-full bg-blue-600 px-7 py-3 text-lg font-black text-white transition hover:bg-blue-700"
+                  className="whitespace-nowrap rounded-full bg-blue-600 px-4 py-2.5 text-base font-black text-white transition hover:bg-blue-700 sm:px-7 sm:py-3 sm:text-lg"
                 >
                   Sign In
                 </Link>
@@ -212,7 +212,7 @@ export default function Navbar() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-gray-100 lg:hidden"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-xl hover:bg-gray-100 lg:hidden"
               aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={menuOpen}
               aria-controls="mobile-navigation"
