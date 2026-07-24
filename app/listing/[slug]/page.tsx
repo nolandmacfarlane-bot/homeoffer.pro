@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import Navbar from '@/components/Navbar'
+import ListingEngagement from '@/components/ListingEngagement'
 
 const homes: Record<string, {
   address: string
@@ -163,15 +164,54 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             </section>
           </div>
 
-          <aside className="sticky top-28 rounded-2xl border border-slate-200 bg-white p-8 shadow-lg shadow-slate-950/5">
-            <span className="inline-flex rounded-lg bg-blue-600 px-4 py-2.5 text-base font-black text-white">◷ {home.time} left</span>
+          <aside className="space-y-6">
+            <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-lg shadow-slate-950/5">
+              <span className="inline-flex rounded-lg bg-blue-600 px-4 py-2.5 text-base font-black text-white">◷ {home.time} left</span>
             <dl className="mt-7 space-y-4 text-base">
               <div className="flex justify-between gap-4"><dt className="font-bold text-slate-600">Leading offer</dt><dd className="font-black">{money(home.offer)}</dd></div>
               <div className="flex justify-between gap-4"><dt className="font-bold text-slate-600">Buyer&apos;s premium (3%)</dt><dd className="font-black">{money(premium)}</dd></div>
               <div className="flex justify-between gap-4 border-t border-slate-200 pt-4 text-lg"><dt className="font-black">Total price</dt><dd className="font-black text-blue-700">{money(total)}</dd></div>
             </dl>
             <Link href="/login" className="mt-7 block rounded-full bg-red-600 px-6 py-4 text-center text-lg font-black text-white transition hover:bg-red-700">Get approved to offer</Link>
-            <p className="mt-5 text-center text-sm leading-6 text-slate-500">Property details shown are for the current marketplace preview and should be independently verified.</p>
+              <p className="mt-5 text-center text-sm leading-6 text-slate-500">Property details shown are for the current marketplace preview and should be independently verified.</p>
+            </section>
+
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-2xl font-black text-slate-950">Open houses</h2>
+              <p className="mt-1 text-sm text-slate-500">{home.address}, {home.city} {home.zip}</p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                {[
+                  { day: 'Sat, Jul 25', time: '11:00 AM - 1:00 PM', start: '20260725T180000Z', end: '20260725T200000Z' },
+                  { day: 'Sun, Jul 26', time: '1:00 PM - 4:00 PM', start: '20260726T200000Z', end: '20260726T230000Z' },
+                ].map((event) => {
+                  const calendarUrl = `/api/open-house-calendar?title=${encodeURIComponent(`Open House: ${home.address}`)}&location=${encodeURIComponent(`${home.address}, ${home.city} ${home.zip}`)}&start=${event.start}&end=${event.end}`
+                  return (
+                    <div key={event.start} className="rounded-xl border border-slate-300 bg-slate-50 p-4">
+                      <p className="font-black text-slate-950">{event.day}</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-600">{event.time}</p>
+                      <a href={calendarUrl} className="mt-3 inline-flex items-center gap-2 text-sm font-black text-blue-700 underline decoration-blue-300 underline-offset-4 hover:text-blue-900">
+                        <span aria-hidden="true">＋</span> Add to calendar
+                      </a>
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Listed by</p>
+              <div className="mt-4 flex items-center gap-4">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-blue-50 text-2xl font-black text-blue-700" aria-hidden="true">NM</div>
+                <div>
+                  <h2 className="text-xl font-black text-slate-950">Nolan MacFarlane</h2>
+                  <p className="mt-1 text-sm font-bold text-slate-600">eXp Realty of Northern California, Inc.</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-500">CA DRE #02231070</p>
+                </div>
+              </div>
+              <Link href={`/login?next=/listing/${slug}`} className="mt-5 block rounded-full border-2 border-blue-600 px-5 py-3 text-center font-black text-blue-700 hover:bg-blue-50">Contact listing agent</Link>
+            </section>
+
+            <ListingEngagement slug={slug} address={home.address} />
           </aside>
         </div>
       </div>
