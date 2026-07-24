@@ -62,7 +62,7 @@ export default function AgentEarningsCalculator() {
               type="range"
               min="0"
               max="100"
-              step="5"
+              step="1"
               value={extendedAgents}
               onChange={(event) => setExtendedAgents(Number(event.target.value))}
               className="mt-3 h-2 w-full cursor-pointer accent-blue-600"
