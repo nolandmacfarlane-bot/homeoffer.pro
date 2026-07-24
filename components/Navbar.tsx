@@ -114,7 +114,7 @@ export default function Navbar() {
   const marketingLinks = [
     { key: 'homes', label: 'Homes', href: '/' },
     { key: 'how-it-works', label: 'How It Works', href: '/how-it-works' },
-    { key: 'list-property', label: 'List a Property', href: '/seller/create-listing' },
+    { key: 'list-property', label: 'List a Property', href: '/list-property' },
     { key: 'agent-partners', label: 'Grow Your Network', href: '/#agent-partners' },
     { key: 'faq', label: 'FAQ', href: '/#faq' },
   ]
