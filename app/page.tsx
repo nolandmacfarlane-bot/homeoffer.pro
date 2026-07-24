@@ -4,12 +4,12 @@ import Navbar from '@/components/Navbar'
 import AgentEarningsCalculator from '@/components/AgentEarningsCalculator'
 
 const listings = [
-  { city: 'Granite Bay, CA', address: '8575 Hidden Lakes Drive', beds: 5, baths: 4, sqft: '4,218', offer: 612500, time: '18h 42m', hours: 18, crop: 'object-[70%_center]' },
-  { city: 'Rocklin, CA', address: '1642 Poppy Circle', beds: 5, baths: 3, sqft: '2,729', offer: 438000, time: '2d 08h', hours: 56, crop: 'object-[82%_center]' },
-  { city: 'Folsom, CA', address: '1064 Empire Mine Road', beds: 3, baths: 3, sqft: '2,184', offer: 526500, time: '4d 14h', hours: 110, crop: 'object-center' },
-  { city: 'Roseville, CA', address: '2289 Pleasant Grove Blvd', beds: 4, baths: 3, sqft: '2,956', offer: 574000, time: '6d 03h', hours: 147, crop: 'object-[60%_center]' },
-  { city: 'Loomis, CA', address: '6120 Colwell Lane', beds: 4, baths: 4, sqft: '3,604', offer: 697500, time: '8d 19h', hours: 211, crop: 'object-[75%_center]' },
-  { city: 'Auburn, CA', address: '3390 Vista Robles Way', beds: 3, baths: 2, sqft: '2,310', offer: 459000, time: '10d 11h', hours: 251, crop: 'object-left' },
+  { slug: '8575-hidden-lakes-drive', city: 'Granite Bay, CA', address: '8575 Hidden Lakes Drive', beds: 5, baths: 4, sqft: '4,218', offer: 612500, time: '18h 42m', hours: 18, crop: 'object-[70%_center]' },
+  { slug: '1642-poppy-circle', city: 'Rocklin, CA', address: '1642 Poppy Circle', beds: 5, baths: 3, sqft: '2,729', offer: 438000, time: '2d 08h', hours: 56, crop: 'object-[82%_center]' },
+  { slug: '1064-empire-mine-road', city: 'Folsom, CA', address: '1064 Empire Mine Road', beds: 3, baths: 3, sqft: '2,184', offer: 526500, time: '4d 14h', hours: 110, crop: 'object-center' },
+  { slug: '2289-pleasant-grove-blvd', city: 'Roseville, CA', address: '2289 Pleasant Grove Blvd', beds: 4, baths: 3, sqft: '2,956', offer: 574000, time: '6d 03h', hours: 147, crop: 'object-[60%_center]' },
+  { slug: '6120-colwell-lane', city: 'Loomis, CA', address: '6120 Colwell Lane', beds: 4, baths: 4, sqft: '3,604', offer: 697500, time: '8d 19h', hours: 211, crop: 'object-[75%_center]' },
+  { slug: '3390-vista-robles-way', city: 'Auburn, CA', address: '3390 Vista Robles Way', beds: 3, baths: 2, sqft: '2,310', offer: 459000, time: '10d 11h', hours: 251, crop: 'object-left' },
 ].sort((a, b) => a.hours - b.hours)
 
 const money = (amount: number) => amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
@@ -42,15 +42,15 @@ export default function HomePage() {
 
             return (
               <article key={home.address} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-950/10">
-                <div className="relative h-56 overflow-hidden rounded-xl bg-slate-200">
+                <Link href={`/listing/${home.slug}`} className="relative block h-56 overflow-hidden rounded-xl bg-slate-200" aria-label={`View ${home.address}`}>
                   <Image src="/homeoffer-hero.webp" alt={`${home.address}, ${home.city}`} fill sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" className={`object-cover transition duration-500 group-hover:scale-[1.03] ${home.crop}`} />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 to-transparent px-5 pb-5 pt-14 text-white">
                     <span className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-black"><span aria-hidden="true">◷</span>{home.time} left</span>
                   </div>
-                </div>
+                </Link>
 
                 <div className="pt-4">
-                  <h2 className="text-lg font-black tracking-tight">{home.address}</h2>
+                  <h2 className="text-lg font-black tracking-tight"><Link href={`/listing/${home.slug}`} className="hover:text-blue-700">{home.address}</Link></h2>
                   <p className="mt-1 text-sm font-medium text-slate-500">{home.city}</p>
                   <p className="mt-2 text-sm text-slate-600">{home.beds} beds · {home.baths} baths · {home.sqft} sq ft</p>
 
@@ -67,7 +67,7 @@ export default function HomePage() {
                   </div>
 
                   <div className="mt-4 flex items-center justify-between gap-3">
-                    <Link href="/properties" className="font-black text-blue-700 hover:text-blue-900">View property →</Link>
+                    <Link href={`/listing/${home.slug}`} className="font-black text-blue-700 hover:text-blue-900">View property →</Link>
                     <Link href="/login" className="rounded-full bg-[#0b1220] px-4 py-2 text-sm font-black text-white hover:bg-blue-600">Submit offer</Link>
                   </div>
                 </div>
