@@ -197,6 +197,7 @@ export default function HomePage() {
               ['How much does the next offer increase?', 'Offers move in clear $500 increments.'],
               ['What is the buyer’s premium?', 'The buyer’s premium is 3% of the accepted offer. It is added to the offer to calculate the total price and includes the platform fee and buyer-agent compensation.'],
               ['Can the seller accept or reject an offer?', 'Yes. The seller retains the right to accept, reject or counter an offer according to the listing terms.'],
+              ['What happens if the home does not sell through HomeOffer.pro?', 'The seller will not owe the 0.5% platform fee on a later off-platform sale. The seller may choose either $1,000 when the HomeOffer.pro campaign ends without a sale or $2,000 only when the property later closes escrow. The selected option is confirmed in the signed listing documents.'],
             ].map(([question, answer]) => (
               <details key={question} className="group py-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-black"><span>{question}</span><span className="text-xl text-blue-600 group-open:rotate-45">+</span></summary>
