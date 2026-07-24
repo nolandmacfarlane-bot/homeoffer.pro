@@ -85,7 +85,7 @@ export default async function HomePage({
 
                   <div className="mt-4 flex items-center justify-between gap-3">
                     <Link href={`/listing/${home.slug}`} className="font-black text-blue-700 hover:text-blue-900">View property →</Link>
-                    <Link href="/login" className="rounded-full bg-[#0b1220] px-4 py-2 text-sm font-black text-white hover:bg-blue-600">Submit offer</Link>
+                    <Link href="/login" className="rounded-full bg-red-600 px-4 py-2 text-sm font-black text-white transition hover:bg-red-700">Submit offer</Link>
                   </div>
                 </div>
               </article>
