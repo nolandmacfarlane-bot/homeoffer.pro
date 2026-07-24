@@ -29,7 +29,7 @@ export default function AgentEarningsCalculator() {
           Calculate your potential yearly earnings
         </h3>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-          Move the sliders to see how direct and extended partner closings could add up over one year.
+          Move the sliders to see how Tier 1 and Tier 2 agent closings could add up over one year.
         </p>
       </div>
 
@@ -37,8 +37,8 @@ export default function AgentEarningsCalculator() {
         <div className="space-y-7">
           <label className="block">
             <span className="flex items-center justify-between gap-4">
-              <span className="font-black text-slate-900">Direct partner agents</span>
-              <output className="min-w-16 rounded-lg bg-blue-50 px-3 py-1.5 text-center font-black text-blue-700">{directAgents}</output>
+              <span className="font-black text-slate-900">Tier 1 agents</span>
+              <output className="min-w-16 rounded-lg bg-blue-600 px-3 py-1.5 text-center font-black text-white shadow-md shadow-blue-600/25">{directAgents}</output>
             </span>
             <input
               type="range"
@@ -48,45 +48,45 @@ export default function AgentEarningsCalculator() {
               value={directAgents}
               onChange={(event) => setDirectAgents(Number(event.target.value))}
               className="mt-3 h-2 w-full cursor-pointer accent-blue-600"
-              aria-label="Number of direct partner agents"
+              aria-label="Number of Tier 1 agents"
             />
-            <span className="mt-2 flex justify-between text-xs font-bold text-slate-500"><span>0</span><span>50 agents</span></span>
+            <span className="mt-2 block text-right text-xs font-bold text-blue-700">50 agents</span>
           </label>
 
           <label className="block">
             <span className="flex items-center justify-between gap-4">
-              <span className="font-black text-slate-900">Extended network agents</span>
-              <output className="min-w-16 rounded-lg bg-slate-100 px-3 py-1.5 text-center font-black text-slate-900">{extendedAgents}</output>
+              <span className="font-black text-slate-900">Tier 2 agents</span>
+              <output className="min-w-16 rounded-lg bg-blue-600 px-3 py-1.5 text-center font-black text-white shadow-md shadow-blue-600/25">{extendedAgents}</output>
             </span>
             <input
               type="range"
               min="0"
-              max="250"
+              max="100"
               step="5"
               value={extendedAgents}
               onChange={(event) => setExtendedAgents(Number(event.target.value))}
-              className="mt-3 h-2 w-full cursor-pointer accent-slate-950"
-              aria-label="Number of extended network agents"
+              className="mt-3 h-2 w-full cursor-pointer accent-blue-600"
+              aria-label="Number of Tier 2 agents"
             />
-            <span className="mt-2 flex justify-between text-xs font-bold text-slate-500"><span>0</span><span>250 agents</span></span>
+            <span className="mt-2 block text-right text-xs font-bold text-blue-700">100 agents</span>
           </label>
 
           <label className="block">
             <span className="flex items-center justify-between gap-4">
               <span className="font-black text-slate-900">Average closings per agent each year</span>
-              <output className="min-w-16 rounded-lg bg-slate-100 px-3 py-1.5 text-center font-black text-slate-900">{closingsPerAgent}</output>
+              <output className="min-w-16 rounded-lg bg-blue-600 px-3 py-1.5 text-center font-black text-white shadow-md shadow-blue-600/25">{closingsPerAgent}</output>
             </span>
             <input
               type="range"
               min="1"
-              max="12"
+              max="25"
               step="1"
               value={closingsPerAgent}
               onChange={(event) => setClosingsPerAgent(Number(event.target.value))}
-              className="mt-3 h-2 w-full cursor-pointer accent-slate-950"
+              className="mt-3 h-2 w-full cursor-pointer accent-blue-600"
               aria-label="Average closings per agent each year"
             />
-            <span className="mt-2 flex justify-between text-xs font-bold text-slate-500"><span>1 closing</span><span>12 closings</span></span>
+            <span className="mt-2 block text-right text-xs font-bold text-blue-700">25 closings</span>
           </label>
         </div>
 
@@ -96,11 +96,11 @@ export default function AgentEarningsCalculator() {
 
           <dl className="mt-7 space-y-3 border-t border-slate-700 pt-5 text-sm">
             <div className="flex justify-between gap-4">
-              <dt className="text-slate-300">Direct partner rewards</dt>
+              <dt className="text-slate-300">Tier 1 rewards</dt>
               <dd className="font-black">{currency.format(directEarnings)}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-slate-300">Extended network rewards</dt>
+              <dt className="text-slate-300">Tier 2 rewards</dt>
               <dd className="font-black">{currency.format(extendedEarnings)}</dd>
             </div>
           </dl>
