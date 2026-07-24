@@ -30,6 +30,27 @@ export default function ListPropertyPage() {
           ))}
         </div>
 
+        <section className="mt-12 overflow-hidden rounded-3xl border border-slate-200 bg-white">
+          <div className="border-b border-slate-200 px-7 py-6 sm:px-9">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-600">No-sale protection</p>
+            <h2 className="mt-2 text-3xl font-black tracking-[-0.03em]">If your home does not sell through HomeOffer.pro</h2>
+            <p className="mt-3 max-w-3xl leading-7 text-slate-600">You will not owe the 0.5% platform fee on a later off-platform sale. Instead, choose one of these two simple options:</p>
+          </div>
+          <div className="grid gap-5 p-7 sm:grid-cols-2 sm:p-9">
+            <div className="rounded-2xl border-2 border-blue-600 bg-blue-50 p-6">
+              <p className="text-sm font-black uppercase tracking-[0.12em] text-blue-700">Option 1</p>
+              <p className="mt-3 text-4xl font-black text-slate-950">$1,000</p>
+              <p className="mt-2 font-bold text-slate-700">Paid when the HomeOffer.pro campaign ends without a sale.</p>
+            </div>
+            <div className="rounded-2xl border border-slate-300 bg-white p-6">
+              <p className="text-sm font-black uppercase tracking-[0.12em] text-slate-600">Option 2</p>
+              <p className="mt-3 text-4xl font-black text-slate-950">$2,000</p>
+              <p className="mt-2 font-bold text-slate-700">Paid only when the property later closes escrow.</p>
+            </div>
+          </div>
+          <p className="border-t border-slate-200 px-7 py-4 text-xs leading-5 text-slate-500 sm:px-9">The selected option and payment terms will be confirmed in the signed listing documents before launch.</p>
+        </section>
+
         <section className="mt-12 rounded-3xl bg-slate-950 p-8 text-white sm:p-10">
           <h2 className="text-3xl font-black">What you will need</h2>
           <ul className="mt-6 grid gap-4 text-sm font-bold text-slate-200 sm:grid-cols-2">
