@@ -98,15 +98,12 @@ export default async function HomePage({
         <div className="mx-auto max-w-7xl">
           <div className="grid items-start gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
             <div>
-              <span className="inline-flex rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-blue-700">
-                Built for agents
-              </span>
-              <h2 className="mt-5 text-4xl font-black tracking-[-0.04em] text-slate-950 sm:text-5xl">
+              <h2 className="text-4xl font-black tracking-[-0.04em] text-slate-950 sm:text-5xl">
                 Grow your business.<br />
                 <span className="text-blue-600">Grow your network.</span>
               </h2>
               <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">
-                Join HomeOffer for just $7 a month, bring listings to a more transparent marketplace and earn partner rewards when agents in your network close real transactions.
+                Join HomeOffer.pro for just $7 a month, bring listings to a different, more proactive sales approach and earn partner rewards when agents in your network close transactions.
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
@@ -140,7 +137,7 @@ export default async function HomePage({
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-600">Agent Partner Program</p>
-                    <h3 className="mt-1 text-2xl font-black text-slate-950">Two levels. One simple goal.</h3>
+                    <h3 className="mt-1 text-2xl font-black text-slate-950">Two tiers. One simple goal.</h3>
                   </div>
                   <span className="rounded-full bg-slate-950 px-3 py-1.5 text-xs font-black text-white">Rewards after closing</span>
                 </div>
@@ -159,8 +156,8 @@ export default async function HomePage({
                       <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white">1</div>
                       <span className="text-2xl font-black text-blue-700">$250</span>
                     </div>
-                    <p className="mt-5 text-sm font-bold text-blue-700">Direct partner</p>
-                    <p className="mt-1 text-sm leading-5 text-slate-600">An agent you introduced closes a HomeOffer transaction.</p>
+                    <p className="mt-5 text-sm font-bold text-blue-700">Tier 1</p>
+                    <p className="mt-1 text-sm leading-5 text-slate-600">An agent you introduced closes a HomeOffer.pro transaction.</p>
                   </div>
 
                   <div className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -168,8 +165,8 @@ export default async function HomePage({
                       <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-200 text-sm font-black text-slate-700">2</div>
                       <span className="text-2xl font-black text-slate-950">$75</span>
                     </div>
-                    <p className="mt-5 text-sm font-bold text-slate-800">Extended network</p>
-                    <p className="mt-1 text-sm leading-5 text-slate-600">Their direct partner closes a HomeOffer transaction.</p>
+                    <p className="mt-5 text-sm font-bold text-slate-800">Tier 2</p>
+                    <p className="mt-1 text-sm leading-5 text-slate-600">An agent in your Tier 2 network closes a HomeOffer.pro transaction.</p>
                   </div>
                 </div>
 
