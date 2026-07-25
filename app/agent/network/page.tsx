@@ -266,6 +266,9 @@ export default function AgentNetworkPage() {
                   </>
                 ) : (
                   <>
+                    <Link href="/agent/listing-builder" className="rounded-xl bg-blue-600 px-5 py-3 font-black text-white">
+                      Create property listing
+                    </Link>
                     <Link href="/agent/dashboard" className="rounded-xl border-2 border-slate-300 px-5 py-3 font-black text-slate-900">
                       Listing dashboard
                     </Link>
