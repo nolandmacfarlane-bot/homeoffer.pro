@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import AgentEarningsCalculator from '@/components/AgentEarningsCalculator'
+import NetworkContinuity from '@/components/NetworkContinuity'
 
 const listings = [
   { slug: '8575-hidden-lakes-drive', city: 'Granite Bay, CA', address: '8575 Hidden Lakes Drive', beds: 5, baths: 4, sqft: '4,218', offer: 612500, time: '18h 42m', hours: 18, crop: 'object-[70%_center]' },
@@ -195,6 +196,7 @@ export default async function HomePage({
             </div>
           </div>
 
+          <NetworkContinuity />
           <AgentEarningsCalculator />
         </div>
       </section>
