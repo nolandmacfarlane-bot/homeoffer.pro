@@ -105,7 +105,13 @@ export default function AgentDashboard() {
               </h1>
               <p className="text-gray-600 mt-1">Manage your properties & offers</p>
             </div>
-            <div className="space-x-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <Link
+                href="/agent/listing-builder"
+                className="rounded-full bg-blue-600 px-5 py-2.5 font-black text-white hover:bg-blue-700"
+              >
+                Create property listing
+              </Link>
               <Link
                 href="/agent/network"
                 className="text-indigo-700 hover:text-indigo-900 font-semibold"
