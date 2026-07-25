@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import ListingEngagement from '@/components/ListingEngagement'
+import AddToCalendar from '@/components/AddToCalendar'
 
 const homes: Record<string, {
   address: string
@@ -189,9 +190,13 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                     <div key={event.start} className="rounded-xl border border-slate-300 bg-slate-50 p-4">
                       <p className="font-black text-slate-950">{event.day}</p>
                       <p className="mt-1 text-sm font-semibold text-slate-600">{event.time}</p>
-                      <a href={calendarUrl} className="mt-3 inline-flex items-center gap-2 text-sm font-black text-blue-700 underline decoration-blue-300 underline-offset-4 hover:text-blue-900">
-                        <span aria-hidden="true">＋</span> Add to calendar
-                      </a>
+                      <AddToCalendar
+                        title={`Open House: ${home.address}`}
+                        location={`${home.address}, ${home.city} ${home.zip}`}
+                        start={event.start}
+                        end={event.end}
+                        appleUrl={calendarUrl}
+                      />
                     </div>
                   )
                 })}
