@@ -234,6 +234,17 @@ export default function AgentNetworkPage() {
     ? `https://homeoffer.pro/signup?ref=${user.referral_code}`
     : 'Available after the database setup is completed'
 
+  const memberStart = user?.created_at ? new Date(user.created_at) : null
+  const monthsAsMember = memberStart
+    ? Math.max(1, (new Date().getFullYear() - memberStart.getFullYear()) * 12 + new Date().getMonth() - memberStart.getMonth() + 1)
+    : 0
+  const memberDuration = memberStart
+    ? `${monthsAsMember} ${monthsAsMember === 1 ? 'month' : 'months'}`
+    : 'Not available'
+  const memberSince = memberStart
+    ? memberStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    : 'Membership date unavailable'
+
   if (loading) {
     return <div className="min-h-screen bg-slate-50 flex items-center justify-center">Loading agent hub…</div>
   }
@@ -303,8 +314,9 @@ export default function AgentNetworkPage() {
             </div>
           )}
 
-          <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
             {[
+              ['HomeOffer.pro member', publicPreview ? '6 months' : memberDuration, publicPreview ? 'Example membership length' : `Since ${memberSince}`],
               ['Your closed homes', publicPreview ? '12' : closedUnits.toString(), publicPreview ? 'Example production record' : 'Recorded from your listings'],
               ['Tier 1 agents', publicPreview ? '10' : tierOne.length.toString(), publicPreview ? '60 example closed homes' : `${tierOne.reduce((sum, agent) => sum + agent.closedUnits, 0)} closed homes`],
               ['Tier 2 agents', publicPreview ? '20' : tierTwo.length.toString(), publicPreview ? '120 example closed homes' : `${tierTwo.reduce((sum, agent) => sum + agent.closedUnits, 0)} closed homes`],
