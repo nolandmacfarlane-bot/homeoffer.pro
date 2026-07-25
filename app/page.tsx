@@ -21,7 +21,6 @@ export default async function HomePage({
 }) {
   const { sort = 'ending' } = await searchParams
   const orderedListings = [...listings].sort((a, b) => {
-    if (sort === 'highest') return b.offer - a.offer
     if (sort === 'newest') return b.hours - a.hours
     return a.hours - b.hours
   })
@@ -43,11 +42,14 @@ export default async function HomePage({
             <div className="mt-4 flex flex-wrap gap-2">
             <Link href="/?sort=ending#homes" className={sortLinkClass('ending')} aria-current={sort === 'ending' ? 'true' : undefined}>Ending soon</Link>
             <Link href="/?sort=newest#homes" className={sortLinkClass('newest')} aria-current={sort === 'newest' ? 'true' : undefined}>Newly listed</Link>
-            <Link href="/?sort=highest#homes" className={sortLinkClass('highest')} aria-current={sort === 'highest' ? 'true' : undefined}>Highest offer</Link>
             </div>
           </div>
           <div className="flex flex-col items-start gap-2 md:items-end">
-            <p className="text-sm font-semibold text-slate-500"><span className="font-black text-slate-950">{listings.length}</span> active properties · 11 days · $500 increments</p>
+            <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm font-black text-slate-700">
+              <span>• 11-day offer period</span>
+              <span>• $500 increments</span>
+              <span>• Free to submit offers</span>
+            </div>
             <Link href="/properties" className="text-sm font-black text-blue-700 hover:text-blue-900">View all properties →</Link>
           </div>
         </div>
@@ -110,10 +112,7 @@ export default async function HomePage({
                 <Link href="/signup?role=agent" className="rounded-full bg-blue-600 px-6 py-3 font-black text-white transition hover:bg-blue-700">
                   Join for $7/month
                 </Link>
-                <Link href="/#agent-program-details" className="rounded-full border border-slate-300 bg-white px-6 py-3 font-black text-slate-900 transition hover:border-blue-300 hover:text-blue-700">
-                  See how rewards work
-                </Link>
-                <Link href="/#agent-earnings-calculator" className="rounded-full bg-slate-950 px-6 py-3 font-black text-white transition hover:bg-blue-600">
+                <Link href="/#agent-earnings-calculator" className="rounded-full border border-slate-300 bg-white px-6 py-3 font-black text-slate-900 transition hover:border-blue-300 hover:text-blue-700">
                   Calculate Your Earnings
                 </Link>
               </div>
@@ -139,7 +138,7 @@ export default async function HomePage({
                     <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-600">Agent Partner Program</p>
                     <h3 className="mt-1 text-2xl font-black text-slate-950">Two tiers. One simple goal.</h3>
                   </div>
-                  <span className="rounded-full bg-slate-950 px-3 py-1.5 text-xs font-black text-white">Rewards after closing</span>
+                  <span className="border border-blue-200 border-l-4 border-l-blue-600 bg-blue-50 px-3 py-2 text-xs font-black text-blue-800">Rewards are earned after closing</span>
                 </div>
               </div>
 
