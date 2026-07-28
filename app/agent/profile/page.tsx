@@ -127,51 +127,66 @@ export default function AgentProfilePage() {
       <main className="min-h-screen bg-slate-50 text-slate-950">
         <section className="border-b border-slate-200 bg-white">
           <div className="mx-auto max-w-6xl px-4 py-9 sm:px-6 lg:px-8">
-            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-              <div>
-                <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">
-                  Agent account
-                </p>
-                <h1 className="mt-2 text-4xl font-black tracking-[-0.04em]">
-                  Welcome, {formData.first_name || 'Agent'}
-                </h1>
-                <p className="mt-2 text-lg text-slate-600">
-                  Everything you need is organized below.
-                </p>
-              </div>
-              <Link
-                href="/settings"
-                className="font-black text-blue-700 hover:text-blue-900"
-              >
-                Account settings &amp; sign out →
-              </Link>
-            </div>
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">
+              Agent account
+            </p>
+            <h1 className="mt-2 text-4xl font-black tracking-[-0.04em]">
+              Agent Dashboard
+            </h1>
+            <p className="mt-2 text-lg text-slate-600">
+              Welcome, {formData.first_name || 'Agent'}. Choose what you want to do.
+            </p>
           </div>
         </section>
 
         <div className="mx-auto max-w-6xl space-y-7 px-4 py-8 sm:px-6 lg:px-8">
-          <nav aria-label="Agent account shortcuts" className="grid gap-4 md:grid-cols-3">
-            <AccountLink
+          <nav aria-label="Agent dashboard menu" className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <DashboardLink
               number="01"
-              title="My listings"
-              description="See your properties, offers and listing activity."
-              href="/agent/dashboard"
+              title="Agent information"
+              description="View or edit your personal, brokerage, phone and license information."
+              href="#agent-information"
             />
-            <AccountLink
+            <DashboardLink
               number="02"
               title="Post a property"
-              description="Start a new property listing and save your draft."
+              description="Create a new property listing and save your work as a draft."
               href="/agent/listing-builder"
             />
-            <AccountLink
+            <DashboardLink
               number="03"
+              title="My listings"
+              description="See the properties you posted, listing activity and offers."
+              href="/agent/dashboard"
+            />
+            <DashboardLink
+              number="04"
               title="Organization & network"
-              description="View your Tier 1, Tier 2, production and rewards."
+              description="See your Tier 1 and Tier 2 agents and your organization."
               href="/agent/network"
+            />
+            <DashboardLink
+              number="05"
+              title="Earnings & production"
+              description="Review closed homes, production totals and eligible rewards."
+              href="/agent/network"
+            />
+            <DashboardLink
+              number="06"
+              title="Notifications & account settings"
+              description="Manage notifications, privacy, account security and sign out."
+              href="/settings"
+            />
+            <DashboardLink
+              number="07"
+              title="Back to live listings"
+              description="Return to the HomeOffer.pro property marketplace."
+              href="/"
+              last
             />
           </nav>
 
-          <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <section id="agent-information" className="scroll-mt-28 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <div className="flex flex-col justify-between gap-4 border-b border-slate-200 px-6 py-6 sm:flex-row sm:items-center sm:px-8">
               <div>
                 <h2 className="text-2xl font-black">Your agent information</h2>
@@ -269,28 +284,38 @@ export default function AgentProfilePage() {
   )
 }
 
-function AccountLink({
+function DashboardLink({
   number,
   title,
   description,
   href,
+  last = false,
 }: {
   number: string
   title: string
   description: string
   href: string
+  last?: boolean
 }) {
   return (
     <Link
       href={href}
-      className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+      className={`group flex min-h-24 items-center gap-4 px-5 py-5 transition hover:bg-blue-50 sm:gap-6 sm:px-8 ${last ? '' : 'border-b border-slate-200'}`}
     >
-      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white">
         {number}
       </span>
-      <h2 className="mt-5 text-xl font-black group-hover:text-blue-700">{title}</h2>
-      <p className="mt-2 leading-6 text-slate-600">{description}</p>
-      <p className="mt-5 font-black text-blue-700">Open →</p>
+      <span className="min-w-0 flex-1">
+        <span className="block text-lg font-black text-slate-950 group-hover:text-blue-700 sm:text-xl">
+          {title}
+        </span>
+        <span className="mt-1 block text-sm leading-6 text-slate-600 sm:text-base">
+          {description}
+        </span>
+      </span>
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-slate-300 text-2xl font-black text-blue-700 transition group-hover:border-blue-600 group-hover:bg-blue-600 group-hover:text-white" aria-hidden="true">
+        →
+      </span>
     </Link>
   )
 }
