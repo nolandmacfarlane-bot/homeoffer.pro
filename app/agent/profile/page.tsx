@@ -40,15 +40,18 @@ export default function AgentProfilePage() {
         return
       }
 
-      setUser(currentUser)
+      const { data: authData } = await supabase.auth.getUser()
+      const metadata = authData.user?.user_metadata || {}
+
+      setUser({ ...currentUser, ...metadata })
       setFormData({
-        first_name: currentUser.first_name || '',
-        last_name: currentUser.last_name || '',
-        email: currentUser.email || '',
-        phone_number: currentUser.phone_number || '',
-        dre_license_number: currentUser.dre_license_number || '',
-        broker_name: currentUser.broker_name || '',
-        broker_dre_number: currentUser.broker_dre_number || '',
+        first_name: currentUser.first_name || metadata.first_name || '',
+        last_name: currentUser.last_name || metadata.last_name || '',
+        email: currentUser.email || authData.user?.email || '',
+        phone_number: currentUser.phone_number || metadata.phone_number || '',
+        dre_license_number: currentUser.dre_license_number || metadata.dre_license_number || '',
+        broker_name: currentUser.broker_name || metadata.broker_name || '',
+        broker_dre_number: currentUser.broker_dre_number || metadata.broker_dre_number || '',
       })
     } catch (err) {
       console.error('Error:', err)
@@ -61,20 +64,34 @@ export default function AgentProfilePage() {
   async function handleSaveProfile() {
     setSaving(true)
     try {
+      const profileDetails = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        phone_number: formData.phone_number,
+        dre_license_number: formData.dre_license_number,
+        broker_name: formData.broker_name,
+        broker_dre_number: formData.broker_dre_number,
+      }
+
+      const { error: metadataError } = await supabase.auth.updateUser({
+        data: profileDetails,
+      })
+      if (metadataError) throw metadataError
+
       const { error } = await supabase
         .from('users')
-        .update({
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          phone_number: formData.phone_number,
-          dre_license_number: formData.dre_license_number,
-          broker_name: formData.broker_name,
-          broker_dre_number: formData.broker_dre_number,
-        })
+        .update(profileDetails)
         .eq('id', user.id)
 
-      if (error) throw error
+      const isMissingAgentColumn =
+        error?.message?.includes('schema cache') &&
+        ['phone_number', 'dre_license_number', 'broker_name', 'broker_dre_number'].some(
+          (field) => error.message.includes(field)
+        )
 
+      if (error && !isMissingAgentColumn) throw error
+
+      setUser({ ...user, ...profileDetails })
       alert('✅ Profile updated successfully!')
       setEditing(false)
       await loadProfile()
