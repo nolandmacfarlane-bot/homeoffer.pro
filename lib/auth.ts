@@ -25,14 +25,37 @@ export async function signUp(email: string, password: string, userData: {
       first_name: userData.first_name,
       last_name: userData.last_name,
       user_type: userData.user_type,
-      phone_number: userData.phone_number || null,
-      dre_license_number: userData.dre_license_number || null,
-      broker_name: userData.broker_name || null,
-      broker_dre_number: userData.broker_dre_number || null,
       sms_opt_in: userData.sms_opt_in ?? false,
     })
 
   if (profileError) throw profileError
+
+  if (userData.user_type === 'agent') {
+    const agentDetails = {
+      phone_number: userData.phone_number || '',
+      dre_license_number: userData.dre_license_number || '',
+      broker_name: userData.broker_name || '',
+      broker_dre_number: userData.broker_dre_number || '',
+    }
+
+    const { error: metadataError } = await supabase.auth.updateUser({
+      data: agentDetails,
+    })
+    if (metadataError) throw metadataError
+
+    const { error: agentProfileError } = await supabase
+      .from('users')
+      .update(agentDetails)
+      .eq('id', data.user?.id)
+
+    const missingAgentColumn =
+      agentProfileError?.message?.includes('schema cache') &&
+      ['phone_number', 'dre_license_number', 'broker_name', 'broker_dre_number'].some(
+        (field) => agentProfileError.message.includes(field)
+      )
+
+    if (agentProfileError && !missingAgentColumn) throw agentProfileError
+  }
 
   return data
 }
