@@ -163,7 +163,7 @@ export default function SignupPage() {
 
         {agentSignup && (
           <div className="mb-5 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-900">
-            Agent membership is $7 per month. Your license information is required so we can verify your account.
+            Creating an agent account is free. The $7 monthly listing membership is only required when you are ready to publish a property.
           </div>
         )}
 
