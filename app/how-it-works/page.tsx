@@ -10,108 +10,43 @@ export const metadata: Metadata = {
 
 const audiences = [
   {
-    number: '01',
     name: 'For buyers',
-    headline: 'Shop with more context and less guesswork.',
-    intro:
-      'HomeOffer.pro puts the information buyers need to act confidently in one place.',
-    benefits: [
-      {
-        title: 'See opportunities immediately',
-        copy: 'Active homes appear first, so buyers can browse naturally instead of landing on an empty search screen.',
-      },
-      {
-        title: 'Understand the full price',
-        copy: 'The leading offer, buyer’s premium and estimated total price are shown separately before a buyer submits an offer.',
-      },
-      {
-        title: 'Plan the next step',
-        copy: 'Open-house dates, property details, time remaining and agent contact information are easy to find from the listing.',
-      },
+    bullets: [
+      'See the leading offer and estimated total price',
+      'Find open houses and deadlines quickly',
+      'Use your own real estate agent',
     ],
   },
   {
-    number: '02',
     name: 'For sellers',
-    headline: 'Create a focused moment around the sale.',
-    intro:
-      'A defined offer period gives the property a clear launch, timeline and call to action.',
-    benefits: [
-      {
-        title: 'Concentrated market attention',
-        copy: 'An 11-day offer period can bring interested buyers into the same decision window instead of letting the listing drift.',
-      },
-      {
-        title: 'A low starting point can invite interest',
-        copy: 'The pricing strategy is designed to encourage discovery and participation while the seller retains the rights stated in the listing agreement.',
-      },
-      {
-        title: 'A fairer no-sale choice',
-        copy: 'If the campaign does not produce a sale, the seller selects the agreed $1,000 campaign-end option or $2,000 close-of-escrow option—not a later 0.5% platform fee on an off-platform sale.',
-      },
+    bullets: [
+      'Create urgency with an 11-day offer period',
+      'Attract attention with a low starting offer',
+      'Accept, reject or counter any offer',
     ],
   },
   {
-    number: '03',
     name: 'For listing agents',
-    headline: 'Run a more organized listing campaign.',
-    intro:
-      'The listing, timeline and buyer activity are presented through one repeatable process.',
-    benefits: [
-      {
-        title: 'One clear campaign hub',
-        copy: 'Photos, property facts, open houses, pricing and contact details can be presented together instead of across disconnected messages.',
-      },
-      {
-        title: 'Clear expectations for buyers',
-        copy: 'The offer window and $500 increments make the next action easier to explain to every interested party.',
-      },
-      {
-        title: 'More useful conversations',
-        copy: 'When buyers can review the basics first, agents can spend more time on property-specific questions, qualification and representation.',
-      },
+    bullets: [
+      'Manage one organized listing campaign',
+      'Keep photos, dates and pricing together',
+      'Spend less time repeating basic information',
     ],
   },
   {
-    number: '04',
     name: 'For buyer agents',
-    headline: 'Stay central to the buyer’s decision.',
-    intro:
-      'HomeOffer.pro is built to support representation—not route buyers around their agent.',
-    benefits: [
-      {
-        title: 'Representation stays visible',
-        copy: 'The buyer-agent role is addressed in the offer process so buyers know when and how their agent participates.',
-      },
-      {
-        title: 'Compensation is explained',
-        copy: 'The pricing breakdown shows that the buyer’s premium includes the platform fee and buyer-agent compensation, subject to the parties’ written agreements.',
-      },
-      {
-        title: 'A shared source of information',
-        copy: 'The buyer and agent can review the same listing details, offer status, deadlines and open-house schedule before deciding what to do next.',
-      },
+    bullets: [
+      'Stay involved throughout the offer process',
+      'Review the same information as your buyer',
+      'Keep compensation clearly explained',
     ],
   },
   {
-    number: '05',
     name: 'For brokers',
-    headline: 'Bring consistency to a process that is usually fragmented.',
-    intro:
-      'A structured marketplace can help a brokerage oversee how participating agents present and manage campaigns.',
-    benefits: [
-      {
-        title: 'A repeatable workflow',
-        copy: 'Standard steps for listings, open houses, pricing and offers make the process easier to train, review and improve.',
-      },
-      {
-        title: 'Broker oversight remains essential',
-        copy: 'Agent participation, compensation and marketing remain subject to licensing rules, brokerage approval and the transaction documents.',
-      },
-      {
-        title: 'Growth with accountability',
-        copy: 'Agent-network rewards are tied to eligible closed transactions—not recruiting alone—and remain subject to final broker-approved program terms.',
-      },
+    bullets: [
+      'Use a consistent process across agents',
+      'Maintain brokerage oversight',
+      'Track eligible closings and rewards',
     ],
   },
 ]
@@ -248,20 +183,16 @@ export default function HowItWorksPage() {
       </nav>
 
       <section className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
-        <div className="max-w-3xl">
+        <div className="mx-auto max-w-3xl text-center">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">
-            Built around the whole transaction
+            Who benefits?
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-[-0.035em] text-slate-950 sm:text-4xl">
-            Better information benefits everyone at the table.
+            One platform. Clear benefits for everyone.
           </h2>
-          <p className="mt-4 text-lg leading-8 text-slate-600">
-            These are the practical reasons each person can benefit from a more visible,
-            structured offer process.
-          </p>
         </div>
 
-        <div className="mt-10 space-y-6">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {audiences.map((audience) => {
             const id = audience.name.toLowerCase().replaceAll(' ', '-').replace('for-', '')
 
@@ -269,40 +200,24 @@ export default function HowItWorksPage() {
               <article
                 id={id}
                 key={audience.name}
-                className="scroll-mt-44 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
+                className="scroll-mt-44 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
               >
-                <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr]">
-                  <div>
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white">
-                      {audience.number}
-                    </span>
-                    <p className="mt-5 text-sm font-black uppercase tracking-[0.14em] text-blue-700">
-                      {audience.name}
-                    </p>
-                    <h3 className="mt-2 text-2xl font-black tracking-[-0.03em] text-slate-950 sm:text-3xl">
-                      {audience.headline}
-                    </h3>
-                    <p className="mt-4 leading-7 text-slate-600">{audience.intro}</p>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-3">
-                    {audience.benefits.map((benefit) => (
-                      <div
-                        key={benefit.title}
-                        className="rounded-2xl border border-slate-200 bg-[#f6f8fb] p-5"
+                <h3 className="text-xl font-black tracking-[-0.02em] text-slate-950">
+                  {audience.name}
+                </h3>
+                <ul className="mt-5 space-y-4">
+                  {audience.bullets.map((bullet) => (
+                    <li key={bullet} className="flex gap-3 text-sm font-bold leading-6 text-slate-600">
+                      <span
+                        aria-hidden="true"
+                        className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-black text-blue-700"
                       >
-                        <span
-                          aria-hidden="true"
-                          className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-black text-blue-700"
-                        >
-                          ✓
-                        </span>
-                        <h4 className="mt-4 text-lg font-black text-slate-950">{benefit.title}</h4>
-                        <p className="mt-2 text-sm leading-6 text-slate-600">{benefit.copy}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                        ✓
+                      </span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
               </article>
             )
           })}
