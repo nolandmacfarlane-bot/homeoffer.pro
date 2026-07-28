@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import CountdownTimer from '@/components/CountdownTimer'
+import AgentOrganizationPanel from '@/components/AgentOrganizationPanel'
 
 export default function AgentDashboard() {
   const router = useRouter()
@@ -166,6 +167,10 @@ export default function AgentDashboard() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 pt-8">
+        <AgentOrganizationPanel />
       </div>
 
       {/* Properties */}
