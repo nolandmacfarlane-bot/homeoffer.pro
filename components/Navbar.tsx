@@ -130,7 +130,7 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
-      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1800px] px-3 sm:px-6 lg:px-8">
         <div className="flex h-[74px] items-center justify-between gap-2 sm:h-[92px] sm:gap-5">
           {/* Logo - always clickable to go home/dashboard */}
           <Link 
@@ -149,7 +149,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden flex-1 items-center gap-1 lg:flex">
+          <div className="hidden min-w-0 flex-1 items-center justify-center gap-0 min-[1500px]:flex">
             {marketingLinks.map((link) => (
               <Link
                 key={link.key}
@@ -183,7 +183,7 @@ export default function Navbar() {
             ) : user ? (
               <>
                 {/* User name + avatar - Desktop */}
-                <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-100">
+                <div className="hidden 2xl:flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-100">
                   <div className="w-6 h-6 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
                     {user.first_name?.charAt(0) || '?'}
                   </div>
@@ -193,7 +193,7 @@ export default function Navbar() {
                 {/* Sign Out Button */}
                 <button
                   onClick={handleSignOut}
-                  className="hidden sm:block px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-sm transition"
+                  className="hidden whitespace-nowrap sm:block px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-sm transition"
                 >
                   Sign Out
                 </button>
@@ -212,7 +212,7 @@ export default function Navbar() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-xl hover:bg-gray-100 lg:hidden"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-xl hover:bg-gray-100 min-[1500px]:hidden"
               aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={menuOpen}
               aria-controls="mobile-navigation"
@@ -224,7 +224,7 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div id="mobile-navigation" className="space-y-2 border-t border-gray-200 pb-4 pt-4 lg:hidden">
+          <div id="mobile-navigation" className="space-y-2 border-t border-gray-200 pb-4 pt-4 min-[1500px]:hidden">
             {marketingLinks.map((link) => (
               <Link
                 key={link.key}
