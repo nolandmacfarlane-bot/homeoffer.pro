@@ -1,9 +1,29 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const activeSupabaseUrl = 'https://uokoedtpzehkryjpcbyy.supabase.co'
+const activeSupabasePublishableKey = 'sb_publishable_Lu4jrFjKQDRdT_uhPSihYA_iNltLogE'
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+const configuredUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const configuredKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const hasCurrentProjectConfiguration =
+  configuredUrl?.includes('uokoedtpzehkryjpcbyy') && Boolean(configuredKey)
+
+export const supabaseUrl = hasCurrentProjectConfiguration
+  ? configuredUrl!
+  : activeSupabaseUrl
+
+export const supabaseAnonKey = hasCurrentProjectConfiguration
+  ? configuredKey!
+  : activeSupabasePublishableKey
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    flowType: 'pkce',
+    detectSessionInUrl: true,
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+})
 
 // Database types
 export interface Property {
