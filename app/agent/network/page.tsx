@@ -276,17 +276,12 @@ export default function AgentNetworkPage() {
                     </Link>
                   </>
                 ) : (
-                  <>
-                    <Link href="/agent/listing-builder" className="rounded-xl bg-blue-600 px-5 py-3 font-black text-white">
-                      Create property listing
-                    </Link>
-                    <Link href="/agent/dashboard" className="rounded-xl border-2 border-slate-300 px-5 py-3 font-black text-slate-900">
-                      Listing dashboard
-                    </Link>
-                    <Link href="/agent/profile" className="rounded-xl bg-slate-950 px-5 py-3 font-black text-white">
-                      Agent profile
-                    </Link>
-                  </>
+                  <Link
+                    href="/agent/profile"
+                    className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-slate-300 bg-white px-6 py-3 text-base font-black text-slate-900 transition hover:border-blue-600 hover:text-blue-700"
+                  >
+                    ← Agent Dashboard
+                  </Link>
                 )}
               </div>
             </div>
