@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import ListingEngagement from '@/components/ListingEngagement'
 import AddToCalendar from '@/components/AddToCalendar'
+import OfferHistory from '@/components/OfferHistory'
 
 const homes: Record<string, {
   address: string
@@ -177,6 +178,8 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
               <p className="mt-4 text-center text-sm font-bold leading-6 text-slate-700">The seller reserves the right to accept, reject or counter any offer.</p>
               <p className="mt-3 text-center text-sm leading-6 text-slate-500">Property details shown are for the current marketplace preview and should be independently verified.</p>
             </section>
+
+            <OfferHistory address={home.address} />
 
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-2xl font-black text-slate-950">Open houses</h2>
