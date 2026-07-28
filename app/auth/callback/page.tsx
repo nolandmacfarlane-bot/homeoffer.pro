@@ -36,7 +36,7 @@ export default function AuthCallbackPage() {
         }
 
         const authUser = sessionData.session.user
-        const intendedRole = window.localStorage.getItem('homeoffer_signup_role') as AccountRole | null
+        const intendedRole: AccountRole = 'buyer'
 
         const { data: existingProfile, error: lookupError } = await supabase
           .from('users')
@@ -55,7 +55,7 @@ export default function AuthCallbackPage() {
             authUser.email?.split('@')[0] ||
             'User'
           const [firstName, ...lastNameParts] = fullName.trim().split(/\s+/)
-          accountRole = intendedRole || null
+          accountRole = intendedRole
 
           const { error: insertError } = await supabase.from('users').insert({
             id: authUser.id,
@@ -67,16 +67,6 @@ export default function AuthCallbackPage() {
           })
 
           if (insertError) throw insertError
-        } else if (intendedRole && accountRole !== intendedRole) {
-          const { error: roleError } = await supabase
-            .from('users')
-            .update({
-              user_type: intendedRole,
-            })
-            .eq('id', authUser.id)
-
-          if (roleError) throw roleError
-          accountRole = intendedRole
         }
 
         if (accountRole === 'agent') {
@@ -92,10 +82,7 @@ export default function AuthCallbackPage() {
         window.localStorage.removeItem('homeoffer_signup_role')
 
         if (!active) return
-        if (accountRole === 'seller') router.replace('/seller')
-        else if (accountRole === 'agent') router.replace('/agent/profile')
-        else if (accountRole === 'buyer') router.replace('/buyer')
-        else router.replace('/select-role')
+        router.replace('/')
       } catch (err: any) {
         if (active) setError(err.message || 'Unable to complete sign in.')
       }
