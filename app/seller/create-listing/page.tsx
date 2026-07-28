@@ -11,6 +11,7 @@ export default function CreateListingPage() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [listingBlockedReason, setListingBlockedReason] = useState('')
 
   const [formData, setFormData] = useState({
     address: '',
@@ -43,12 +44,29 @@ export default function CreateListingPage() {
       return
     }
 
+    if (currentUser.user_type === 'agent') {
+      const { data: eligibility, error: eligibilityError } = await supabase.rpc(
+        'get_agent_listing_eligibility',
+        { p_agent_id: currentUser.id }
+      )
+
+      if (!eligibilityError && eligibility && !eligibility.allowed) {
+        setListingBlockedReason(eligibility.reason)
+      }
+    }
+
     setUser(currentUser)
     setLoading(false)
   }
 
   async function handleCreateListing(e: React.FormEvent) {
     e.preventDefault()
+
+    if (listingBlockedReason) {
+      alert(listingBlockedReason)
+      return
+    }
+
     setSaving(true)
 
     try {
@@ -125,6 +143,12 @@ export default function CreateListingPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
+        {listingBlockedReason && (
+          <div className="mb-6 rounded-lg border border-red-300 bg-red-50 p-5">
+            <p className="font-bold text-red-900">Listing access paused</p>
+            <p className="mt-1 text-sm text-red-800">{listingBlockedReason}</p>
+          </div>
+        )}
         <div className="bg-white rounded-lg shadow p-8">
           <form onSubmit={handleCreateListing} className="space-y-6">
             {/* Address Section */}
@@ -344,10 +368,14 @@ export default function CreateListingPage() {
             <div className="flex gap-4">
               <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || Boolean(listingBlockedReason)}
                 className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold disabled:opacity-50 transition"
               >
-                {saving ? 'Creating...' : '✅ Create Listing'}
+                {listingBlockedReason
+                  ? 'Subscription required to list'
+                  : saving
+                    ? 'Creating...'
+                    : 'Create Listing'}
               </button>
               <button
                 type="button"
