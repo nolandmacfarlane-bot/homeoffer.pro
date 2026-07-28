@@ -75,11 +75,7 @@ export default function Navbar() {
     }
 
     if (user.user_type === 'agent') {
-      return [
-        { label: 'My Listings', href: '/agent/dashboard' },
-        { label: 'Post a Property', href: '/agent/listing-builder' },
-        { label: 'Organization', href: '/agent/network' },
-      ]
+      return []
     }
 
     if (user.user_type === 'seller') {
@@ -96,6 +92,7 @@ export default function Navbar() {
 
   const navLinks = getNavLinks()
   const dashboardLink = getDashboardLink()
+  const logoLink = user?.user_type === 'agent' ? '/' : dashboardLink
   const profileLink = user?.user_type === 'agent' ? '/agent/profile' : '/settings'
   const marketingLinks = [
     { key: 'homes', label: 'Homes', href: '/' },
@@ -120,7 +117,7 @@ export default function Navbar() {
         <div className="flex h-[74px] items-center justify-between gap-2 sm:h-[92px] sm:gap-5">
           {/* Logo - always clickable to go home/dashboard */}
           <Link 
-            href={dashboardLink}
+            href={logoLink}
             className="flex shrink-0 items-center transition hover:opacity-75"
             aria-label="HomeOffer.pro home"
           >
@@ -170,7 +167,7 @@ export default function Navbar() {
               <Link
                 href={profileLink}
                 className="flex h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-indigo-100 px-2.5 text-indigo-900 transition hover:bg-indigo-200 sm:px-4"
-                aria-label="Open profile"
+                aria-label={user?.user_type === 'agent' ? 'Open Agent Dashboard' : 'Open profile'}
               >
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
                   {user.first_name?.charAt(0) || '?'}
