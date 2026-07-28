@@ -30,7 +30,7 @@ const audiences = [
     bullets: [
       'Manage one organized listing campaign',
       'Keep photos, dates and pricing together',
-      'Spend less time repeating basic information',
+      'A focused 11-day offer period can lead to an earlier closing and commission payment',
     ],
   },
   {
