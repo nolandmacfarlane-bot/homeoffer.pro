@@ -3,11 +3,12 @@
 --
 -- Core rules implemented:
 -- 1. Agent production, rewards and sponsorship history are permanent records.
--- 2. Sixty continuous days of unpaid membership forfeits the agent's downline.
+-- 2. A missed subscription renewal immediately removes new-listing access.
+-- 3. Sixty continuous days of unpaid membership forfeits the agent's downline.
 --    Their direct agents roll up to the nearest sponsor and are not restored later.
--- 3. Confirmed refusal to pay an earned platform fee permanently bans the account.
--- 4. Other rule violations can be documented, suspended or permanently banned by an admin.
--- 5. Every status and organization change is written to an audit table.
+-- 4. Confirmed refusal to pay an earned platform fee permanently bans the account.
+-- 5. Other rule violations can be documented, suspended or permanently banned by an admin.
+-- 6. Every status and organization change is written to an audit table.
 
 BEGIN;
 
@@ -713,6 +714,127 @@ AFTER UPDATE ON public.agent_memberships
 FOR EACH ROW
 EXECUTE FUNCTION public.restore_paid_agent_after_membership_change();
 
+CREATE OR REPLACE FUNCTION public.get_agent_listing_eligibility(
+  p_agent_id uuid DEFAULT auth.uid()
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_requester uuid := auth.uid();
+  v_user_type text;
+  v_account_status text;
+  v_membership_status text;
+  v_delinquent_since timestamptz;
+  v_allowed boolean;
+  v_reason text;
+BEGIN
+  IF v_requester IS NULL THEN
+    RAISE EXCEPTION 'Authentication required';
+  END IF;
+
+  IF p_agent_id <> v_requester AND NOT public.is_homeoffer_admin(v_requester) THEN
+    RAISE EXCEPTION 'Access denied';
+  END IF;
+
+  SELECT
+    u.user_type,
+    u.account_status,
+    coalesce(m.status, 'inactive'),
+    m.delinquent_since
+  INTO
+    v_user_type,
+    v_account_status,
+    v_membership_status,
+    v_delinquent_since
+  FROM public.users u
+  LEFT JOIN public.agent_memberships m ON m.user_id = u.id
+  WHERE u.id = p_agent_id;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Agent not found';
+  END IF;
+
+  v_allowed :=
+    v_account_status = 'active'
+    AND (
+      v_user_type <> 'agent'
+      OR v_membership_status IN ('active', 'trialing')
+    );
+
+  v_reason := CASE
+    WHEN v_account_status = 'permanently_banned'
+      THEN 'This account is permanently banned from HomeOffer.pro.'
+    WHEN v_account_status = 'suspended'
+      THEN 'This account is suspended from HomeOffer.pro.'
+    WHEN v_user_type <> 'agent'
+      THEN NULL
+    WHEN v_membership_status IN ('past_due', 'unpaid', 'delinquent')
+      THEN 'Your subscription payment is past due. Renew to list another property. Your organization remains protected for 60 continuous days from the missed payment.'
+    WHEN v_membership_status NOT IN ('active', 'trialing')
+      THEN 'An active HomeOffer.pro agent subscription is required to list a property.'
+    ELSE NULL
+  END;
+
+  RETURN jsonb_build_object(
+    'allowed', v_allowed,
+    'reason', v_reason,
+    'account_status', v_account_status,
+    'membership_status', v_membership_status,
+    'delinquent_since', v_delinquent_since,
+    'organization_grace_days_remaining',
+      CASE
+        WHEN v_delinquent_since IS NULL THEN 60
+        ELSE greatest(
+          0,
+          60 - floor(extract(epoch FROM (now() - v_delinquent_since)) / 86400)::integer
+        )
+      END
+  );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.enforce_agent_listing_eligibility()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_eligibility jsonb;
+BEGIN
+  -- Existing listings remain manageable. Eligibility is checked when a listing
+  -- is first created, assigned to another agent, or newly published as active.
+  IF TG_OP = 'INSERT'
+     OR NEW.listing_agent_id IS DISTINCT FROM OLD.listing_agent_id
+     OR (
+       NEW.status = 'active'
+       AND OLD.status IS DISTINCT FROM 'active'
+     ) THEN
+    v_eligibility := public.get_agent_listing_eligibility(NEW.listing_agent_id);
+
+    IF NOT coalesce((v_eligibility ->> 'allowed')::boolean, false) THEN
+      RAISE EXCEPTION '%', coalesce(
+        v_eligibility ->> 'reason',
+        'An active HomeOffer.pro subscription is required to list a property.'
+      );
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS enforce_agent_listing_eligibility
+  ON public.properties;
+CREATE TRIGGER enforce_agent_listing_eligibility
+BEFORE INSERT OR UPDATE ON public.properties
+FOR EACH ROW
+EXECUTE FUNCTION public.enforce_agent_listing_eligibility();
+
 CREATE OR REPLACE FUNCTION public.run_due_agent_enforcement_internal()
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -786,6 +908,9 @@ BEGIN
     'organization_restarted_at', u.organization_restarted_at,
     'membership', jsonb_build_object(
       'status', coalesce(m.status, 'inactive'),
+      'listing_allowed',
+        u.account_status = 'active'
+        AND coalesce(m.status, 'inactive') IN ('active', 'trialing'),
       'current_period_end', m.current_period_end,
       'delinquent_since', m.delinquent_since,
       'days_delinquent',
@@ -966,12 +1091,14 @@ USING (agent_id = auth.uid() OR public.is_homeoffer_admin(auth.uid()));
 
 REVOKE ALL ON FUNCTION public.roll_up_agent_downline(uuid, text, uuid) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.process_subscription_forfeiture(uuid, uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.get_agent_listing_eligibility(uuid) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.restore_agent_organization_eligibility(uuid, uuid) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.confirm_platform_fee_nonpayment(uuid, text, uuid) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.enforce_agent_rule_violation(uuid, text, text, text, jsonb, uuid) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.run_due_agent_enforcement_internal() FROM PUBLIC;
 
 GRANT EXECUTE ON FUNCTION public.claim_agent_sponsor(text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_agent_listing_eligibility(uuid) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_agent_organization_dashboard(uuid) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.run_due_agent_enforcement() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.confirm_platform_fee_nonpayment(uuid, text, uuid) TO authenticated;
