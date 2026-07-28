@@ -131,32 +131,9 @@ export default function AgentProfilePage() {
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow p-8">
-          {/* DRE License Status */}
-          <div className="mb-8 p-6 rounded-lg border-2 border-blue-200 bg-blue-50">
-            <h2 className="text-xl font-bold text-blue-900 mb-3">California DRE License</h2>
-
-            {user?.dre_license_number ? (
-              <div className="space-y-2">
-                <p className="text-blue-800">
-                  <strong>License #:</strong> {user.dre_license_number}
-                </p>
-                <p className="text-blue-800">
-                  <strong>Status:</strong>{' '}
-                  <span className={user?.dre_verified ? 'text-green-600 font-bold' : 'text-orange-600 font-bold'}>
-                    {user?.dre_verified ? '✅ Verified' : '⏳ Pending Verification'}
-                  </span>
-                </p>
-                {user?.dre_verified && user?.dre_verified_at && (
-                  <p className="text-blue-800 text-sm">
-                    Verified: {new Date(user.dre_verified_at).toLocaleDateString()}
-                  </p>
-                )}
-              </div>
-            ) : (
-              <p className="text-blue-800">
-                📌 <strong>Add your DRE License number</strong> to build trust with buyers and appear in agent directories.
-              </p>
-            )}
+          <div className="mb-8 rounded-lg border border-blue-200 bg-blue-50 p-5 text-blue-950">
+            <h2 className="text-xl font-bold">Agent information</h2>
+            <p className="mt-2 text-sm">Your license information is stored with your profile. Manual approval is not required to browse or submit offers.</p>
           </div>
 
           {/* Profile Form */}
