@@ -117,7 +117,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
       <Navbar />
 
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-6 lg:px-8">
-        <Link href="/#homes" className="inline-flex items-center gap-2 text-lg font-black text-blue-700 transition hover:text-blue-900"><span className="text-2xl leading-none" aria-hidden="true">←</span><span>Back to live listings</span></Link>
+        <Link href="/#homes" className="inline-flex min-h-12 items-center justify-center gap-3 rounded-full border-2 border-blue-600 bg-white px-6 py-3 text-lg font-black text-blue-700 shadow-sm transition hover:bg-blue-50 hover:text-blue-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"><span className="flex h-7 w-7 items-center justify-center text-2xl leading-none" aria-hidden="true">←</span><span>Back to live listings</span></Link>
 
         <div className="mt-5 grid gap-3 lg:grid-cols-[2fr_1fr]">
           <div className="relative min-h-[360px] overflow-hidden rounded-2xl bg-slate-200 lg:min-h-[560px]">
