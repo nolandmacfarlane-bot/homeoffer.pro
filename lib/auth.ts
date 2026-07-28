@@ -4,8 +4,10 @@ export async function signUp(email: string, password: string, userData: {
   first_name: string
   last_name: string
   user_type: 'buyer' | 'seller' | 'agent'
-  agent_license?: string
-  agent_state?: string
+  phone_number?: string
+  dre_license_number?: string
+  broker_name?: string
+  broker_dre_number?: string
   sms_opt_in?: boolean
 }) {
   const { data, error } = await supabase.auth.signUp({
@@ -23,8 +25,10 @@ export async function signUp(email: string, password: string, userData: {
       first_name: userData.first_name,
       last_name: userData.last_name,
       user_type: userData.user_type,
-      agent_license: userData.agent_license,
-      agent_state: userData.agent_state,
+      phone_number: userData.phone_number || null,
+      dre_license_number: userData.dre_license_number || null,
+      broker_name: userData.broker_name || null,
+      broker_dre_number: userData.broker_dre_number || null,
       sms_opt_in: userData.sms_opt_in ?? false,
     })
 
