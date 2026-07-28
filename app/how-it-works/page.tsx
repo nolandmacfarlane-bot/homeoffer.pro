@@ -151,7 +151,7 @@ const questions = [
   {
     question: 'Does the seller have to accept the highest offer?',
     answer:
-      'No. Unless the signed documents specifically provide otherwise, the seller retains the right to accept, reject or counter an offer and may consider terms other than price.',
+      'No. The seller is not required to accept the highest offer and reserves the right to accept, reject or counter any offer.',
   },
   {
     question: 'Can financed buyers participate?',
