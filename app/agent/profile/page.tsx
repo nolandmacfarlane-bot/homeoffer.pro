@@ -1,10 +1,21 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import Navbar from '@/components/Navbar'
 import { getCurrentUser } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+
+const emptyProfile = {
+  first_name: '',
+  last_name: '',
+  email: '',
+  phone_number: '',
+  dre_license_number: '',
+  broker_name: '',
+  broker_dre_number: '',
+}
 
 export default function AgentProfilePage() {
   const router = useRouter()
@@ -12,16 +23,7 @@ export default function AgentProfilePage() {
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
-
-  const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone_number: '',
-    dre_license_number: '',
-    broker_name: '',
-    broker_dre_number: '',
-  })
+  const [formData, setFormData] = useState(emptyProfile)
 
   useEffect(() => {
     loadProfile()
@@ -42,26 +44,30 @@ export default function AgentProfilePage() {
 
       const { data: authData } = await supabase.auth.getUser()
       const metadata = authData.user?.user_metadata || {}
+      const mergedUser = { ...currentUser, ...metadata }
 
-      setUser({ ...currentUser, ...metadata })
+      setUser(mergedUser)
       setFormData({
         first_name: currentUser.first_name || metadata.first_name || '',
         last_name: currentUser.last_name || metadata.last_name || '',
         email: currentUser.email || authData.user?.email || '',
         phone_number: currentUser.phone_number || metadata.phone_number || '',
-        dre_license_number: currentUser.dre_license_number || metadata.dre_license_number || '',
+        dre_license_number:
+          currentUser.dre_license_number || metadata.dre_license_number || '',
         broker_name: currentUser.broker_name || metadata.broker_name || '',
-        broker_dre_number: currentUser.broker_dre_number || metadata.broker_dre_number || '',
+        broker_dre_number:
+          currentUser.broker_dre_number || metadata.broker_dre_number || '',
       })
-    } catch (err) {
-      console.error('Error:', err)
-      router.push('/login')
+    } catch (error) {
+      console.error('Agent profile error:', error)
     } finally {
       setLoading(false)
     }
   }
 
   async function handleSaveProfile() {
+    if (!user) return
+
     setSaving(true)
     try {
       const profileDetails = {
@@ -93,239 +99,231 @@ export default function AgentProfilePage() {
 
       setUser({ ...user, ...profileDetails })
       setEditing(false)
-      await loadProfile()
-    } catch (err: any) {
-      alert('Error: ' + err.message)
+    } catch (error: any) {
+      alert('We could not save your information: ' + error.message)
     } finally {
       setSaving(false)
     }
   }
 
+  const updateField = (field: keyof typeof emptyProfile, value: string) => {
+    setFormData((current) => ({ ...current, [field]: value }))
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">Loading...</p>
-      </div>
+      <>
+        <Navbar />
+        <main className="flex min-h-[60vh] items-center justify-center bg-slate-50">
+          <p className="font-bold text-slate-600">Loading your account...</p>
+        </main>
+      </>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Agent Profile</h1>
-              <p className="text-gray-600 mt-1">Manage your professional information</p>
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-slate-50 text-slate-950">
+        <section className="border-b border-slate-200 bg-white">
+          <div className="mx-auto max-w-6xl px-4 py-9 sm:px-6 lg:px-8">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">
+                  Agent account
+                </p>
+                <h1 className="mt-2 text-4xl font-black tracking-[-0.04em]">
+                  Welcome, {formData.first_name || 'Agent'}
+                </h1>
+                <p className="mt-2 text-lg text-slate-600">
+                  Everything you need is organized below.
+                </p>
+              </div>
+              <Link
+                href="/settings"
+                className="font-black text-blue-700 hover:text-blue-900"
+              >
+                Account settings &amp; sign out →
+              </Link>
             </div>
-            <Link
+          </div>
+        </section>
+
+        <div className="mx-auto max-w-6xl space-y-7 px-4 py-8 sm:px-6 lg:px-8">
+          <nav aria-label="Agent account shortcuts" className="grid gap-4 md:grid-cols-3">
+            <AccountLink
+              number="01"
+              title="My listings"
+              description="See your properties, offers and listing activity."
               href="/agent/dashboard"
-              className="text-gray-600 hover:text-gray-900 font-semibold"
-            >
-              ← Back
-            </Link>
-          </div>
-        </div>
-      </div>
+            />
+            <AccountLink
+              number="02"
+              title="Post a property"
+              description="Start a new property listing and save your draft."
+              href="/agent/listing-builder"
+            />
+            <AccountLink
+              number="03"
+              title="Organization & network"
+              description="View your Tier 1, Tier 2, production and rewards."
+              href="/agent/network"
+            />
+          </nav>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow p-8">
-          <div className="mb-8 rounded-lg border border-blue-200 bg-blue-50 p-5 text-blue-950">
-            <h2 className="text-xl font-bold">Agent information</h2>
-            <p className="mt-2 text-sm">Your license information is stored with your profile. Manual approval is not required to browse or submit offers.</p>
-          </div>
-
-          {/* Profile Form */}
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
+          <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <div className="flex flex-col justify-between gap-4 border-b border-slate-200 px-6 py-6 sm:flex-row sm:items-center sm:px-8">
+              <div>
+                <h2 className="text-2xl font-black">Your agent information</h2>
+                <p className="mt-1 text-slate-600">
+                  Personal, brokerage and license details connected to your account.
+                </p>
+              </div>
               {!editing && (
                 <button
                   onClick={() => setEditing(true)}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold"
+                  className="rounded-full bg-blue-600 px-6 py-3 font-black text-white hover:bg-blue-700"
                 >
-                  Edit
+                  Edit information
                 </button>
               )}
             </div>
 
             {!editing ? (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <p className="text-sm text-gray-600 font-semibold mb-1">First Name</p>
-                    <p className="text-gray-900 text-lg">{formData.first_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 font-semibold mb-1">Last Name</p>
-                    <p className="text-gray-900 text-lg">{formData.last_name}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-sm text-gray-600 font-semibold mb-1">Email</p>
-                  <p className="text-gray-900 text-lg">{formData.email}</p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-gray-600 font-semibold mb-1">Phone</p>
-                  <p className="text-gray-900 text-lg">{formData.phone_number || '(Not provided)'}</p>
-                </div>
-
-                <div className="border-t pt-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">License Information</h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <p className="text-sm text-gray-600 font-semibold mb-1">DRE License #</p>
-                      <p className="text-gray-900 text-lg">
-                        {formData.dre_license_number || '(Not provided)'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 font-semibold mb-1">Broker Name</p>
-                      <p className="text-gray-900 text-lg">
-                        {formData.broker_name || '(Not provided)'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <p className="text-sm text-gray-600 font-semibold mb-1">Broker DRE #</p>
-                    <p className="text-gray-900 text-lg">
-                      {formData.broker_dre_number || '(Not provided)'}
-                    </p>
-                  </div>
-                </div>
+              <div className="grid gap-x-10 gap-y-7 p-6 sm:grid-cols-2 sm:p-8">
+                <Information label="Name" value={[formData.first_name, formData.last_name].filter(Boolean).join(' ')} />
+                <Information label="Email" value={formData.email} />
+                <Information label="Phone" value={formData.phone_number} />
+                <Information label="Brokerage" value={formData.broker_name} />
+                <Information label="DRE license number" value={formData.dre_license_number} />
+                <Information label="Broker DRE number" value={formData.broker_dre_number} />
               </div>
             ) : (
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.first_name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, first_name: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.last_name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, last_name: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.phone_number}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone_number: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="(555) 123-4567"
+              <form className="space-y-7 p-6 sm:p-8" onSubmit={(event) => event.preventDefault()}>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <ProfileField
+                    label="First name"
+                    value={formData.first_name}
+                    onChange={(value) => updateField('first_name', value)}
+                  />
+                  <ProfileField
+                    label="Last name"
+                    value={formData.last_name}
+                    onChange={(value) => updateField('last_name', value)}
                   />
                 </div>
 
-                <div className="border-t pt-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">License Information</h3>
+                <ProfileField
+                  label="Phone number"
+                  type="tel"
+                  value={formData.phone_number}
+                  onChange={(value) => updateField('phone_number', value)}
+                />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        California DRE License # *
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.dre_license_number}
-                        onChange={(e) =>
-                          setFormData({ ...formData, dre_license_number: e.target.value })
-                        }
-                        placeholder="12345678"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Find your license at: <a href="https://www.bre.ca.gov/" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">bre.ca.gov</a>
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Broker Name
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.broker_name}
-                        onChange={(e) =>
-                          setFormData({ ...formData, broker_name: e.target.value })
-                        }
-                        placeholder="Your Broker's Name"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
-                    </div>
+                <div className="border-t border-slate-200 pt-7">
+                  <h3 className="text-xl font-black">Brokerage and license</h3>
+                  <div className="mt-5 grid gap-5 sm:grid-cols-2">
+                    <ProfileField
+                      label="California DRE license number"
+                      value={formData.dre_license_number}
+                      onChange={(value) => updateField('dre_license_number', value)}
+                    />
+                    <ProfileField
+                      label="Brokerage name"
+                      value={formData.broker_name}
+                      onChange={(value) => updateField('broker_name', value)}
+                    />
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Broker DRE License #
-                    </label>
-                    <input
-                      type="text"
+                  <div className="mt-5">
+                    <ProfileField
+                      label="Broker DRE number"
                       value={formData.broker_dre_number}
-                      onChange={(e) =>
-                        setFormData({ ...formData, broker_dre_number: e.target.value })
-                      }
-                      placeholder="Broker's DRE #"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      onChange={(value) => updateField('broker_dre_number', value)}
                     />
                   </div>
                 </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-blue-900 text-sm">
-                    <strong>DRE verification:</strong> After you add your DRE license number, our team will verify it within 24-48 hours. Once verified, you'll appear in buyer agent directories.
-                  </p>
-                </div>
-
-                <div className="flex gap-4">
+                <div className="flex flex-col gap-3 border-t border-slate-200 pt-7 sm:flex-row">
                   <button
                     type="button"
                     onClick={handleSaveProfile}
                     disabled={saving}
-                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold disabled:opacity-50 transition"
+                    className="rounded-full bg-blue-600 px-7 py-3 font-black text-white hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {saving ? 'Saving...' : '✅ Save Profile'}
+                    {saving ? 'Saving...' : 'Save information'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setEditing(false)}
-                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 px-6 py-3 rounded-lg font-semibold transition"
+                    className="rounded-full border-2 border-slate-300 px-7 py-3 font-black text-slate-800 hover:bg-slate-100"
                   >
                     Cancel
                   </button>
                 </div>
               </form>
             )}
-          </div>
+          </section>
         </div>
-      </div>
+      </main>
+    </>
+  )
+}
+
+function AccountLink({
+  number,
+  title,
+  description,
+  href,
+}: {
+  number: string
+  title: string
+  description: string
+  href: string
+}) {
+  return (
+    <Link
+      href={href}
+      className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+    >
+      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white">
+        {number}
+      </span>
+      <h2 className="mt-5 text-xl font-black group-hover:text-blue-700">{title}</h2>
+      <p className="mt-2 leading-6 text-slate-600">{description}</p>
+      <p className="mt-5 font-black text-blue-700">Open →</p>
+    </Link>
+  )
+}
+
+function Information({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-sm font-black uppercase tracking-[0.08em] text-slate-500">{label}</p>
+      <p className="mt-2 break-words text-lg font-bold text-slate-950">{value || 'Not added yet'}</p>
     </div>
+  )
+}
+
+function ProfileField({
+  label,
+  value,
+  onChange,
+  type = 'text',
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  type?: string
+}) {
+  return (
+    <label className="block text-sm font-black text-slate-800">
+      {label}
+      <input
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-950 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+      />
+    </label>
   )
 }
