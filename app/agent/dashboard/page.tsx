@@ -109,12 +109,20 @@ export default function AgentDashboard() {
             <h1 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">My listings</h1>
             <p className="mt-2 text-base text-slate-600">Manage your properties, activity, and offers in one place.</p>
           </div>
-          <Link
-            href="/agent/listing-builder"
-            className="inline-flex min-h-12 items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-base font-black text-white transition hover:bg-blue-700"
-          >
-            Post a property
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/agent/profile"
+              className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-slate-300 bg-white px-6 py-3 text-base font-black text-slate-900 transition hover:border-blue-600 hover:text-blue-700"
+            >
+              ← Agent Dashboard
+            </Link>
+            <Link
+              href="/agent/listing-builder"
+              className="inline-flex min-h-12 items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-base font-black text-white transition hover:bg-blue-700"
+            >
+              Post a property
+            </Link>
+          </div>
         </div>
       </section>
 
