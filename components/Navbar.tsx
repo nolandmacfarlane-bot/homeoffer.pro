@@ -1,13 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getCurrentUser, signOut } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 export default function Navbar() {
-  const router = useRouter()
   const pathname = usePathname()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -48,18 +47,6 @@ export default function Navbar() {
       setUser(null)
     } finally {
       setLoading(false)
-    }
-  }
-
-  async function handleSignOut() {
-    try {
-      await signOut()
-      setUser(null)
-      setMenuOpen(false)
-      router.refresh()
-      router.push('/')
-    } catch (err) {
-      console.error('Sign out error:', err)
     }
   }
 
@@ -111,6 +98,7 @@ export default function Navbar() {
 
   const navLinks = getNavLinks()
   const dashboardLink = getDashboardLink()
+  const profileLink = user?.user_type === 'agent' ? '/agent/profile' : '/settings'
   const marketingLinks = [
     { key: 'homes', label: 'Homes', href: '/' },
     { key: 'how-it-works', label: 'How It Works', href: '/how-it-works' },
@@ -176,28 +164,21 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right side - Sign Out / Sign In */}
+          {/* Right side - Profile / Sign In */}
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
             {loading ? (
               <div className="w-10 h-10 animate-pulse bg-gray-300 rounded-lg" />
             ) : user ? (
-              <>
-                {/* User name + avatar - Desktop */}
-                <div className="hidden 2xl:flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-100">
-                  <div className="w-6 h-6 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                    {user.first_name?.charAt(0) || '?'}
-                  </div>
-                  <span className="text-indigo-900 font-semibold text-sm">{user.first_name || 'User'}</span>
+              <Link
+                href={profileLink}
+                className="flex h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-indigo-100 px-2.5 text-indigo-900 transition hover:bg-indigo-200 sm:px-4"
+                aria-label="Open profile"
+              >
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
+                  {user.first_name?.charAt(0) || '?'}
                 </div>
-
-                {/* Sign Out Button */}
-                <button
-                  onClick={handleSignOut}
-                  className="hidden whitespace-nowrap sm:block px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-sm transition"
-                >
-                  Sign Out
-                </button>
-              </>
+                <span className="hidden text-sm font-semibold sm:inline">{user.first_name || 'User'}</span>
+              </Link>
             ) : (
               <>
                 <Link
@@ -259,15 +240,6 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* Sign Out - Mobile */}
-            {user && (
-              <button
-                onClick={handleSignOut}
-                className="w-full text-left px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg font-semibold text-sm transition mt-4"
-              >
-                Sign Out
-              </button>
-            )}
           </div>
         )}
       </div>
