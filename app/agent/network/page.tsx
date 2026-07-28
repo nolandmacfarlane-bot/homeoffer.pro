@@ -229,7 +229,8 @@ export default function AgentNetworkPage() {
     }
   }, [tierOneModel, tierTwoModel, annualClosings])
 
-  const membershipActive = membership?.status === 'active' || membership?.status === 'trialing'
+  const ownerAccess = user?.email?.toLowerCase() === 'noland.macfarlane@gmail.com'
+  const membershipActive = ownerAccess || membership?.status === 'active' || membership?.status === 'trialing'
   const shareUrl = user?.referral_code
     ? `https://homeoffer.pro/signup?ref=${user.referral_code}`
     : 'Available after the database setup is completed'
@@ -335,7 +336,7 @@ export default function AgentNetworkPage() {
                 <span className={`rounded-full px-3 py-1 text-xs font-black uppercase ${
                   membershipActive ? 'bg-emerald-400 text-emerald-950' : 'bg-white/15 text-white'
                 }`}>
-                  {membership?.status?.replace('_', ' ') || 'Not subscribed'}
+                  {ownerAccess ? 'Owner access' : membership?.status?.replace('_', ' ') || 'Not subscribed'}
                 </span>
               </div>
               <p className="mt-5 text-slate-300">
@@ -373,7 +374,7 @@ export default function AgentNetworkPage() {
             <article className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
               <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">Invite agents</p>
               <h2 className="mt-2 text-2xl font-black text-slate-950">Build your professional network</h2>
-              <p className="mt-3 text-slate-600">Share your link with licensed agents or enter the code of the agent who invited you.</p>
+              <p className="mt-3 text-slate-600">If another agent invited you, enter their referral code to join their Tier 1 network. Otherwise, leave this blank.</p>
               <div className="mt-5 rounded-xl bg-slate-100 p-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Your referral link</p>
                 <p className="mt-1 break-all font-bold text-slate-900">
@@ -384,7 +385,7 @@ export default function AgentNetworkPage() {
                 <input
                   value={sponsorCode}
                   onChange={(event) => setSponsorCode(event.target.value.toUpperCase())}
-                  placeholder="Sponsor code"
+                  placeholder="Referral code (optional)"
                   className="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-slate-950"
                 />
                 <button
