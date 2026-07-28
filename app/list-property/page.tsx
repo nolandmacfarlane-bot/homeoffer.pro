@@ -9,7 +9,7 @@ export default function ListPropertyPage() {
         <div className="max-w-3xl">
           <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">For sellers and listing agents</p>
           <h1 className="mt-3 text-5xl font-black tracking-[-0.045em] sm:text-6xl">List your property on HomeOffer.pro</h1>
-          <p className="mt-5 text-lg leading-8 text-slate-600">Put your home in front of active buyers with a clear 11-day offer period, transparent pricing and $500 offer increments.</p>
+          <p className="mt-5 text-lg leading-8 text-slate-600">Put your home in front of active buyers with a clear 11-day offer period, transparent pricing and $500 offer increments. Accounts and bidding are free; listing agents pay $7 per month only when they publish a property.</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/signup?role=seller" className="rounded-full bg-blue-600 px-7 py-3.5 text-lg font-black text-white hover:bg-blue-700">Start a property listing</Link>
             <Link href="/login" className="rounded-full border border-slate-300 bg-white px-7 py-3.5 text-lg font-black text-slate-950 hover:border-blue-400 hover:text-blue-700">Sign in to continue</Link>
