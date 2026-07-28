@@ -192,12 +192,13 @@ export default function HowItWorksPage() {
               Why HomeOffer.pro
             </p>
             <h1 className="mt-4 max-w-4xl text-4xl font-black tracking-[-0.045em] text-slate-950 sm:text-5xl lg:text-6xl">
-              A clearer, more focused way to buy and sell a home.
+              Turn buyer interest into a clear, competitive offer process.
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600 sm:text-xl">
-              Traditional home sales can scatter listings, deadlines, pricing and communication
-              across multiple places. HomeOffer.pro brings the campaign into one easy-to-follow
-              experience for buyers, sellers and the professionals representing them.
+              Instead of letting a listing sit while buyers wonder what to do next, HomeOffer.pro
+              brings interested buyers into one defined offer window. Buyers can see the leading offer,
+              full price and deadline, while sellers gain urgency, visibility and a better opportunity
+              for competing offers.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -219,10 +220,10 @@ export default function HowItWorksPage() {
             <p className="text-sm font-black text-slate-950">The HomeOffer.pro difference</p>
             <dl className="mt-5 divide-y divide-slate-200">
               {[
-                ['11 days', 'A focused offer period'],
-                ['$500', 'Clear offer increments'],
-                ['3 parts', 'Offer, premium and total shown'],
-                ['5 audiences', 'Buyer, seller, listing agent, buyer agent and broker'],
+                ['11 days', 'One clear offer window'],
+                ['$500', 'Simple offer increments'],
+                ['Up front', 'Leading offer and total price'],
+                ['One place', 'Listings, open houses and offer activity'],
               ].map(([value, label]) => (
                 <div key={label} className="flex items-center justify-between gap-5 py-4 first:pt-0 last:pb-0">
                   <dt className="text-sm font-bold text-slate-600">{label}</dt>
