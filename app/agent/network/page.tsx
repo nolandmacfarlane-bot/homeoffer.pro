@@ -24,6 +24,14 @@ type NetworkAgent = {
   closedUnits: number
 }
 
+type SponsorCandidate = {
+  id: string
+  first_name: string
+  last_name: string
+  phone_number: string | null
+  dre_license_number: string | null
+}
+
 type Reward = {
   id: string
   tier: 1 | 2
@@ -51,7 +59,10 @@ export default function AgentNetworkPage() {
   const [message, setMessage] = useState('')
   const [systemReady, setSystemReady] = useState(true)
   const [publicPreview, setPublicPreview] = useState(false)
-  const [sponsorCode, setSponsorCode] = useState('')
+  const [sponsorSearch, setSponsorSearch] = useState('')
+  const [sponsorResults, setSponsorResults] = useState<SponsorCandidate[]>([])
+  const [selectedSponsor, setSelectedSponsor] = useState<SponsorCandidate | null>(null)
+  const [sponsorSearching, setSponsorSearching] = useState(false)
   const [tierOneModel, setTierOneModel] = useState(10)
   const [tierTwoModel, setTierTwoModel] = useState(20)
   const [annualClosings, setAnnualClosings] = useState(6)
@@ -190,17 +201,65 @@ export default function AgentNetworkPage() {
     }
   }
 
-  async function claimSponsor() {
-    setMessage('')
-    const { error } = await supabase.rpc('claim_agent_sponsor', {
-      sponsor_code: sponsorCode,
-    })
-    if (error) {
-      setMessage(error.message)
+  async function searchForSponsor() {
+    const term = sponsorSearch.trim()
+    if (term.length < 2) {
+      setMessage('Enter at least two letters of the agent’s name.')
       return
     }
-    setMessage('Sponsor connected. Your network relationship is now recorded.')
-    setSponsorCode('')
+
+    setMessage('')
+    setSponsorSearching(true)
+    const firstTerm = term.split(/\s+/)[0].replace(/[,%()]/g, '')
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, first_name, last_name, phone_number, dre_license_number')
+      .eq('user_type', 'agent')
+      .neq('id', user.id)
+      .or(`first_name.ilike.%${firstTerm}%,last_name.ilike.%${firstTerm}%`)
+      .limit(12)
+
+    setSponsorSearching(false)
+    if (error) {
+      setMessage('We could not search the agent directory. Please try again.')
+      return
+    }
+
+    const normalized = term.toLowerCase()
+    const matches = (data || []).filter((agent) =>
+      `${agent.first_name || ''} ${agent.last_name || ''}`.toLowerCase().includes(normalized)
+      || (agent.first_name || '').toLowerCase().includes(normalized)
+      || (agent.last_name || '').toLowerCase().includes(normalized)
+    )
+    setSponsorResults(matches as SponsorCandidate[])
+    if (matches.length === 0) setMessage('No matching agents were found.')
+  }
+
+  async function confirmSponsor() {
+    if (!selectedSponsor || user?.referred_by_agent_id) return
+    const fullName = `${selectedSponsor.first_name} ${selectedSponsor.last_name}`.trim()
+    const confirmed = window.confirm(
+      `This sponsor choice is permanent and cannot be changed. Are you sure you want to select ${fullName}?`
+    )
+    if (!confirmed) return
+
+    setMessage('')
+    const { data, error } = await supabase
+      .from('users')
+      .update({ referred_by_agent_id: selectedSponsor.id })
+      .eq('id', user.id)
+      .is('referred_by_agent_id', null)
+      .select('referred_by_agent_id')
+      .single()
+
+    if (error || !data) {
+      setMessage('Your sponsor could not be saved. It may already be selected.')
+      return
+    }
+
+    setUser({ ...user, referred_by_agent_id: selectedSponsor.id })
+    setMessage(`${fullName} is now permanently connected as your sponsor.`)
+    setSponsorResults([])
   }
 
   const rewardTotals = useMemo(() => {
@@ -232,10 +291,6 @@ export default function AgentNetworkPage() {
 
   const ownerAccess = user?.email?.toLowerCase() === 'noland.macfarlane@gmail.com'
   const membershipActive = ownerAccess || membership?.status === 'active' || membership?.status === 'trialing'
-  const shareUrl = user?.referral_code
-    ? `https://homeoffer.pro/signup?ref=${user.referral_code}`
-    : 'Available after the database setup is completed'
-
   const memberStart = user?.created_at ? new Date(user.created_at) : null
   const monthsAsMember = memberStart
     ? Math.max(1, (new Date().getFullYear() - memberStart.getFullYear()) * 12 + new Date().getMonth() - memberStart.getMonth() + 1)
@@ -375,30 +430,74 @@ export default function AgentNetworkPage() {
             </article>
 
             <article className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
-              <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">Invite agents</p>
-              <h2 className="mt-2 text-2xl font-black text-slate-950">Build your professional network</h2>
-              <p className="mt-3 text-slate-600">If another agent invited you, enter their referral code to join their Tier 1 network. Otherwise, leave this blank.</p>
-              <div className="mt-5 rounded-xl bg-slate-100 p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Your referral link</p>
-                <p className="mt-1 break-all font-bold text-slate-900">
-                  {publicPreview ? 'Created automatically after you join' : shareUrl}
-                </p>
-              </div>
-              {!publicPreview && <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                <input
-                  value={sponsorCode}
-                  onChange={(event) => setSponsorCode(event.target.value.toUpperCase())}
-                  placeholder="Referral code (optional)"
-                  className="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-slate-950"
-                />
-                <button
-                  onClick={claimSponsor}
-                  disabled={!sponsorCode || !systemReady}
-                  className="rounded-xl bg-slate-950 px-5 py-3 font-black text-white disabled:opacity-50"
-                >
-                  Connect sponsor
-                </button>
-              </div>}
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">Your sponsor</p>
+              <h2 className="mt-2 text-2xl font-black text-slate-950">Select the agent who introduced you</h2>
+              <p className="mt-3 text-slate-600">Search by first or last name, then verify the agent using their DRE number and phone number.</p>
+
+              {publicPreview ? (
+                <p className="mt-5 rounded-xl bg-slate-100 p-4 font-bold text-slate-700">Sign in to search the agent directory.</p>
+              ) : user?.referred_by_agent_id ? (
+                <p className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4 font-bold text-blue-900">Your sponsor has already been selected and cannot be changed.</p>
+              ) : (
+                <>
+                  <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                    <input
+                      value={sponsorSearch}
+                      onChange={(event) => {
+                        setSponsorSearch(event.target.value)
+                        setSelectedSponsor(null)
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') searchForSponsor()
+                      }}
+                      placeholder="Enter the agent’s first or last name"
+                      className="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-slate-950"
+                    />
+                    <button
+                      onClick={searchForSponsor}
+                      disabled={sponsorSearching}
+                      className="rounded-xl bg-slate-950 px-5 py-3 font-black text-white disabled:opacity-50"
+                    >
+                      {sponsorSearching ? 'Searching…' : 'Search agents'}
+                    </button>
+                  </div>
+
+                  {sponsorResults.length > 0 && (
+                    <div className="mt-4 space-y-2">
+                      {sponsorResults.map((agent) => {
+                        const isSelected = selectedSponsor?.id === agent.id
+                        return (
+                          <button
+                            key={agent.id}
+                            type="button"
+                            onClick={() => setSelectedSponsor(agent)}
+                            className={`w-full rounded-xl border p-4 text-left transition ${isSelected ? 'border-blue-600 bg-blue-50' : 'border-slate-200 hover:border-blue-400'}`}
+                          >
+                            <span className="block text-lg font-black text-slate-950">{agent.first_name} {agent.last_name}</span>
+                            <span className="mt-1 block text-sm text-slate-600">
+                              DRE #{agent.dre_license_number || 'Not provided'} · {agent.phone_number || 'Phone not provided'}
+                            </span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+
+                  {selectedSponsor && (
+                    <div className="mt-4 rounded-xl border-2 border-blue-600 bg-blue-50 p-5">
+                      <p className="font-black text-slate-950">Confirm your sponsor</p>
+                      <p className="mt-1 text-sm leading-6 text-slate-700">This choice is irreversible. Make sure the name, DRE number and phone number identify the correct agent.</p>
+                      <button
+                        type="button"
+                        onClick={confirmSponsor}
+                        className="mt-4 rounded-xl bg-blue-600 px-5 py-3 font-black text-white hover:bg-blue-700"
+                      >
+                        Yes, permanently select this sponsor
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
             </article>
           </section>
 
