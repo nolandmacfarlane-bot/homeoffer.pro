@@ -119,8 +119,8 @@ export default function AgentListingBuilder() {
               <h2 className="text-2xl font-black">Property information</h2>
             </div>
             <div className="mt-6 grid gap-5 md:grid-cols-2">
-              <label className={labelClass}>Street address<input required className={inputClass} value={form.address} onChange={(e) => updateField('address', e.target.value)} placeholder="1642 Poppy Circle" /></label>
-              <label className={labelClass}>City<input required className={inputClass} value={form.city} onChange={(e) => updateField('city', e.target.value)} placeholder="Rocklin" /></label>
+              <label className={labelClass}>Street address<input required className={inputClass} value={form.address} onChange={(e) => updateField('address', e.target.value)} /></label>
+              <label className={labelClass}>City<input required className={inputClass} value={form.city} onChange={(e) => updateField('city', e.target.value)} /></label>
               <label className={labelClass}>State<input required className={inputClass} value={form.state} onChange={(e) => updateField('state', e.target.value)} /></label>
               <label className={labelClass}>ZIP code<input required className={inputClass} value={form.zip} onChange={(e) => updateField('zip', e.target.value)} inputMode="numeric" /></label>
             </div>
