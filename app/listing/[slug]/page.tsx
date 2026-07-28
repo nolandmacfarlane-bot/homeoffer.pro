@@ -174,7 +174,8 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
               <div className="flex justify-between gap-4 border-t border-slate-200 pt-4 text-lg"><dt className="font-black">Total price</dt><dd className="font-black text-blue-700">{money(total)}</dd></div>
             </dl>
             <Link href="/login" className="mt-7 block rounded-full bg-red-600 px-6 py-4 text-center text-lg font-black text-white transition hover:bg-red-700">Get approved to offer</Link>
-              <p className="mt-5 text-center text-sm leading-6 text-slate-500">Property details shown are for the current marketplace preview and should be independently verified.</p>
+              <p className="mt-4 text-center text-sm font-bold leading-6 text-slate-700">The seller reserves the right to accept, reject or counter any offer.</p>
+              <p className="mt-3 text-center text-sm leading-6 text-slate-500">Property details shown are for the current marketplace preview and should be independently verified.</p>
             </section>
 
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
