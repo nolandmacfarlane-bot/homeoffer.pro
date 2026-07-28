@@ -100,19 +100,45 @@ export async function signOut() {
 }
 
 export async function getCurrentUser() {
-  const { data, error } = await supabase.auth.getUser()
-  if (error) throw error
-  
-  if (!data.user) return null
-  
-  // Get full user profile from users table
+  // The browser session is persisted by Supabase. Read it first so a temporary
+  // network/profile error never turns a valid login into a redirect loop.
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+  if (sessionError) throw sessionError
+
+  const sessionUser = sessionData.session?.user
+  if (!sessionUser) return null
+
+  // Refresh/verify when possible, but keep the valid persisted session as a
+  // fallback if Supabase's user endpoint is briefly unavailable.
+  const { data: verifiedData } = await supabase.auth.getUser()
+  const authUser = verifiedData.user || sessionUser
+
+  // Profile data is optional for authentication. RLS, schema, or connectivity
+  // problems here must not make the app claim the user has been signed out.
   const { data: userProfile } = await supabase
     .from('users')
     .select('*')
-    .eq('id', data.user.id)
-    .single()
-  
-  return userProfile || data.user
+    .eq('id', authUser.id)
+    .maybeSingle()
+
+  if (userProfile) {
+    return {
+      ...authUser,
+      ...userProfile,
+      user_metadata: authUser.user_metadata,
+    }
+  }
+
+  return {
+    ...authUser,
+    first_name:
+      authUser.user_metadata?.first_name ||
+      authUser.user_metadata?.full_name?.split(' ')[0] ||
+      authUser.email?.split('@')[0] ||
+      'User',
+    last_name: authUser.user_metadata?.last_name || '',
+    user_type: authUser.user_metadata?.user_type || 'buyer',
+  }
 }
 
 export async function requestBuyerApproval(
