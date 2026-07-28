@@ -21,11 +21,6 @@ const emptyForm = {
   startingOffer: '',
   description: '',
   virtualTourUrl: '',
-  agentName: '',
-  brokerage: '',
-  dreNumber: '',
-  phone: '',
-  email: '',
 }
 
 export default function AgentListingBuilder() {
@@ -182,19 +177,7 @@ export default function AgentListingBuilder() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 font-black text-white">4</span>
-              <h2 className="text-2xl font-black">Listing-agent contact</h2>
-            </div>
-            <div className="mt-6 grid gap-5 md:grid-cols-2">
-              <label className={labelClass}>Agent name<input required className={inputClass} value={form.agentName} onChange={(e) => updateField('agentName', e.target.value)} /></label>
-              <label className={labelClass}>Brokerage<input required className={inputClass} value={form.brokerage} onChange={(e) => updateField('brokerage', e.target.value)} /></label>
-              <label className={labelClass}>License / DRE number<input className={inputClass} value={form.dreNumber} onChange={(e) => updateField('dreNumber', e.target.value)} /></label>
-              <label className={labelClass}>Phone number<input required type="tel" className={inputClass} value={form.phone} onChange={(e) => updateField('phone', e.target.value)} /></label>
-              <label className={labelClass}>Email address<input required type="email" className={inputClass} value={form.email} onChange={(e) => updateField('email', e.target.value)} /></label>
-            </div>
-          </section>
+
 
           <div className="sticky bottom-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-xl backdrop-blur sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-bold text-slate-600">{saved ? 'Draft saved on this device.' : 'Save your work before leaving this page.'}</p>
