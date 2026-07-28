@@ -116,17 +116,6 @@ const audiences = [
   },
 ]
 
-const comparisonRows = [
-  ['Finding homes', 'Buyers may start with a search form or scattered links.', 'Live opportunities are placed front and center for easy browsing.'],
-  ['Offer timing', 'Deadlines and next steps can vary from listing to listing.', 'A defined 11-day window and clear $500 increments create a shared timeline.'],
-  ['Price context', 'The list price may not show the buyer’s full expected price.', 'Leading offer, buyer’s premium and estimated total are separated.'],
-  ['Open houses', 'Dates may be buried in remarks, posts or messages.', 'Dates and times are displayed in simple cards with calendar access.'],
-  ['Buyer representation', 'The buyer-agent role can feel disconnected from the website.', 'Buyer-agent participation and compensation are explained in the process.'],
-  ['Listing communication', 'Photos, questions, updates and offers may live in different places.', 'The property page acts as a central source for the campaign.'],
-  ['Seller momentum', 'A listing can remain active without a clear decision point.', 'A focused campaign gives interested buyers a reason to act within a defined period.'],
-  ['Broker consistency', 'Each agent may run a different process using different tools.', 'A repeatable workflow makes expectations easier to supervise and document.'],
-]
-
 const questions = [
   {
     question: 'Is HomeOffer.pro a traditional auction?',
@@ -324,41 +313,50 @@ export default function HowItWorksPage() {
         <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">
-              Side-by-side
+              Why use HomeOffer.pro?
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-[-0.035em] text-slate-950 sm:text-4xl">
-              What the experience is designed to improve
+              A simpler way to create competition for a home.
             </h2>
             <p className="mt-4 text-lg leading-8 text-slate-600">
-              HomeOffer.pro does not replace the professionals or contracts in a real estate
-              transaction. It gives them a clearer place to organize the customer experience.
+              Buyers know what is happening, sellers get a focused offer period and everyone can
+              follow the same clear process.
             </p>
           </div>
 
-          <div className="mt-10 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[760px] border-collapse text-left">
-                <caption className="sr-only">
-                  Comparison of a traditional selling process with the HomeOffer.pro experience
-                </caption>
-                <thead>
-                  <tr className="border-b border-slate-200 bg-slate-950 text-white">
-                    <th scope="col" className="w-[20%] px-6 py-5 text-sm font-black">Area</th>
-                    <th scope="col" className="w-[40%] px-6 py-5 text-sm font-black">Traditional process</th>
-                    <th scope="col" className="w-[40%] px-6 py-5 text-sm font-black text-blue-300">HomeOffer.pro approach</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200">
-                  {comparisonRows.map(([area, traditional, homeOffer]) => (
-                    <tr key={area} className="align-top">
-                      <th scope="row" className="px-6 py-5 text-sm font-black text-slate-950">{area}</th>
-                      <td className="px-6 py-5 text-sm leading-6 text-slate-600">{traditional}</td>
-                      <td className="border-l border-blue-100 bg-blue-50/60 px-6 py-5 text-sm font-semibold leading-6 text-slate-800">{homeOffer}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                title: 'A clear deadline',
+                copy: 'Buyers have 11 days to view the home, attend open houses and submit an offer.',
+              },
+              {
+                title: 'Straightforward pricing',
+                copy: 'The leading offer, buyer’s premium and total price are shown clearly before anyone offers.',
+              },
+              {
+                title: 'More buyer attention',
+                copy: 'A low starting offer and defined timeline can encourage more buyers to look and participate.',
+              },
+              {
+                title: 'The seller stays in control',
+                copy: 'The seller reserves the right to accept, reject or counter any offer—including the highest offer.',
+              },
+            ].map((benefit) => (
+              <article
+                key={benefit.title}
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+              >
+                <span
+                  aria-hidden="true"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-lg font-black text-white"
+                >
+                  ✓
+                </span>
+                <h3 className="mt-5 text-xl font-black text-slate-950">{benefit.title}</h3>
+                <p className="mt-3 leading-7 text-slate-600">{benefit.copy}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
