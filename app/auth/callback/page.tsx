@@ -64,7 +64,6 @@ export default function AuthCallbackPage() {
             last_name: lastNameParts.join(' '),
             user_type: accountRole,
             sms_opt_in: false,
-            approved: accountRole === 'agent',
           })
 
           if (insertError) throw insertError
@@ -73,7 +72,6 @@ export default function AuthCallbackPage() {
             .from('users')
             .update({
               user_type: intendedRole,
-              approved: intendedRole === 'agent',
             })
             .eq('id', authUser.id)
 
