@@ -32,6 +32,7 @@ type DashboardData = {
   organization_forfeited_at: string | null
   membership: {
     status: string
+    listing_allowed: boolean
     current_period_end: string | null
     delinquent_since: string | null
     days_delinquent: number
@@ -162,7 +163,8 @@ export default function AgentOrganizationPanel() {
 
       {membershipDelinquent && !data.membership.forfeiture_processed_at && (
         <div className="border-b border-amber-200 bg-amber-50 px-6 py-4 text-sm text-amber-950 sm:px-8">
-          <strong>Membership payment is overdue.</strong> Restore billing within{' '}
+          <strong>Membership payment is overdue, so new listing access is paused.</strong>{' '}
+          Restore billing within{' '}
           {daysUntilForfeiture} days to keep your current organization. At 60 continuous days
           unpaid, your downline rolls up and does not return.
         </div>
