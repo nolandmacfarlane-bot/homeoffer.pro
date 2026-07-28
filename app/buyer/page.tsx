@@ -50,8 +50,8 @@ export default function BuyerDashboard() {
         smsEnabled: currentUser.sms_opt_in || false,
       })
     } catch (err) {
+      // Data-loading errors should not invalidate a valid login session.
       console.error('Error loading dashboard:', err)
-      router.push('/login')
     } finally {
       setLoading(false)
     }
