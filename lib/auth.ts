@@ -26,7 +26,6 @@ export async function signUp(email: string, password: string, userData: {
       agent_license: userData.agent_license,
       agent_state: userData.agent_state,
       sms_opt_in: userData.sms_opt_in ?? false,
-      approved: userData.user_type === 'agent',
     })
 
   if (profileError) throw profileError
