@@ -103,8 +103,16 @@ export default function SettingsPage() {
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow">
-          <div className="max-w-4xl mx-auto px-4 py-6">
+          <div className="flex max-w-4xl flex-col gap-4 px-4 py-6 mx-auto sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+            {user?.user_type === 'agent' && (
+              <Link
+                href="/agent/profile"
+                className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-slate-300 bg-white px-6 py-3 text-base font-black text-slate-900 transition hover:border-blue-600 hover:text-blue-700"
+              >
+                ← Agent Dashboard
+              </Link>
+            )}
           </div>
         </div>
 
