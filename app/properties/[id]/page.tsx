@@ -21,6 +21,11 @@ export default function PropertyDetailPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
+  const [offerRole, setOfferRole] = useState<'buyer' | 'agent' | ''>('')
+  const [approvalGranted, setApprovalGranted] = useState(false)
+  const [approvalRequested, setApprovalRequested] = useState(false)
+  const [cardVerified, setCardVerified] = useState(false)
+  const [verificationLoading, setVerificationLoading] = useState(false)
 
   useEffect(() => {
     loadPropertyData()
@@ -30,6 +35,30 @@ export default function PropertyDetailPage() {
     try {
       const currentUser = await getCurrentUser()
       setUser(currentUser)
+
+      if (currentUser?.id) {
+        setCardVerified(Boolean(currentUser.offer_card_verified))
+        const { data: approval } = await supabase
+          .from('agent_approvals')
+          .select('id, approved')
+          .eq('property_id', propertyId)
+          .eq('buyer_id', currentUser.id)
+          .maybeSingle()
+        setApprovalRequested(Boolean(approval))
+        setApprovalGranted(Boolean(approval?.approved))
+
+        const query = new URLSearchParams(window.location.search)
+        const sessionId = query.get('session_id')
+        if (query.get('card_verification') === 'complete' && sessionId) {
+          const response = await fetch(`/api/card-verification?session_id=${encodeURIComponent(sessionId)}`)
+          const result = await response.json()
+          if (response.ok && result.verified && result.propertyId === propertyId) {
+            setCardVerified(true)
+            await supabase.auth.updateUser({ data: { offer_card_verified: true } })
+            window.history.replaceState({}, '', `/properties/${propertyId}`)
+          }
+        }
+      }
 
       const { property, offers } = await getPropertyWithOffers(propertyId)
       setProperty(property)
@@ -56,6 +85,50 @@ export default function PropertyDetailPage() {
   const platformFee = currentOfferAmount * 0.005
   const buyerAgentCommission = currentOfferAmount * 0.025
   const estimatedTotal = currentOfferAmount + platformFee + buyerAgentCommission
+  const canSubmitOffer = approvalGranted || cardVerified
+
+  async function startCardVerification() {
+    if (!user) {
+      router.push(`/login?redirect=/properties/${propertyId}`)
+      return
+    }
+
+    setVerificationLoading(true)
+    setError('')
+    try {
+      const response = await fetch('/api/card-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ propertyId, email: user.email }),
+      })
+      const result = await response.json()
+      if (!response.ok || !result.url) throw new Error(result.error || 'Unable to start card verification')
+      window.location.href = result.url
+    } catch (err: any) {
+      setError(err.message)
+      setVerificationLoading(false)
+    }
+  }
+
+  async function requestListingAgentApproval() {
+    if (!user) {
+      router.push(`/login?redirect=/properties/${propertyId}`)
+      return
+    }
+
+    setError('')
+    const { error: approvalError } = await supabase.from('agent_approvals').insert({
+      property_id: propertyId,
+      buyer_id: user.id,
+      listing_agent_id: property.listing_agent_id,
+      approved: false,
+    })
+    if (approvalError && !approvalError.message.toLowerCase().includes('duplicate')) {
+      setError(approvalError.message)
+      return
+    }
+    setApprovalRequested(true)
+  }
 
   async function handleSubmitOffer(e: React.FormEvent) {
     e.preventDefault()
@@ -65,6 +138,14 @@ export default function PropertyDetailPage() {
     try {
       if (!user) {
         throw new Error('You must be logged in to submit an offer')
+      }
+
+      if (!offerRole) {
+        throw new Error('Choose whether you are submitting as a buyer or an agent')
+      }
+
+      if (!canSubmitOffer) {
+        throw new Error('Request listing-agent approval or verify a card before submitting an offer')
       }
 
       if (!offerAmount) {
@@ -226,80 +307,63 @@ export default function PropertyDetailPage() {
               </div>
             )}
 
-            {/* Approval Message or Offer Form */}
+            {/* Offer identity, verification and submission */}
             {property.status === 'active' && (
-              <>
-                {!user?.approved ? (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <p className="text-yellow-800 font-semibold mb-2">⏳ Awaiting Approval</p>
-                    <p className="text-yellow-700 text-sm mb-4">
-                      Your access to submit offers is pending approval from the listing agent.
-                    </p>
-                    <button
-                      onClick={async () => {
-                        if (!user?.id) return
-                        try {
-                          await supabase.from('agent_approvals').insert({
-                            property_id: propertyId,
-                            buyer_id: user.id,
-                            listing_agent_id: property.listing_agent_id,
-                          })
-                          alert('Approval request sent! The listing agent will review shortly.')
-                          await loadPropertyData()
-                        } catch (err: any) {
-                          alert('Error: ' + err.message)
-                        }
-                      }}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold text-sm w-full"
-                    >
-                      Request Approval
-                    </button>
+              <div className="space-y-4">
+                {!user ? (
+                  <div className="rounded-lg border border-blue-200 bg-white p-6 shadow">
+                    <h3 className="text-xl font-bold text-gray-900">Ready to submit an offer?</h3>
+                    <p className="mt-2 text-sm text-gray-600">Create a free account or sign in first.</p>
+                    <Link href={`/login?redirect=/properties/${propertyId}`} className="mt-4 block rounded-lg bg-blue-600 px-4 py-3 text-center font-bold text-white hover:bg-blue-700">Sign in to continue</Link>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmitOffer} className="space-y-4 bg-white rounded-lg shadow p-6">
-                    {error && (
-                      <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
-                        {error}
+                  <>
+                    <div className="rounded-lg bg-white p-6 shadow">
+                      <h3 className="text-lg font-bold text-gray-900">Who are you submitting this offer for?</h3>
+                      <div className="mt-4 grid grid-cols-2 gap-3">
+                        <button type="button" onClick={() => setOfferRole('buyer')} aria-pressed={offerRole === 'buyer'} className={`rounded-lg border-2 px-4 py-3 font-bold ${offerRole === 'buyer' ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-300 text-gray-900'}`}>I am a buyer</button>
+                        <button type="button" onClick={() => setOfferRole('agent')} aria-pressed={offerRole === 'agent'} className={`rounded-lg border-2 px-4 py-3 font-bold ${offerRole === 'agent' ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-300 text-gray-900'}`}>I am an agent</button>
+                      </div>
+                    </div>
+
+                    {!canSubmitOffer && (
+                      <div className="rounded-lg border border-blue-200 bg-blue-50 p-5">
+                        <h3 className="font-bold text-gray-900">Verify before submitting</h3>
+                        <p className="mt-1 text-sm text-gray-600">Choose either option. Bidding is free.</p>
+                        <div className="mt-4 space-y-3">
+                          <button type="button" onClick={requestListingAgentApproval} disabled={approvalRequested} className="w-full rounded-lg bg-blue-600 px-4 py-3 font-bold text-white hover:bg-blue-700 disabled:bg-blue-300">
+                            {approvalRequested ? 'Approval request sent' : "Request listing agent's approval to offer"}
+                          </button>
+                          <button type="button" onClick={startCardVerification} disabled={verificationLoading} className="w-full rounded-lg border-2 border-gray-900 bg-white px-4 py-3 font-bold text-gray-900 hover:bg-gray-50 disabled:opacity-50">
+                            {verificationLoading ? 'Opening secure verification...' : 'Verify with a credit or debit card'}
+                          </button>
+                          <p className="text-center text-xs text-gray-500">Card verification does not purchase anything or charge a HomeOffer.pro fee.</p>
+                        </div>
                       </div>
                     )}
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Your Offer ($500 increments)
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-3 text-gray-600">$</span>
-                        <input
-                          type="number"
-                          value={offerAmount}
-                          onChange={(e) => setOfferAmount(e.target.value)}
-                          step="500"
-                          min={Math.max(500, (highestOffer?.amount || property.starting_offer) + 500)}
-                          className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900"
-                          placeholder="0"
-                          required
-                        />
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2">
-                        Min: $
-                        {Math.max(500, (highestOffer?.amount || property.starting_offer) + 500).toLocaleString()}
-                      </p>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={submitting}
-                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition disabled:opacity-50"
-                    >
-                      {submitting ? 'Submitting...' : 'Submit Offer'}
-                    </button>
-
-                    <p className="text-xs text-gray-500 text-center">
-                      📱 You'll be notified when someone offers more
-                    </p>
-                  </form>
+                    {canSubmitOffer && (
+                      <form onSubmit={handleSubmitOffer} className="space-y-4 rounded-lg bg-white p-6 shadow">
+                        <div className="rounded-lg bg-green-50 px-4 py-3 text-sm font-bold text-green-800">
+                          {cardVerified ? 'Card verified' : 'Approved by the listing agent'}
+                        </div>
+                        {error && <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
+                        <div>
+                          <label className="mb-1 block text-sm font-medium text-gray-700">Your offer ($500 increments)</label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-3 text-gray-600">$</span>
+                            <input type="number" value={offerAmount} onChange={(e) => setOfferAmount(e.target.value)} step="500" min={Math.max(500, (highestOffer?.amount || property.starting_offer) + 500)} className="w-full rounded-lg border border-gray-300 py-2 pl-8 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                          </div>
+                          <p className="mt-2 text-xs text-gray-500">Minimum: ${Math.max(500, (highestOffer?.amount || property.starting_offer) + 500).toLocaleString()}</p>
+                        </div>
+                        <button type="submit" disabled={submitting || !offerRole} className="w-full rounded-lg bg-red-600 py-3 font-bold text-white transition hover:bg-red-700 disabled:opacity-50">
+                          {submitting ? 'Submitting...' : 'Submit offer'}
+                        </button>
+                      </form>
+                    )}
+                  </>
                 )}
-              </>
+              </div>
             )}
 
             {property.status !== 'active' && (
