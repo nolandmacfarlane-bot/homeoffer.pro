@@ -13,6 +13,10 @@ export default function SignupPage() {
     password_confirm: '',
     first_name: '',
     last_name: '',
+    phone_number: '',
+    dre_license_number: '',
+    broker_name: '',
+    broker_dre_number: '',
   })
   const [smsOptIn, setSmsOptIn] = useState(false)
   const [termsAccepted, setTermsAccepted] = useState(false)
@@ -46,6 +50,12 @@ export default function SignupPage() {
     }
   }, [])
 
+  function chooseRole(role: 'buyer' | 'agent') {
+    setSignupRole(role)
+    setAgentSignup(role === 'agent')
+    window.localStorage.setItem('homeoffer_signup_role', role)
+  }
+
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
     setError('')
@@ -60,11 +70,19 @@ export default function SignupPage() {
         throw new Error('Password must be at least 8 characters')
       }
 
+      if (agentSignup && !formData.dre_license_number.trim()) {
+        throw new Error('California DRE license number is required for agent accounts')
+      }
+
       await signUp(formData.email, formData.password, {
         first_name: formData.first_name,
         last_name: formData.last_name,
         user_type: signupRole,
         sms_opt_in: smsOptIn,
+        phone_number: formData.phone_number,
+        dre_license_number: formData.dre_license_number,
+        broker_name: formData.broker_name,
+        broker_dre_number: formData.broker_dre_number,
       })
 
       if (agentSignup) {
@@ -111,9 +129,41 @@ export default function SignupPage() {
         <p className="text-gray-600 mb-6">
           {agentSignup ? 'Create your agent account' : 'Create your account'}
         </p>
+        <fieldset className="mb-6">
+          <legend className="mb-3 text-base font-bold text-gray-900">I am creating an account as a:</legend>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => chooseRole('buyer')}
+              aria-pressed={signupRole === 'buyer'}
+              className={`min-h-16 rounded-lg border-2 px-4 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 ${
+                signupRole === 'buyer'
+                  ? 'border-blue-600 bg-blue-50 text-blue-900'
+                  : 'border-gray-300 bg-white text-gray-900 hover:border-gray-500'
+              }`}
+            >
+              <span className="block font-bold">Buyer</span>
+              <span className="block text-xs font-normal">Browse homes and make offers</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => chooseRole('agent')}
+              aria-pressed={signupRole === 'agent'}
+              className={`min-h-16 rounded-lg border-2 px-4 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 ${
+                signupRole === 'agent'
+                  ? 'border-blue-600 bg-blue-50 text-blue-900'
+                  : 'border-gray-300 bg-white text-gray-900 hover:border-gray-500'
+              }`}
+            >
+              <span className="block font-bold">Real estate agent</span>
+              <span className="block text-xs font-normal">List properties and manage clients</span>
+            </button>
+          </div>
+        </fieldset>
+
         {agentSignup && (
           <div className="mb-5 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-900">
-            Agent membership is $7 per month. Add your license details after creating your account, then complete secure billing through Stripe.
+            Agent membership is $7 per month. Your license information is required so we can verify your account.
           </div>
         )}
 
@@ -252,6 +302,28 @@ export default function SignupPage() {
               aria-required="true"
             />
           </div>
+
+          {agentSignup && (
+            <fieldset className="space-y-4 rounded-lg border border-gray-200 p-4">
+              <legend className="px-1 text-base font-bold text-gray-900">Agent information</legend>
+              <div>
+                <label htmlFor="phone-number" className="block text-sm font-medium text-gray-700 mb-1">Phone number</label>
+                <input id="phone-number" type="tel" value={formData.phone_number} onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base text-gray-900" required />
+              </div>
+              <div>
+                <label htmlFor="dre-license" className="block text-sm font-medium text-gray-700 mb-1">California DRE license number</label>
+                <input id="dre-license" type="text" value={formData.dre_license_number} onChange={(e) => setFormData({ ...formData, dre_license_number: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base text-gray-900" required />
+              </div>
+              <div>
+                <label htmlFor="broker-name" className="block text-sm font-medium text-gray-700 mb-1">Brokerage name</label>
+                <input id="broker-name" type="text" value={formData.broker_name} onChange={(e) => setFormData({ ...formData, broker_name: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base text-gray-900" required />
+              </div>
+              <div>
+                <label htmlFor="broker-dre" className="block text-sm font-medium text-gray-700 mb-1">Broker DRE license number</label>
+                <input id="broker-dre" type="text" value={formData.broker_dre_number} onChange={(e) => setFormData({ ...formData, broker_dre_number: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base text-gray-900" required />
+              </div>
+            </fieldset>
+          )}
 
           {/* SMS Opt-In Checkbox */}
           <div className="flex items-start gap-3 bg-blue-50 p-3 rounded-lg">
