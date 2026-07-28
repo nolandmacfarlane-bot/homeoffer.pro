@@ -19,15 +19,28 @@ export default function SignupPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [agentSignup, setAgentSignup] = useState(false)
+  const [signupRole, setSignupRole] = useState<'buyer' | 'seller' | 'agent'>('buyer')
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const referralCode = params.get('ref')
-    const isAgentSignup = params.get('role') === 'agent' || Boolean(referralCode)
-    setAgentSignup(isAgentSignup)
-    if (isAgentSignup) {
-      window.localStorage.setItem('homeoffer_signup_role', 'agent')
+    const requestedRole = params.get('role')
+    const role =
+      requestedRole === 'seller'
+        ? 'seller'
+        : requestedRole === 'agent' || referralCode
+          ? 'agent'
+          : 'buyer'
+
+    setSignupRole(role)
+    setAgentSignup(role === 'agent')
+
+    if (role === 'seller' || role === 'agent') {
+      window.localStorage.setItem('homeoffer_signup_role', role)
+    } else {
+      window.localStorage.removeItem('homeoffer_signup_role')
     }
+
     if (referralCode) {
       window.localStorage.setItem('homeoffer_sponsor_code', referralCode.toUpperCase())
     }
@@ -50,7 +63,7 @@ export default function SignupPage() {
       await signUp(formData.email, formData.password, {
         first_name: formData.first_name,
         last_name: formData.last_name,
-        user_type: agentSignup ? 'agent' : 'buyer',
+        user_type: signupRole,
         sms_opt_in: smsOptIn,
       })
 
@@ -65,8 +78,11 @@ export default function SignupPage() {
         }
         window.localStorage.removeItem('homeoffer_signup_role')
         router.push('/agent/profile')
+      } else if (signupRole === 'seller') {
+        window.localStorage.removeItem('homeoffer_signup_role')
+        router.push('/seller')
       } else {
-        router.push('/select-role')
+        router.push('/buyer')
       }
     } catch (err: any) {
       setError(err.message)
