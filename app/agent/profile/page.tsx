@@ -142,43 +142,36 @@ export default function AgentProfilePage() {
         <div className="mx-auto max-w-6xl space-y-7 px-4 py-8 sm:px-6 lg:px-8">
           <nav aria-label="Agent dashboard menu" className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <DashboardLink
-              number="01"
               title="Agent information"
               description="View or edit your personal, brokerage, phone and license information."
               href="#agent-information"
             />
             <DashboardLink
-              number="02"
               title="Post a property"
               description="Create a new property listing and save your work as a draft."
               href="/agent/listing-builder"
             />
             <DashboardLink
-              number="03"
               title="My listings"
               description="See the properties you posted, listing activity and offers."
               href="/agent/dashboard"
             />
             <DashboardLink
-              number="04"
               title="Organization & network"
               description="See your Tier 1 and Tier 2 agents and your organization."
               href="/agent/network"
             />
             <DashboardLink
-              number="05"
               title="Earnings & production"
               description="Review closed homes, production totals and eligible rewards."
               href="/agent/network"
             />
             <DashboardLink
-              number="06"
               title="Notifications & account settings"
               description="Manage notifications, privacy, account security and sign out."
               href="/settings"
             />
             <DashboardLink
-              number="07"
               title="Back to live listings"
               description="Return to the HomeOffer.pro property marketplace."
               href="/"
@@ -285,13 +278,11 @@ export default function AgentProfilePage() {
 }
 
 function DashboardLink({
-  number,
   title,
   description,
   href,
   last = false,
 }: {
-  number: string
   title: string
   description: string
   href: string
@@ -302,9 +293,6 @@ function DashboardLink({
       href={href}
       className={`group flex min-h-24 items-center gap-4 px-5 py-5 transition hover:bg-blue-50 sm:gap-6 sm:px-8 ${last ? '' : 'border-b border-slate-200'}`}
     >
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white">
-        {number}
-      </span>
       <span className="min-w-0 flex-1">
         <span className="block text-lg font-black text-slate-950 group-hover:text-blue-700 sm:text-xl">
           {title}
@@ -313,8 +301,11 @@ function DashboardLink({
           {description}
         </span>
       </span>
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-slate-300 text-2xl font-black text-blue-700 transition group-hover:border-blue-600 group-hover:bg-blue-600 group-hover:text-white" aria-hidden="true">
-        →
+      <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-slate-300 text-blue-700 transition group-hover:border-blue-600 group-hover:bg-blue-600 group-hover:text-white" aria-hidden="true">
+        <svg viewBox="0 0 24 24" className="block h-8 w-8" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 12h14" />
+          <path d="m13 6 6 6-6 6" />
+        </svg>
       </span>
     </Link>
   )
