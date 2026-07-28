@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import CountdownTimer from '@/components/CountdownTimer'
-import AgentOrganizationPanel from '@/components/AgentOrganizationPanel'
+import Navbar from '@/components/Navbar'
 
 export default function AgentDashboard() {
   const router = useRouter()
@@ -88,53 +88,35 @@ export default function AgentDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">Loading...</p>
-      </div>
+      <>
+        <Navbar />
+        <div className="min-h-[70vh] bg-gray-50 flex items-center justify-center">
+          <p className="text-gray-600">Loading your listings...</p>
+        </div>
+      </>
     )
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar />
+
       {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Listing Agent Dashboard
-              </h1>
-              <p className="text-gray-600 mt-1">Manage your properties & offers</p>
-            </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <Link
-                href="/agent/listing-builder"
-                className="rounded-full bg-blue-600 px-5 py-2.5 font-black text-white hover:bg-blue-700"
-              >
-                Create property listing
-              </Link>
-              <Link
-                href="/agent/network"
-                className="text-indigo-700 hover:text-indigo-900 font-semibold"
-              >
-                Production & Network
-              </Link>
-              <Link
-                href="/seller"
-                className="text-gray-600 hover:text-gray-900 font-semibold"
-              >
-                Back
-              </Link>
-              <button
-                onClick={() => router.push('/login')}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-semibold"
-              >
-                Sign Out
-              </button>
-            </div>
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-8 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-600">Agent workspace</p>
+            <h1 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">My listings</h1>
+            <p className="mt-2 text-base text-slate-600">Manage your properties, activity, and offers in one place.</p>
           </div>
+          <Link
+            href="/agent/listing-builder"
+            className="inline-flex min-h-12 items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-base font-black text-white transition hover:bg-blue-700"
+          >
+            Post a property
+          </Link>
         </div>
-      </div>
+      </section>
 
       {/* Stats */}
       <div className="bg-white border-b">
@@ -169,9 +151,6 @@ export default function AgentDashboard() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 pt-8">
-        <AgentOrganizationPanel />
-      </div>
 
       {/* Properties */}
       <div className="max-w-6xl mx-auto px-4 py-8">
