@@ -79,8 +79,8 @@ export default function AgentDashboard() {
 
       setProperties(enrichedProps)
     } catch (err) {
-      console.error('Error:', err)
-      router.push('/login')
+      // A listing/profile query failure is not an authentication failure.
+      console.error('Error loading agent dashboard:', err)
     } finally {
       setLoading(false)
     }
