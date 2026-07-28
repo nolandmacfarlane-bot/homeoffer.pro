@@ -92,7 +92,6 @@ export default function AgentProfilePage() {
       if (error && !isMissingAgentColumn) throw error
 
       setUser({ ...user, ...profileDetails })
-      alert('✅ Profile updated successfully!')
       setEditing(false)
       await loadProfile()
     } catch (err: any) {
