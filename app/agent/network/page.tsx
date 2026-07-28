@@ -107,7 +107,8 @@ export default function AgentNetworkPage() {
         rewardResult.error?.code === '42P01' ||
         tierOneResult.error?.code === '42703'
 
-      if (migrationMissing) {
+      const currentUserIsOwner = currentUser.email?.toLowerCase() === 'noland.macfarlane@gmail.com'
+      if (migrationMissing && !currentUserIsOwner) {
         setSystemReady(false)
       }
 
@@ -296,7 +297,7 @@ export default function AgentNetworkPage() {
             </div>
           )}
 
-          {!systemReady && (
+          {!systemReady && !ownerAccess && (
             <div className="rounded-xl border border-amber-300 bg-amber-50 px-5 py-4 text-amber-950">
               <p className="font-black">Agent membership setup is awaiting database activation.</p>
               <p className="mt-1 text-sm">Your listing dashboard still works. Network and billing records will appear after the new migration is applied.</p>
@@ -331,7 +332,7 @@ export default function AgentNetworkPage() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-300">Agent membership</p>
-                  <h2 className="mt-2 text-3xl font-black">$7 per month</h2>
+                  <h2 className="mt-2 text-3xl font-black">{ownerAccess ? 'Permanent owner access' : '$7 per month'}</h2>
                 </div>
                 <span className={`rounded-full px-3 py-1 text-xs font-black uppercase ${
                   membershipActive ? 'bg-emerald-400 text-emerald-950' : 'bg-white/15 text-white'
@@ -340,7 +341,9 @@ export default function AgentNetworkPage() {
                 </span>
               </div>
               <p className="mt-5 text-slate-300">
-                Access the agent network, production ledger, and member tools. Billing is handled securely by Stripe.
+                {ownerAccess
+                  ? 'Your account is permanently active with full access. No subscription or payment is required.'
+                  : 'Access the agent network, production ledger, and member tools. Billing is handled securely by Stripe.'}
               </p>
               {membership?.current_period_end && (
                 <p className="mt-3 text-sm text-slate-400">
@@ -348,7 +351,7 @@ export default function AgentNetworkPage() {
                   {new Date(membership.current_period_end).toLocaleDateString()}.
                 </p>
               )}
-              <button
+              {!ownerAccess && <button
                 onClick={() =>
                   publicPreview
                     ? router.push('/signup?role=agent')
@@ -368,7 +371,7 @@ export default function AgentNetworkPage() {
                     : membershipActive
                       ? 'Manage billing'
                       : 'Subscribe for $7/month'}
-              </button>
+              </button>}
             </article>
 
             <article className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
