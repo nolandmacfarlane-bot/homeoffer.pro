@@ -1,136 +1,83 @@
 import { supabase } from './supabase'
 
-// Submit an offer on a property
-export async function submitOffer(
-  propertyId: string,
-  buyerId: string,
+export type PublicBidEvent = {
+  sequence_number: number
   amount: number
-) {
-  // Validate offer is a $500 increment
-  if (amount % 500 !== 0) {
-    throw new Error('Offers must be in $500 increments')
+  masked_bidder: string
+  created_at: string
+}
+
+export type OfferSummary = { current_amount: number; bid_count: number }
+export type MyOfferStatus = { maximum_amount: number; current_amount: number; is_leading: boolean }
+export type ListingAgentBidder = {
+  bidder_id: string
+  full_name: string
+  email: string
+  phone_number: string | null
+  user_type: string
+  maximum_amount: number
+  visible_amount: number
+  is_leading: boolean
+  bid_steps: number
+  last_bid_at: string
+}
+export type ListingAgentBidEvent = PublicBidEvent & {
+  bidder_id: string
+  full_name: string
+  email: string
+  phone_number: string | null
+  maximum_amount: number
+}
+
+export async function submitMaximumOffer(propertyId: string, maximumAmount: number) {
+  if (!Number.isSafeInteger(maximumAmount) || maximumAmount <= 0 || maximumAmount % 500 !== 0) {
+    throw new Error('Your maximum must be entered in exact $500 increments.')
   }
-
-  // Check if buyer is approved for this property
-  const { data: approval, error: approvalError } = await supabase
-    .from('agent_approvals')
-    .select('*')
-    .eq('property_id', propertyId)
-    .eq('buyer_id', buyerId)
-    .eq('approved', true)
-    .single()
-
-  if (approvalError || !approval) {
-    throw new Error('Buyer not approved for this property')
-  }
-
-  // Get current highest offer
-  const { data: highestOffer } = await supabase
-    .from('offers')
-    .select('amount')
-    .eq('property_id', propertyId)
-    .order('amount', { ascending: false })
-    .limit(1)
-    .single()
-
-  // Validate new offer is higher
-  if (highestOffer && amount <= highestOffer.amount) {
-    throw new Error(`Offer must be higher than current highest: $${highestOffer.amount}`)
-  }
-
-  // Get property to check starting offer
-  const { data: property } = await supabase
-    .from('properties')
-    .select('starting_offer')
-    .eq('id', propertyId)
-    .single()
-
-  if (!property || amount < property.starting_offer) {
-    throw new Error(`Offer must be at least starting price: $${property?.starting_offer}`)
-  }
-
-  // Mark previous highest offer as not highest
-  if (highestOffer) {
-    await supabase
-      .from('offers')
-      .update({ is_highest: false })
-      .eq('property_id', propertyId)
-      .eq('is_highest', true)
-  }
-
-  // Submit new offer
-  const { data, error } = await supabase
-    .from('offers')
-    .insert({
-      property_id: propertyId,
-      buyer_id: buyerId,
-      amount,
-      is_highest: true,
-    })
-
+  const { data, error } = await supabase.rpc('place_max_offer', {
+    p_property_id: propertyId,
+    p_maximum_amount: maximumAmount,
+  })
   if (error) throw error
-
-  // Extend offer period if within last 15 minutes
-  await extendOfferPeriodIfNeeded(propertyId)
-
-  return data
+  return data?.[0]
 }
 
-// Check if offer period should be extended (within last 15 mins)
-export async function extendOfferPeriodIfNeeded(propertyId: string) {
-  const { data: property } = await supabase
-    .from('properties')
-    .select('offer_end_date')
-    .eq('id', propertyId)
-    .single()
-
-  if (!property) return
-
-  const now = new Date()
-  const endDate = new Date(property.offer_end_date)
-  const minutesRemaining = (endDate.getTime() - now.getTime()) / (1000 * 60)
-
-  // If within last 15 minutes, extend by 15 more minutes
-  if (minutesRemaining > 0 && minutesRemaining <= 15) {
-    const newEndDate = new Date(now.getTime() + 15 * 60 * 1000)
-
-    await supabase
-      .from('properties')
-      .update({
-        offer_end_date: newEndDate.toISOString(),
-      })
-      .eq('id', propertyId)
-
-    return { extended: true, newEndDate }
-  }
-
-  return { extended: false }
+export async function submitOffer(propertyId: string, _buyerId: string, amount: number) {
+  return submitMaximumOffer(propertyId, amount)
 }
 
-// Get all offers for a property
-export async function getOffersForProperty(propertyId: string) {
-  const { data, error } = await supabase
-    .from('offers')
-    .select(`
-      *,
-      users:buyer_id (first_name, last_name, email)
-    `)
-    .eq('property_id', propertyId)
-    .order('amount', { ascending: false })
-
+export async function getPublicOfferHistory(propertyId: string): Promise<PublicBidEvent[]> {
+  const { data, error } = await supabase.rpc('get_public_offer_history', { p_property_id: propertyId })
   if (error) throw error
-  return data
+  return (data || []) as PublicBidEvent[]
 }
 
-// Get highest offer for a property
+export async function getPublicOfferSummary(propertyId: string): Promise<OfferSummary | null> {
+  const { data, error } = await supabase.rpc('get_public_offer_summary', { p_property_id: propertyId })
+  if (error) throw error
+  return (data?.[0] as OfferSummary) || null
+}
+
+export async function getMyOfferStatus(propertyId: string): Promise<MyOfferStatus | null> {
+  const { data, error } = await supabase.rpc('get_my_offer_status', { p_property_id: propertyId })
+  if (error) throw error
+  return (data?.[0] as MyOfferStatus) || null
+}
+
+export async function getListingAgentBidderDetails(propertyId: string): Promise<ListingAgentBidder[]> {
+  const { data, error } = await supabase.rpc('get_listing_agent_bidder_details', { p_property_id: propertyId })
+  if (error) throw error
+  return (data || []) as ListingAgentBidder[]
+}
+
+export async function getListingAgentBidHistory(propertyId: string): Promise<ListingAgentBidEvent[]> {
+  const { data, error } = await supabase.rpc('get_listing_agent_bid_history', { p_property_id: propertyId })
+  if (error) throw error
+  return (data || []) as ListingAgentBidEvent[]
+}
+
+export const getOffersForProperty = getPublicOfferHistory
+
 export async function getHighestOffer(propertyId: string) {
-  const { data, error } = await supabase
-    .from('offers')
-    .select('*')
-    .eq('property_id', propertyId)
-    .eq('is_highest', true)
-    .single()
-
-  if (error && error.code !== 'PGRST116') throw error // PGRST116 = no rows found
-  return data || null
+  const summary = await getPublicOfferSummary(propertyId)
+  return summary ? { amount: summary.current_amount, is_highest: true } : null
 }
