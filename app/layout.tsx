@@ -63,11 +63,11 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta name="color-scheme" content="light" />
-        <link rel="icon" href="/homeoffer-mark.png" type="image/png" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/homeoffer-mark.png" />
-        <link rel="shortcut icon" href="/homeoffer-mark.png" />
-        <meta name="theme-color" content="#0b5cff" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
+        <link rel="shortcut icon" href="/icon.svg" />
+        <meta name="theme-color" content="#4f46e5" />
       </head>
       <body className="min-h-full flex flex-col">
         <a className="skip-link" href="#main-content">Skip to main content</a>
