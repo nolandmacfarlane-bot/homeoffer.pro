@@ -127,6 +127,25 @@ export default function AgentProfilePage() {
       <main className="min-h-screen bg-slate-50 text-slate-950">
         <section className="border-b border-slate-200 bg-white">
           <div className="mx-auto max-w-6xl px-4 py-9 sm:px-6 lg:px-8">
+            <Link
+              href="/"
+              className="mb-7 inline-flex min-h-12 items-center gap-3 rounded-full border-2 border-slate-300 bg-white px-5 py-2.5 font-black text-blue-700 transition hover:border-blue-600 hover:bg-blue-50"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M19 12H5" />
+                <path d="m11 18-6-6 6-6" />
+              </svg>
+              Back to live listings
+            </Link>
             <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">
               Agent account
             </p>
@@ -170,11 +189,6 @@ export default function AgentProfilePage() {
               title="Notifications & account settings"
               description="Manage notifications, privacy, account security and sign out."
               href="/settings"
-            />
-            <DashboardLink
-              title="Back to live listings"
-              description="Return to the HomeOffer.pro property marketplace."
-              href="/"
               last
             />
           </nav>
