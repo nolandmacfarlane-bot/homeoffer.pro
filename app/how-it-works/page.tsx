@@ -10,45 +10,121 @@ export const metadata: Metadata = {
 
 const audiences = [
   {
+    number: '01',
     name: 'For buyers',
-    bullets: [
-      'See the leading offer and estimated total price',
-      'Find open houses and deadlines quickly',
-      'Use your own real estate agent',
+    headline: 'Shop with more context and less guesswork.',
+    intro:
+      'HomeOffer.pro puts the information buyers need to act confidently in one place.',
+    benefits: [
+      {
+        title: 'See opportunities immediately',
+        copy: 'Active homes appear first, so buyers can browse naturally instead of landing on an empty search screen.',
+      },
+      {
+        title: 'Understand the full price',
+        copy: 'The leading offer, buyer’s premium and estimated total price are shown separately before a buyer submits an offer.',
+      },
+      {
+        title: 'Plan the next step',
+        copy: 'Open-house dates, property details, time remaining and agent contact information are easy to find from the listing.',
+      },
     ],
   },
   {
+    number: '02',
     name: 'For sellers',
-    bullets: [
-      'Create urgency with an 11-day offer period',
-      'Attract attention with a low starting offer',
-      'Accept, reject or counter any offer',
+    headline: 'Create a focused moment around the sale.',
+    intro:
+      'A defined offer period gives the property a clear launch, timeline and call to action.',
+    benefits: [
+      {
+        title: 'Concentrated market attention',
+        copy: 'An 11-day offer period can bring interested buyers into the same decision window instead of letting the listing drift.',
+      },
+      {
+        title: 'A low starting point can invite interest',
+        copy: 'The pricing strategy is designed to encourage discovery and participation while the seller retains the rights stated in the listing agreement.',
+      },
+      {
+        title: 'A fairer no-sale choice',
+        copy: 'If the campaign does not produce a sale, the seller selects the agreed $1,000 campaign-end option or $2,000 close-of-escrow option—not a later 0.5% platform fee on an off-platform sale.',
+      },
     ],
   },
   {
+    number: '03',
     name: 'For listing agents',
-    bullets: [
-      'Manage one organized listing campaign',
-      'Keep photos, dates and pricing together',
-      'A focused 11-day offer period can lead to an earlier closing and commission payment',
+    headline: 'Run a more organized listing campaign.',
+    intro:
+      'The listing, timeline and buyer activity are presented through one repeatable process.',
+    benefits: [
+      {
+        title: 'One clear campaign hub',
+        copy: 'Photos, property facts, open houses, pricing and contact details can be presented together instead of across disconnected messages.',
+      },
+      {
+        title: 'Clear expectations for buyers',
+        copy: 'The offer window and $500 increments make the next action easier to explain to every interested party.',
+      },
+      {
+        title: 'More useful conversations',
+        copy: 'When buyers can review the basics first, agents can spend more time on property-specific questions, qualification and representation.',
+      },
     ],
   },
   {
+    number: '04',
     name: 'For buyer agents',
-    bullets: [
-      'Stay involved throughout the offer process',
-      'Review the same information as your buyer',
-      'Keep compensation clearly explained',
+    headline: 'Stay central to the buyer’s decision.',
+    intro:
+      'HomeOffer.pro is built to support representation—not route buyers around their agent.',
+    benefits: [
+      {
+        title: 'Representation stays visible',
+        copy: 'The buyer-agent role is addressed in the offer process so buyers know when and how their agent participates.',
+      },
+      {
+        title: 'Compensation is explained',
+        copy: 'The pricing breakdown shows that the buyer’s premium includes the platform fee and buyer-agent compensation, subject to the parties’ written agreements.',
+      },
+      {
+        title: 'A shared source of information',
+        copy: 'The buyer and agent can review the same listing details, offer status, deadlines and open-house schedule before deciding what to do next.',
+      },
     ],
   },
   {
+    number: '05',
     name: 'For brokers',
-    bullets: [
-      'Use a consistent process across agents',
-      'Maintain brokerage oversight',
-      'Track eligible closings and rewards',
+    headline: 'Bring consistency to a process that is usually fragmented.',
+    intro:
+      'A structured marketplace can help a brokerage oversee how participating agents present and manage campaigns.',
+    benefits: [
+      {
+        title: 'A repeatable workflow',
+        copy: 'Standard steps for listings, open houses, pricing and offers make the process easier to train, review and improve.',
+      },
+      {
+        title: 'Broker oversight remains essential',
+        copy: 'Agent participation, compensation and marketing remain subject to licensing rules, brokerage approval and the transaction documents.',
+      },
+      {
+        title: 'Growth with accountability',
+        copy: 'Agent-network rewards are tied to eligible closed transactions—not recruiting alone—and remain subject to final broker-approved program terms.',
+      },
     ],
   },
+]
+
+const comparisonRows = [
+  ['Finding homes', 'Buyers may start with a search form or scattered links.', 'Live opportunities are placed front and center for easy browsing.'],
+  ['Offer timing', 'Deadlines and next steps can vary from listing to listing.', 'A defined 11-day window and clear $500 increments create a shared timeline.'],
+  ['Price context', 'The list price may not show the buyer’s full expected price.', 'Leading offer, buyer’s premium and estimated total are separated.'],
+  ['Open houses', 'Dates may be buried in remarks, posts or messages.', 'Dates and times are displayed in simple cards with calendar access.'],
+  ['Buyer representation', 'The buyer-agent role can feel disconnected from the website.', 'Buyer-agent participation and compensation are explained in the process.'],
+  ['Listing communication', 'Photos, questions, updates and offers may live in different places.', 'The property page acts as a central source for the campaign.'],
+  ['Seller momentum', 'A listing can remain active without a clear decision point.', 'A focused campaign gives interested buyers a reason to act within a defined period.'],
+  ['Broker consistency', 'Each agent may run a different process using different tools.', 'A repeatable workflow makes expectations easier to supervise and document.'],
 ]
 
 const questions = [
@@ -75,7 +151,7 @@ const questions = [
   {
     question: 'Does the seller have to accept the highest offer?',
     answer:
-      'No. The seller is not required to accept the highest offer and reserves the right to accept, reject or counter any offer.',
+      'No. Unless the signed documents specifically provide otherwise, the seller retains the right to accept, reject or counter an offer and may consider terms other than price.',
   },
   {
     question: 'Can financed buyers participate?',
@@ -116,13 +192,12 @@ export default function HowItWorksPage() {
               Why HomeOffer.pro
             </p>
             <h1 className="mt-4 max-w-4xl text-4xl font-black tracking-[-0.045em] text-slate-950 sm:text-5xl lg:text-6xl">
-              Turn buyer interest into a clear, competitive offer process.
+              A clearer, more focused way to buy and sell a home.
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600 sm:text-xl">
-              Instead of letting a listing sit while buyers wonder what to do next, HomeOffer.pro
-              brings interested buyers into one defined offer window. Buyers can see the leading offer,
-              full price and deadline, while sellers gain urgency, visibility and a better opportunity
-              for competing offers.
+              Traditional home sales can scatter listings, deadlines, pricing and communication
+              across multiple places. HomeOffer.pro brings the campaign into one easy-to-follow
+              experience for buyers, sellers and the professionals representing them.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -144,10 +219,10 @@ export default function HowItWorksPage() {
             <p className="text-sm font-black text-slate-950">The HomeOffer.pro difference</p>
             <dl className="mt-5 divide-y divide-slate-200">
               {[
-                ['11 days', 'One clear offer window'],
-                ['$500', 'Simple offer increments'],
-                ['Up front', 'Leading offer and total price'],
-                ['One place', 'Listings, open houses and offer activity'],
+                ['11 days', 'A focused offer period'],
+                ['$500', 'Clear offer increments'],
+                ['3 parts', 'Offer, premium and total shown'],
+                ['5 audiences', 'Buyer, seller, listing agent, buyer agent and broker'],
               ].map(([value, label]) => (
                 <div key={label} className="flex items-center justify-between gap-5 py-4 first:pt-0 last:pb-0">
                   <dt className="text-sm font-bold text-slate-600">{label}</dt>
@@ -183,16 +258,20 @@ export default function HowItWorksPage() {
       </nav>
 
       <section className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="max-w-3xl">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">
-            Who benefits?
+            Built around the whole transaction
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-[-0.035em] text-slate-950 sm:text-4xl">
-            One platform. Clear benefits for everyone.
+            Better information benefits everyone at the table.
           </h2>
+          <p className="mt-4 text-lg leading-8 text-slate-600">
+            These are the practical reasons each person can benefit from a more visible,
+            structured offer process.
+          </p>
         </div>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-10 space-y-6">
           {audiences.map((audience) => {
             const id = audience.name.toLowerCase().replaceAll(' ', '-').replace('for-', '')
 
@@ -200,24 +279,40 @@ export default function HowItWorksPage() {
               <article
                 id={id}
                 key={audience.name}
-                className="scroll-mt-44 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                className="scroll-mt-44 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
               >
-                <h3 className="text-xl font-black tracking-[-0.02em] text-slate-950">
-                  {audience.name}
-                </h3>
-                <ul className="mt-5 space-y-4">
-                  {audience.bullets.map((bullet) => (
-                    <li key={bullet} className="flex gap-3 text-sm font-bold leading-6 text-slate-600">
-                      <span
-                        aria-hidden="true"
-                        className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-black text-blue-700"
+                <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr]">
+                  <div>
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white">
+                      {audience.number}
+                    </span>
+                    <p className="mt-5 text-sm font-black uppercase tracking-[0.14em] text-blue-700">
+                      {audience.name}
+                    </p>
+                    <h3 className="mt-2 text-2xl font-black tracking-[-0.03em] text-slate-950 sm:text-3xl">
+                      {audience.headline}
+                    </h3>
+                    <p className="mt-4 leading-7 text-slate-600">{audience.intro}</p>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {audience.benefits.map((benefit) => (
+                      <div
+                        key={benefit.title}
+                        className="rounded-2xl border border-slate-200 bg-[#f6f8fb] p-5"
                       >
-                        ✓
-                      </span>
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
+                        <span
+                          aria-hidden="true"
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-black text-blue-700"
+                        >
+                          ✓
+                        </span>
+                        <h4 className="mt-4 text-lg font-black text-slate-950">{benefit.title}</h4>
+                        <p className="mt-2 text-sm leading-6 text-slate-600">{benefit.copy}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </article>
             )
           })}
@@ -228,50 +323,41 @@ export default function HowItWorksPage() {
         <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">
-              Why use HomeOffer.pro?
+              Side-by-side
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-[-0.035em] text-slate-950 sm:text-4xl">
-              A simpler way to create competition for a home.
+              What the experience is designed to improve
             </h2>
             <p className="mt-4 text-lg leading-8 text-slate-600">
-              Buyers know what is happening, sellers get a focused offer period and everyone can
-              follow the same clear process.
+              HomeOffer.pro does not replace the professionals or contracts in a real estate
+              transaction. It gives them a clearer place to organize the customer experience.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                title: 'A clear deadline',
-                copy: 'Buyers have 11 days to view the home, attend open houses and submit an offer.',
-              },
-              {
-                title: 'Straightforward pricing',
-                copy: 'The leading offer, buyer’s premium and total price are shown clearly before anyone offers.',
-              },
-              {
-                title: 'More buyer attention',
-                copy: 'A low starting offer and defined timeline can encourage more buyers to look and participate.',
-              },
-              {
-                title: 'The seller stays in control',
-                copy: 'The seller reserves the right to accept, reject or counter any offer—including the highest offer.',
-              },
-            ].map((benefit) => (
-              <article
-                key={benefit.title}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-              >
-                <span
-                  aria-hidden="true"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-lg font-black text-white"
-                >
-                  ✓
-                </span>
-                <h3 className="mt-5 text-xl font-black text-slate-950">{benefit.title}</h3>
-                <p className="mt-3 leading-7 text-slate-600">{benefit.copy}</p>
-              </article>
-            ))}
+          <div className="mt-10 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[760px] border-collapse text-left">
+                <caption className="sr-only">
+                  Comparison of a traditional selling process with the HomeOffer.pro experience
+                </caption>
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-950 text-white">
+                    <th scope="col" className="w-[20%] px-6 py-5 text-sm font-black">Area</th>
+                    <th scope="col" className="w-[40%] px-6 py-5 text-sm font-black">Traditional process</th>
+                    <th scope="col" className="w-[40%] px-6 py-5 text-sm font-black text-blue-300">HomeOffer.pro approach</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {comparisonRows.map(([area, traditional, homeOffer]) => (
+                    <tr key={area} className="align-top">
+                      <th scope="row" className="px-6 py-5 text-sm font-black text-slate-950">{area}</th>
+                      <td className="px-6 py-5 text-sm leading-6 text-slate-600">{traditional}</td>
+                      <td className="border-l border-blue-100 bg-blue-50/60 px-6 py-5 text-sm font-semibold leading-6 text-slate-800">{homeOffer}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
