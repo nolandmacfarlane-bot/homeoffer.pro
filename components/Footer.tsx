@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 
 export default function Footer() {
   return (
@@ -9,19 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Company Info */}
           <div>
-            <Link
-              href="/"
-              className="mb-4 inline-flex rounded-xl bg-white px-3 py-2 transition hover:opacity-90"
-              aria-label="HomeOffer.pro home"
-            >
-              <Image
-                src="/homeoffer-logo-15.png"
-                alt="HomeOffer.pro"
-                width={1908}
-                height={824}
-                className="h-10 w-auto"
-              />
-            </Link>
+            <h3 className="text-white font-bold text-lg mb-3">Home Offer</h3>
             <p className="text-sm text-gray-400 mb-4">
               Transparent real estate offer marketplace by California Probate & Trust.
             </p>
