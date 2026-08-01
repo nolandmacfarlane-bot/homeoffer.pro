@@ -90,25 +90,25 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-[88px] items-center justify-between gap-5">
+      <div className="w-full px-4 sm:px-6 lg:px-7">
+        <div className="flex h-[100px] items-center justify-between gap-6">
           {/* Logo - always clickable to go home/dashboard */}
           <Link 
             href={dashboardLink}
             className="flex shrink-0 items-center gap-2 transition hover:opacity-75"
           >
-            <Image src="/homeoffer-logo.svg" alt="" width={70} height={82} className="h-14 w-12 sm:h-16 sm:w-[54px]" priority />
-            <span className="text-2xl font-black tracking-[-0.045em] text-[#0b1220] sm:text-3xl">HomeOffer<span className="text-blue-600">.pro</span></span>
+            <Image src="/homeoffer-logo.svg" alt="" width={88} height={100} className="h-16 w-[54px] sm:h-20 sm:w-[68px]" priority />
+            <span className="text-3xl font-black tracking-[-0.045em] text-[#0b1220] sm:text-4xl">HomeOffer<span className="text-blue-600">.pro</span></span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden flex-1 items-center gap-1 lg:flex">
-            <Link href="/" className="rounded-lg px-3 py-2 text-sm font-extrabold text-blue-600">Homes</Link>
-            <Link href="/#buy-and-sell" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">Buy &amp; Sell</Link>
-            <Link href="/#how-it-works" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">How It Works</Link>
-            <Link href="/#agent-partners" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">For Agents</Link>
-            <Link href="/#submit-an-offer" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">Submit an Offer</Link>
-            <Link href="/#faq" className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">FAQ</Link>
+          <div className="hidden flex-1 items-center justify-center gap-2 lg:flex">
+            <Link href="/" className="rounded-lg px-3 py-3 text-lg font-extrabold text-blue-600">Homes</Link>
+            <Link href="/#buy-and-sell" className="rounded-lg px-3 py-3 text-lg font-bold text-slate-700 hover:bg-slate-100">Buy &amp; Sell</Link>
+            <Link href="/#how-it-works" className="rounded-lg px-3 py-3 text-lg font-bold text-slate-700 hover:bg-slate-100">How It Works</Link>
+            <Link href="/#agent-partners" className="rounded-lg px-3 py-3 text-lg font-bold text-slate-700 hover:bg-slate-100">For Agents</Link>
+            <Link href="/#submit-an-offer" className="rounded-lg px-3 py-3 text-lg font-bold text-slate-700 hover:bg-slate-100">Submit an Offer</Link>
+            <Link href="/#faq" className="rounded-lg px-3 py-3 text-lg font-bold text-slate-700 hover:bg-slate-100">FAQ</Link>
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -150,7 +150,7 @@ export default function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="rounded-full bg-blue-600 px-6 py-2.5 text-base font-black text-white transition hover:bg-blue-700"
+                  className="rounded-full bg-blue-600 px-8 py-4 text-xl font-black text-white transition hover:bg-blue-700"
                 >
                   Sign In
                 </Link>
