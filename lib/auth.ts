@@ -74,11 +74,19 @@ export async function signInWithOAuth(provider: 'google' | 'facebook') {
   try {
     // Cast provider to any to avoid TypeScript issues with facebook provider
     const providerType = provider === 'facebook' ? ('facebook' as any) : ('google' as any)
+    const configuredSiteUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '')
+    const browserOrigin = typeof window !== 'undefined' ? window.location.origin : ''
+    const isLocalDevelopment =
+      browserOrigin.startsWith('http://localhost:') ||
+      browserOrigin.startsWith('http://127.0.0.1:')
+    const siteOrigin = isLocalDevelopment
+      ? browserOrigin
+      : configuredSiteUrl || 'https://homeoffer.pro'
     
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: providerType,
       options: {
-        redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
+        redirectTo: `${siteOrigin}/auth/callback`,
       },
     })
 
