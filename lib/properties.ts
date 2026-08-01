@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { getPublicOfferHistory, getPublicOfferSummary } from './offers'
 
 export async function createProperty(data: {
   address: string
@@ -116,20 +117,14 @@ export async function getPropertyWithOffers(propertyId: string) {
 
   if (propertyError) throw propertyError
 
-  const { data: offers, error: offersError } = await supabase
-    .from('offers')
-    .select(`
-      *,
-      users:buyer_id (first_name, last_name, email)
-    `)
-    .eq('property_id', propertyId)
-    .order('amount', { ascending: false })
-
-  if (offersError) throw offersError
+  const [offers, summary] = await Promise.all([
+    getPublicOfferHistory(propertyId),
+    getPublicOfferSummary(propertyId),
+  ])
 
   return {
     property,
     offers,
-    highest_offer: offers?.[0] || null,
+    highest_offer: summary ? { amount: summary.current_amount } : null,
   }
 }
