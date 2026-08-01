@@ -1,329 +1,111 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { getCurrentUser } from '@/lib/auth'
-import { supabase } from '@/lib/supabase'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
+import {
+  getListingAgentBidderDetails,
+  getListingAgentBidHistory,
+  type ListingAgentBidder,
+  type ListingAgentBidEvent,
+} from '@/lib/offers'
+
+const money = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value)
+
+type PropertyHeader = { id: string; address: string; city: string; state: string; zip: string }
 
 export default function OfferorsPage() {
-  const params = useParams()
-  const router = useRouter()
-  const propertyId = params.id as string
-
-  const [property, setProperty] = useState<any>(null)
-  const [offers, setOffers] = useState<any[]>([])
+  const propertyId = useParams().id as string
+  const [property, setProperty] = useState<PropertyHeader | null>(null)
+  const [bidders, setBidders] = useState<ListingAgentBidder[]>([])
+  const [events, setEvents] = useState<ListingAgentBidEvent[]>([])
+  const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<any>(null)
-  const [selectedOfferor, setSelectedOfferor] = useState<any>(null)
-  const [contactMode, setContactMode] = useState<'email' | 'sms' | null>(null)
-  const [messageText, setMessageText] = useState('')
-  const [sending, setSending] = useState(false)
 
   useEffect(() => {
-    loadData()
+    async function load() {
+      try {
+        const { data, error: propertyError } = await supabase.from('properties').select('id,address,city,state,zip').eq('id', propertyId).single()
+        if (propertyError) throw propertyError
+        const [privateBidders, privateEvents] = await Promise.all([
+          getListingAgentBidderDetails(propertyId),
+          getListingAgentBidHistory(propertyId),
+        ])
+        setProperty(data)
+        setBidders(privateBidders)
+        setEvents(privateEvents)
+      } catch (cause: unknown) {
+        setError(cause instanceof Error ? cause.message : 'This information is available only to the assigned listing agent.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
   }, [propertyId])
 
-  async function loadData() {
-    try {
-      const currentUser = await getCurrentUser()
-      if (!currentUser) {
-        router.push('/login')
-        return
-      }
+  if (loading) return <main className="min-h-screen grid place-items-center bg-gray-50">Loading bidder details…</main>
 
-      setUser(currentUser)
-
-      // Get property
-      const { data: prop } = await supabase
-        .from('properties')
-        .select('*')
-        .eq('id', propertyId)
-        .single()
-
-      if (!prop || prop.listing_agent_id !== currentUser.id) {
-        router.push('/agent/dashboard')
-        return
-      }
-
-      setProperty(prop)
-
-      // Get all offers with buyer info
-      const { data: allOffers } = await supabase
-        .from('offers')
-        .select(`
-          *,
-          users:buyer_id (
-            id,
-            first_name,
-            last_name,
-            email,
-            phone_number,
-            user_type,
-            sms_opt_in
-          )
-        `)
-        .eq('property_id', propertyId)
-        .order('amount', { ascending: false })
-
-      setOffers(allOffers || [])
-    } catch (err) {
-      console.error('Error:', err)
-      router.push('/agent/dashboard')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function handleSendMessage() {
-    if (!selectedOfferor || !messageText) return
-
-    setSending(true)
-    try {
-      // SMS placeholder - ready for Twilio
-      if (contactMode === 'sms') {
-        console.log(`[SMS PLACEHOLDER] To: ${selectedOfferor.users.phone_number}`)
-        console.log(`[SMS PLACEHOLDER] Message: ${messageText}`)
-        alert('SMS sent! (Placeholder - Twilio not live yet)')
-      }
-      // Email - ready for Resend
-      else if (contactMode === 'email') {
-        console.log(`[EMAIL PLACEHOLDER] To: ${selectedOfferor.users.email}`)
-        console.log(`[EMAIL PLACEHOLDER] Message: ${messageText}`)
-        alert('Email sent! (Placeholder - email service not live yet)')
-      }
-
-      setMessageText('')
-      setSelectedOfferor(null)
-      setContactMode(null)
-    } catch (err: any) {
-      alert('Error: ' + err.message)
-    } finally {
-      setSending(false)
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    )
-  }
-
-  if (!property) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">Property not found</p>
-      </div>
-    )
-  }
+  if (error) return (
+    <main className="min-h-screen grid place-items-center bg-gray-50 px-6">
+      <section className="max-w-lg rounded-2xl border bg-white p-8 text-center">
+        <h1 className="text-2xl font-black">Private listing information</h1>
+        <p className="mt-3 text-gray-600">{error}</p>
+        <Link href="/agent/dashboard" className="mt-6 inline-flex rounded-full bg-black px-6 py-3 font-bold text-white">Agent dashboard</Link>
+      </section>
+    </main>
+  )
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Offerors</h1>
-              <p className="text-gray-600 mt-1">{property.address}</p>
-            </div>
-            <Link
-              href={`/agent/property/${propertyId}`}
-              className="text-gray-600 hover:text-gray-900 font-semibold"
-            >
-              ← Back
-            </Link>
-          </div>
+    <main className="min-h-screen bg-gray-50 text-gray-950">
+      <header className="border-b bg-white">
+        <div className="mx-auto max-w-7xl px-5 py-7">
+          <Link href="/agent/dashboard" className="text-base font-bold text-blue-700">← Agent dashboard</Link>
+          <h1 className="mt-4 text-3xl font-black">Private bidder activity</h1>
+          <p className="mt-1 text-gray-600">{property?.address}, {property?.city}, {property?.state} {property?.zip}</p>
+          <p className="mt-3 max-w-3xl rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm font-semibold text-blue-950">Only the listing agent assigned to this property can view bidder identities, contact details, and private maximums. These details never appear in public bid history.</p>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {offers.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <p className="text-gray-600 text-lg">No offers yet</p>
+      <div className="mx-auto max-w-7xl space-y-8 px-5 py-8">
+        <section>
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+            <div><h2 className="text-2xl font-black">Bidders</h2><p className="text-gray-600">One row per person, including the maximum they privately authorized.</p></div>
+            <div className="text-sm font-bold">{bidders.length} bidder{bidders.length === 1 ? '' : 's'} · {events.length} visible $500 steps</div>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Offerors List */}
-            <div className="lg:col-span-2">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                {offers.length} Total Offerors
-              </h2>
-
-              <div className="space-y-4">
-                {offers.map((offer, idx) => (
-                  <div
-                    key={offer.id}
-                    onClick={() => setSelectedOfferor(offer)}
-                    className={`p-6 rounded-lg border-2 cursor-pointer transition ${
-                      selectedOfferor?.id === offer.id
-                        ? 'border-indigo-600 bg-indigo-50'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-lg font-bold text-gray-900">
-                            {offer.users.first_name} {offer.users.last_name}
-                          </h3>
-                          {idx === 0 && (
-                            <span className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">
-                              HIGHEST
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-gray-600 text-sm">{offer.users.email}</p>
-                        {offer.users.phone_number && (
-                          <p className="text-gray-600 text-sm">{offer.users.phone_number}</p>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <p className="text-3xl font-bold text-indigo-600">
-                          ${offer.amount.toLocaleString()}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(offer.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Dual Representation Info */}
-                    <div className="bg-gray-50 rounded p-3 text-sm">
-                      <p className="text-gray-700 mb-2">
-                        <strong>Buyer Status:</strong> {offer.users.user_type === 'agent' ? 'Agent' : 'Individual Buyer'}
-                      </p>
-                      <p className="text-gray-700 mb-3">
-                        <strong>SMS Notifications:</strong> {offer.users.sms_opt_in ? '✅ Yes' : '⚫ No'}
-                      </p>
-
-                      {/* Dual Rep Option */}
-                      <div className="bg-blue-100 border border-blue-300 rounded p-2 text-blue-900 text-xs">
-                        💡 <strong>Dual Representation:</strong> California allows dual agency. You can represent this buyer too.
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Contact Form */}
-            <div className="lg:col-span-1">
-              {selectedOfferor ? (
-                <div className="sticky top-4 bg-white rounded-lg shadow p-6 space-y-6">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                      Contact {selectedOfferor.users.first_name}
-                    </h3>
-                    <p className="text-gray-600 text-sm">
-                      Offer: ${selectedOfferor.amount.toLocaleString()}
-                    </p>
-                  </div>
-
-                  {/* Contact Method Selector */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">
-                      Choose Contact Method
-                    </label>
-                    <div className="space-y-2">
-                      <button
-                        onClick={() => setContactMode('email')}
-                        className={`w-full p-3 rounded-lg border-2 font-semibold transition ${
-                          contactMode === 'email'
-                            ? 'border-indigo-600 bg-indigo-50 text-indigo-600'
-                            : 'border-gray-300 text-gray-700 hover:border-gray-400'
-                        }`}
-                      >
-                        📧 Send Email
-                      </button>
-                      {selectedOfferor.users.phone_number && selectedOfferor.users.sms_opt_in ? (
-                        <button
-                          onClick={() => setContactMode('sms')}
-                          className={`w-full p-3 rounded-lg border-2 font-semibold transition ${
-                            contactMode === 'sms'
-                              ? 'border-indigo-600 bg-indigo-50 text-indigo-600'
-                              : 'border-gray-300 text-gray-700 hover:border-gray-400'
-                          }`}
-                        >
-                          📱 Send SMS
-                        </button>
-                      ) : (
-                        <button disabled className="w-full p-3 rounded-lg border-2 border-gray-300 text-gray-400 font-semibold cursor-not-allowed">
-                          📱 SMS (Not opted in)
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Message Input */}
-                  {contactMode && (
-                    <>
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Message
-                        </label>
-                        <textarea
-                          value={messageText}
-                          onChange={(e) => setMessageText(e.target.value)}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          rows={6}
-                          placeholder={
-                            contactMode === 'sms'
-                              ? 'Keep SMS messages under 160 characters...'
-                              : 'Type your message...'
-                          }
-                        />
-                        {contactMode === 'sms' && (
-                          <p className="text-xs text-gray-500 mt-1">
-                            {messageText.length} / 160 characters
-                          </p>
-                        )}
-                      </div>
-
-                      <button
-                        onClick={handleSendMessage}
-                        disabled={sending || !messageText}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg font-semibold disabled:opacity-50 transition"
-                      >
-                        {sending ? 'Sending...' : `Send ${contactMode === 'sms' ? 'SMS' : 'Email'}`}
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setContactMode(null)
-                          setMessageText('')
-                        }}
-                        className="w-full bg-gray-300 hover:bg-gray-400 text-gray-900 px-4 py-3 rounded-lg font-semibold transition"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  )}
-
-                  {/* Quick Actions */}
-                  <div className="pt-4 border-t space-y-2">
-                    <button className="w-full text-left text-sm text-indigo-600 hover:underline font-semibold">
-                      🤝 Offer Dual Representation
-                    </button>
-                    <button className="w-full text-left text-sm text-indigo-600 hover:underline font-semibold">
-                      📋 View Complete Profile
-                    </button>
-                    <button className="w-full text-left text-sm text-gray-600 hover:underline font-semibold">
-                      🚫 Block This Offeror
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-white rounded-lg shadow p-6 text-center text-gray-600">
-                  <p>Select an offeror to contact</p>
-                </div>
-              )}
-            </div>
+          <div className="overflow-x-auto rounded-2xl border bg-white shadow-sm">
+            <table className="w-full min-w-[1000px] text-left text-sm">
+              <thead className="bg-black text-white"><tr>{['Bidder','Type','Phone','Private maximum','Visible amount','Bid steps','Last activity','Status'].map(x => <th key={x} className="px-4 py-4">{x}</th>)}</tr></thead>
+              <tbody>
+                {bidders.map(bidder => <tr key={bidder.bidder_id} className="border-t">
+                  <td className="px-4 py-4"><strong>{bidder.full_name}</strong><br/><a className="text-blue-700 underline" href={`mailto:${bidder.email}`}>{bidder.email}</a></td>
+                  <td className="px-4 py-4 capitalize">{bidder.user_type}</td>
+                  <td className="px-4 py-4">{bidder.phone_number ? <a className="text-blue-700 underline" href={`tel:${bidder.phone_number}`}>{bidder.phone_number}</a> : 'Not provided'}</td>
+                  <td className="px-4 py-4 text-lg font-black">{money(bidder.maximum_amount)}</td>
+                  <td className="px-4 py-4 font-bold">{money(bidder.visible_amount)}</td>
+                  <td className="px-4 py-4">{bidder.bid_steps}</td>
+                  <td className="px-4 py-4">{new Date(bidder.last_bid_at).toLocaleString()}</td>
+                  <td className="px-4 py-4">{bidder.is_leading ? <span className="rounded-full bg-blue-100 px-3 py-1 font-bold text-blue-800">Leading</span> : 'Outbid'}</td>
+                </tr>)}
+                {!bidders.length && <tr><td colSpan={8} className="p-10 text-center text-gray-500">No bids yet.</td></tr>}
+              </tbody>
+            </table>
           </div>
-        )}
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-black">Complete $500-step history</h2>
+          <p className="mb-4 text-gray-600">Every visible increment is recorded separately, even when a bidder authorizes a much higher private maximum.</p>
+          <div className="overflow-x-auto rounded-2xl border bg-white shadow-sm">
+            <table className="w-full min-w-[900px] text-left text-sm">
+              <thead className="bg-gray-100"><tr>{['Step','Visible bid','Bidder','Contact','Bidder maximum','Time'].map(x => <th key={x} className="px-4 py-4">{x}</th>)}</tr></thead>
+              <tbody>{events.map(event => <tr key={`${event.sequence_number}-${event.created_at}`} className="border-t">
+                <td className="px-4 py-3">#{event.sequence_number}</td><td className="px-4 py-3 font-black">{money(event.amount)}</td><td className="px-4 py-3">{event.full_name}</td><td className="px-4 py-3">{event.email}<br/>{event.phone_number || ''}</td><td className="px-4 py-3 font-bold">{money(event.maximum_amount)}</td><td className="px-4 py-3">{new Date(event.created_at).toLocaleString()}</td>
+              </tr>)}</tbody>
+            </table>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   )
 }
