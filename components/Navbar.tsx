@@ -94,7 +94,7 @@ export default function Navbar() {
     { label: 'How It Works', href: '/how-it-works' },
     { label: 'List a Property', href: '/list-property' },
     { label: 'Grow Your Network', href: '/grow-your-network' },
-    { label: 'FAQ', href: '/faq' },
+    { label: 'FAQ', href: '/#faq' },
   ]
 
   return (
