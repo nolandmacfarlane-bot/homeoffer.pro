@@ -51,7 +51,7 @@ export default async function HomePage({
               <span>• $500 increments</span>
               <span>• Free to submit offers</span>
             </div>
-            <Link href="/properties" className="text-sm font-black text-blue-700 hover:text-blue-900">View all properties →</Link>
+            <Link href="/properties" className="inline-flex items-center justify-center rounded-full border-2 border-blue-600 bg-blue-600 px-6 py-3 text-sm font-black text-white transition hover:border-blue-700 hover:bg-blue-700">View all properties →</Link>
           </div>
         </div>
 
