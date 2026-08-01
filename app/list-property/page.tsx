@@ -1,7 +1,30 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
+import { supabase } from '@/lib/supabase'
 
 export default function ListPropertyPage() {
+  const [isSignedIn, setIsSignedIn] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    let active = true
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (active) setIsSignedIn(Boolean(data.session))
+    })
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (active) setIsSignedIn(Boolean(session))
+    })
+
+    return () => {
+      active = false
+      authListener.subscription.unsubscribe()
+    }
+  }, [])
+
   return (
     <main className="min-h-screen bg-[#f6f8fb] text-slate-950">
       <Navbar />
@@ -11,8 +34,10 @@ export default function ListPropertyPage() {
           <h1 className="mt-3 text-5xl font-black tracking-[-0.045em] sm:text-6xl">List your property on HomeOffer.pro</h1>
           <p className="mt-5 text-lg leading-8 text-slate-600">Put your home in front of active buyers with a clear 11-day offer period, transparent pricing and $500 offer increments. Accounts and bidding are free; listing agents pay $7 per month only when they publish a property.</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/signup?role=seller" className="rounded-full bg-blue-600 px-7 py-3.5 text-lg font-black text-white hover:bg-blue-700">Start a property listing</Link>
-            <Link href="/login" className="rounded-full border border-slate-300 bg-white px-7 py-3.5 text-lg font-black text-slate-950 hover:border-blue-400 hover:text-blue-700">Sign in to continue</Link>
+            <Link href={isSignedIn ? '/agent/listing-builder' : '/signup?role=seller'} className="rounded-full bg-blue-600 px-7 py-3.5 text-lg font-black text-white hover:bg-blue-700">Start a property listing</Link>
+            {isSignedIn === false && (
+              <Link href="/login" className="rounded-full border border-slate-300 bg-white px-7 py-3.5 text-lg font-black text-slate-950 hover:border-blue-400 hover:text-blue-700">Sign in to continue</Link>
+            )}
           </div>
         </div>
 
