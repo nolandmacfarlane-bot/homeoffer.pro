@@ -12,6 +12,7 @@ export default function Navbar() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false)
 
   useEffect(() => {
     loadUser()
@@ -33,6 +34,7 @@ export default function Navbar() {
       await signOut()
       setUser(null)
       setMenuOpen(false)
+      setAccountMenuOpen(false)
       router.refresh()
       router.push('/')
     } catch (err) {
@@ -87,6 +89,13 @@ export default function Navbar() {
 
   const navLinks = getNavLinks()
   const dashboardLink = getDashboardLink()
+  const publicLinks = [
+    { label: 'Homes', href: '/' },
+    { label: 'How It Works', href: '/how-it-works' },
+    { label: 'List a Property', href: '/list-property' },
+    { label: 'Grow Your Network', href: '/grow-your-network' },
+    { label: 'FAQ', href: '/faq' },
+  ]
 
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
@@ -110,19 +119,14 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden flex-1 items-center justify-center gap-1 lg:flex">
-            <Link href="/" className="rounded-lg bg-blue-50 px-4 py-3 text-base font-extrabold text-blue-600">Homes</Link>
-            <Link href="/how-it-works" className="rounded-lg px-4 py-3 text-base font-bold text-slate-950 hover:bg-slate-100">How It Works</Link>
-            <Link href="/list-property" className="rounded-lg px-4 py-3 text-base font-bold text-slate-950 hover:bg-slate-100">List a Property</Link>
-            <Link href="/grow-your-network" className="rounded-lg px-4 py-3 text-base font-bold text-slate-950 hover:bg-slate-100">Grow Your Network</Link>
-            <Link href="/faq" className="rounded-lg px-4 py-3 text-base font-bold text-slate-950 hover:bg-slate-100">FAQ</Link>
-            {navLinks.map((link) => (
+            {publicLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-4 py-2 rounded-lg font-semibold text-sm transition ${
+                className={`whitespace-nowrap rounded-lg px-4 py-3 text-base font-extrabold transition ${
                   pathname === link.href
-                    ? 'bg-blue-600 text-white'
-                    : 'text-slate-700 hover:bg-slate-100'
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-slate-950 hover:bg-slate-100'
                 }`}
               >
                 {link.label}
@@ -135,23 +139,28 @@ export default function Navbar() {
             {loading ? (
               <div className="w-10 h-10 animate-pulse bg-gray-300 rounded-lg" />
             ) : user ? (
-              <>
-                {/* User name + avatar - Desktop */}
-                <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-100">
+              <div className="relative hidden sm:block">
+                <button
+                  type="button"
+                  onClick={() => setAccountMenuOpen((open) => !open)}
+                  className="flex items-center gap-2 rounded-full bg-indigo-100 px-4 py-3 transition hover:bg-indigo-200"
+                  aria-expanded={accountMenuOpen}
+                  aria-haspopup="menu"
+                >
                   <div className="w-6 h-6 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
                     {user.first_name?.charAt(0) || '?'}
                   </div>
-                  <span className="text-indigo-900 font-semibold text-sm">{user.first_name || 'User'}</span>
-                </div>
-
-                {/* Sign Out Button */}
-                <button
-                  onClick={handleSignOut}
-                  className="hidden sm:block px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-sm transition"
-                >
-                  Sign Out
+                  <span className="whitespace-nowrap text-sm font-bold text-indigo-950">{user.first_name || 'User'}</span>
+                  <span aria-hidden="true" className="text-xs text-indigo-700">▾</span>
                 </button>
-              </>
+                {accountMenuOpen && (
+                  <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white p-2 shadow-xl" role="menu">
+                    <Link href={dashboardLink} onClick={() => setAccountMenuOpen(false)} className="block rounded-lg px-4 py-3 text-sm font-bold text-slate-900 hover:bg-slate-100" role="menuitem">Dashboard</Link>
+                    <Link href={user.user_type === 'agent' ? '/agent/profile' : '/settings'} onClick={() => setAccountMenuOpen(false)} className="block rounded-lg px-4 py-3 text-sm font-bold text-slate-900 hover:bg-slate-100" role="menuitem">Profile &amp; settings</Link>
+                    <button onClick={handleSignOut} className="block w-full rounded-lg px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-100" role="menuitem">Sign out</button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <Link
@@ -179,12 +188,9 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {menuOpen && (
           <div id="mobile-navigation" className="space-y-2 border-t border-gray-200 pb-4 pt-4 lg:hidden">
-            <Link href="/" className="block rounded-lg px-4 py-2 font-bold text-blue-600" onClick={() => setMenuOpen(false)}>Homes</Link>
-            <Link href="/#buy-and-sell" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>Buy &amp; Sell</Link>
-            <Link href="/#how-it-works" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>How It Works</Link>
-            <Link href="/#agent-partners" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>For Agents</Link>
-            <Link href="/#submit-an-offer" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>Submit an Offer</Link>
-            <Link href="/#faq" className="block rounded-lg px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>FAQ</Link>
+            {publicLinks.map((link) => (
+              <Link key={link.href} href={link.href} className="block rounded-lg px-4 py-3 font-bold text-slate-900 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>{link.label}</Link>
+            ))}
             {/* User info - Mobile */}
             {user && (
               <div className="px-4 py-2 bg-indigo-100 rounded-lg mb-2">
