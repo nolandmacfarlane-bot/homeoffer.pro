@@ -91,14 +91,14 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-[60px] items-center justify-between gap-5">
+        <div className="flex h-[88px] items-center justify-between gap-5">
           {/* Logo - always clickable to go home/dashboard */}
           <Link 
             href={dashboardLink}
             className="flex shrink-0 items-center gap-2 transition hover:opacity-75"
           >
-            <Image src="/homeoffer-logo.svg" alt="" width={44} height={52} className="h-10 w-[34px]" priority />
-            <span className="text-xl font-black tracking-[-0.045em] text-[#0b1220]">HomeOffer<span className="text-blue-600">.pro</span></span>
+            <Image src="/homeoffer-logo.svg" alt="" width={70} height={82} className="h-14 w-12 sm:h-16 sm:w-[54px]" priority />
+            <span className="text-2xl font-black tracking-[-0.045em] text-[#0b1220] sm:text-3xl">HomeOffer<span className="text-blue-600">.pro</span></span>
           </Link>
 
           {/* Desktop Navigation */}
