@@ -5,6 +5,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 
 export default function AllOffersPage() {
   const router = useRouter()
@@ -124,12 +125,7 @@ export default function AllOffersPage() {
               <h1 className="text-3xl font-bold text-gray-900">All Offers</h1>
               <p className="text-gray-600 mt-1">View offers across all your properties</p>
             </div>
-            <Link
-              href="/seller"
-              className="text-gray-600 hover:text-gray-900 font-semibold"
-            >
-              ← Back
-            </Link>
+            <BackButton href="/seller">Back</BackButton>
           </div>
 
           {/* Controls */}

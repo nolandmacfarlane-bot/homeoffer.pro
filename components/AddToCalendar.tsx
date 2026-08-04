@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { primaryButton } from '@/lib/ui-styles'
 
 type Props = {
   title: string
@@ -25,7 +26,7 @@ export default function AddToCalendar({ title, location, start, end, appleUrl }:
         type="button"
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2.5 text-sm font-black text-white hover:bg-blue-700"
+        className={`${primaryButton} w-full px-4`}
       >
         <span aria-hidden="true">＋</span>
         Add to calendar

@@ -6,8 +6,10 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
+import BackButton from '@/components/BackButton'
 import { getCurrentUser } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
+import { primaryButton, secondaryButton } from '@/lib/ui-styles'
 
 type Membership = {
   status: string
@@ -325,20 +327,15 @@ export default function AgentNetworkPage() {
               <div className="flex flex-wrap gap-3">
                 {publicPreview ? (
                   <>
-                    <Link href="/signup?role=agent" className="rounded-xl bg-blue-600 px-5 py-3 font-black text-white">
+                    <Link href="/signup?role=agent" className={primaryButton}>
                       Join for $7/month
                     </Link>
-                    <Link href="/login" className="rounded-xl border-2 border-slate-300 px-5 py-3 font-black text-slate-900">
+                    <Link href="/login" className={secondaryButton}>
                       Agent sign in
                     </Link>
                   </>
                 ) : (
-                  <Link
-                    href="/agent/profile"
-                    className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-slate-300 bg-white px-6 py-3 text-base font-black text-slate-900 transition hover:border-blue-600 hover:text-blue-700"
-                  >
-                    ← Agent Dashboard
-                  </Link>
+                  <BackButton href="/agent/profile">Agent dashboard</BackButton>
                 )}
               </div>
             </div>
@@ -417,7 +414,7 @@ export default function AgentNetworkPage() {
                       )
                 }
                 disabled={billingLoading || (!systemReady && !publicPreview)}
-                className="mt-6 w-full rounded-xl bg-blue-600 px-5 py-3 font-black text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                className={`${primaryButton} mt-6 w-full`}
               >
                 {billingLoading
                   ? 'Opening Stripe…'
@@ -490,7 +487,7 @@ export default function AgentNetworkPage() {
                       <button
                         type="button"
                         onClick={confirmSponsor}
-                        className="mt-4 rounded-xl bg-blue-600 px-5 py-3 font-black text-white hover:bg-blue-700"
+                        className={`${primaryButton} mt-4`}
                       >
                         Yes, permanently select this sponsor
                       </button>

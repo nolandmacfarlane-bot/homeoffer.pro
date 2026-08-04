@@ -5,6 +5,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 
 export default function SMSSettingsPage() {
   const router = useRouter()
@@ -92,12 +93,7 @@ export default function SMSSettingsPage() {
               <h1 className="text-3xl font-bold text-gray-900">SMS Settings</h1>
               <p className="text-gray-600 mt-1">Manage your SMS notifications</p>
             </div>
-            <Link
-              href="/buyer"
-              className="text-gray-600 hover:text-gray-900 font-semibold"
-            >
-              ← Back
-            </Link>
+            <BackButton href="/buyer">Back</BackButton>
           </div>
         </div>
       </div>

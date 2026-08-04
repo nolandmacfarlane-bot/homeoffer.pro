@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 
 export default function PrivacyPage() {
   return (
@@ -73,7 +74,7 @@ export default function PrivacyPage() {
           </div>
 
           <div className="mt-8 flex gap-4">
-            <Link href="/" className="text-indigo-600 hover:underline">← Back to Home</Link>
+            <BackButton href="/">Back to Home</BackButton>
             <Link href="/terms" className="text-indigo-600 hover:underline">View Terms of Service</Link>
           </div>
         </div>

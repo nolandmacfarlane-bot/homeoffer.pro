@@ -2,6 +2,7 @@
 
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 import Navbar from '@/components/Navbar'
 
 type OpenHouse = {
@@ -98,12 +99,7 @@ export default function AgentListingBuilder() {
               <h1 className="mt-2 text-4xl font-black tracking-[-0.04em]">Build a property listing</h1>
               <p className="mt-3 max-w-3xl text-lg text-slate-600">Collect the complete listing, media, open-house schedule and contact information in one organized draft.</p>
             </div>
-            <Link
-              href="/agent/profile"
-              className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-slate-300 bg-white px-6 py-3 text-base font-black text-slate-900 transition hover:border-blue-600 hover:text-blue-700"
-            >
-              ← Agent Dashboard
-            </Link>
+            <BackButton href="/agent/profile">Agent Dashboard</BackButton>
           </div>
         </section>
 

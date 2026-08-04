@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { signIn, signInWithOAuth } from '@/lib/auth'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { primaryButton, secondaryButton } from '@/lib/ui-styles'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -53,7 +54,7 @@ export default function LoginPage() {
           <button
             onClick={() => handleOAuth('google')}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-gray-700 font-semibold py-3 rounded-lg transition disabled:opacity-50 min-h-12"
+            className={`${secondaryButton} w-full`}
             aria-label="Sign in with Google"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -68,7 +69,7 @@ export default function LoginPage() {
           <button
             onClick={() => handleOAuth('facebook')}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 min-h-12"
+            className={`${primaryButton} w-full`}
             aria-label="Sign in with Meta"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -131,7 +132,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 min-h-12 text-base"
+            className={`${primaryButton} w-full`}
             aria-busy={loading}
           >
             {loading ? 'Signing in...' : 'Sign In'}

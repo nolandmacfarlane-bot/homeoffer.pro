@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 import { supabase } from '@/lib/supabase'
 import {
   getListingAgentBidderDetails,
@@ -60,7 +61,7 @@ export default function OfferorsPage() {
     <main className="min-h-screen bg-gray-50 text-gray-950">
       <header className="border-b bg-white">
         <div className="mx-auto max-w-7xl px-5 py-7">
-          <Link href="/agent/dashboard" className="text-base font-bold text-blue-700">← Agent dashboard</Link>
+          <BackButton href="/agent/dashboard">Agent dashboard</BackButton>
           <h1 className="mt-4 text-3xl font-black">Private bidder activity</h1>
           <p className="mt-1 text-gray-600">{property?.address}, {property?.city}, {property?.state} {property?.zip}</p>
           <p className="mt-3 max-w-3xl rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm font-semibold text-blue-950">Only the listing agent assigned to this property can view bidder identities, contact details, and private maximums. These details never appear in public bid history.</p>

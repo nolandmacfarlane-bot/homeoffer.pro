@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 
 export default function PropertyManagementPage() {
   const params = useParams()
@@ -185,12 +186,7 @@ export default function PropertyManagementPage() {
                 {property.city}, {property.state}
               </p>
             </div>
-            <Link
-              href="/agent/dashboard"
-              className="text-gray-600 hover:text-gray-900 font-semibold"
-            >
-              ← Back
-            </Link>
+            <BackButton href="/agent/dashboard">Agent dashboard</BackButton>
           </div>
         </div>
       </div>

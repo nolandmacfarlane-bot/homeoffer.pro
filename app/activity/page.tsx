@@ -5,6 +5,8 @@ import { getCurrentUser } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import BackButton from '@/components/BackButton'
+import { primaryButton } from '@/lib/ui-styles'
 
 export default function ActivityPage() {
   const router = useRouter()
@@ -125,12 +127,7 @@ export default function ActivityPage() {
               <h1 className="text-3xl font-bold text-gray-900">Activity Feed</h1>
               <p className="text-gray-600 mt-1">Real-time marketplace activity</p>
             </div>
-            <Link
-              href="/buyer"
-              className="text-gray-600 hover:text-gray-900 font-semibold"
-            >
-              ← Back
-            </Link>
+            <BackButton href="/buyer">Back</BackButton>
           </div>
         </div>
       </div>
@@ -142,10 +139,10 @@ export default function ActivityPage() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg font-semibold text-sm transition ${
+              className={`inline-flex min-h-12 items-center justify-center rounded-full border-2 px-5 py-3 text-sm font-black transition ${
                 filter === f
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-400'
+                  ? 'border-blue-600 bg-blue-600 text-white'
+                  : 'border-slate-300 bg-white text-slate-700 hover:border-blue-600 hover:text-blue-700'
               }`}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -159,7 +156,7 @@ export default function ActivityPage() {
             <p className="text-gray-600 text-lg mb-4">No activity yet</p>
             <Link
               href="/properties"
-              className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold"
+              className={primaryButton}
             >
               Browse Properties
             </Link>

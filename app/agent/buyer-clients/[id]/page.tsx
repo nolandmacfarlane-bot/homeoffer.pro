@@ -6,6 +6,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import CountdownTimer from '@/components/CountdownTimer'
+import BackButton from '@/components/BackButton'
 
 export default function BuyerClientProfilePage() {
   const params = useParams()
@@ -146,12 +147,7 @@ export default function BuyerClientProfilePage() {
               </h1>
               <p className="text-gray-600 mt-1">Buyer Client Profile</p>
             </div>
-            <Link
-              href="/agent/buyer-clients"
-              className="text-gray-600 hover:text-gray-900 font-semibold"
-            >
-              ← Back
-            </Link>
+            <BackButton href="/agent/buyer-clients">Buyer clients</BackButton>
           </div>
         </div>
       </div>

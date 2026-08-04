@@ -5,6 +5,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 
 export default function BuyerClientsPage() {
   const router = useRouter()
@@ -137,12 +138,7 @@ export default function BuyerClientsPage() {
               </h1>
               <p className="text-gray-600 mt-1">Manage all your buyer clients in one place</p>
             </div>
-            <Link
-              href="/agent/dashboard"
-              className="text-gray-600 hover:text-gray-900 font-semibold"
-            >
-              ← Back
-            </Link>
+            <BackButton href="/agent/dashboard">Agent dashboard</BackButton>
           </div>
         </div>
       </div>

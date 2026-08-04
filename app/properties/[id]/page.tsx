@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { FormEvent, useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
 import CountdownTimer from '@/components/CountdownTimer'
+import BackButton from '@/components/BackButton'
 import { getCurrentUser } from '@/lib/auth'
 import { getPropertyById } from '@/lib/properties'
 import {
@@ -88,7 +89,7 @@ export default function PropertyDetailPage() {
   }
 
   if (loading) return <main className="min-h-screen grid place-items-center bg-gray-50">Loading property…</main>
-  if (!property) return <main className="min-h-screen grid place-items-center bg-gray-50"><Link href="/properties">Back to live listings</Link></main>
+  if (!property) return <main className="min-h-screen grid place-items-center bg-gray-50"><BackButton href="/properties">Back to live listings</BackButton></main>
 
   const current = Number(summary?.current_amount ?? property.starting_offer)
   const premium = current * .03
@@ -96,7 +97,7 @@ export default function PropertyDetailPage() {
 
   return <main className="min-h-screen bg-gray-50 px-4 py-8 text-gray-950">
     <div className="mx-auto max-w-6xl">
-      <Link href="/properties" className="mb-6 inline-flex min-h-12 items-center gap-3 text-lg font-bold text-blue-700">← Back to live listings</Link>
+      <BackButton href="/properties" className="mb-6">Back to live listings</BackButton>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
         <section>
           <div className="grid gap-2 sm:grid-cols-2">

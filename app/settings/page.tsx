@@ -6,6 +6,8 @@ import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
+import BackButton from '@/components/BackButton'
+import { dangerButton, primaryButton, secondaryButton } from '@/lib/ui-styles'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -106,12 +108,7 @@ export default function SettingsPage() {
           <div className="flex max-w-4xl flex-col gap-4 px-4 py-6 mx-auto sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
             {user?.user_type === 'agent' && (
-              <Link
-                href="/agent/profile"
-                className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-slate-300 bg-white px-6 py-3 text-base font-black text-slate-900 transition hover:border-blue-600 hover:text-blue-700"
-              >
-                ← Agent Dashboard
-              </Link>
+              <BackButton href="/agent/profile">Agent dashboard</BackButton>
             )}
           </div>
         </div>
@@ -231,7 +228,7 @@ export default function SettingsPage() {
                       type="button"
                       onClick={handleSaveProfile}
                       disabled={saving}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold disabled:opacity-50 transition"
+                      className={primaryButton}
                     >
                       {saving ? 'Saving...' : '✅ Save Changes'}
                     </button>
@@ -319,7 +316,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
 
-                  <button className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold transition">
+                  <button className={`${primaryButton} mt-6`}>
                     ✅ Save Preferences
                   </button>
                 </div>
@@ -335,7 +332,7 @@ export default function SettingsPage() {
                       <p className="text-sm text-gray-600 mb-4">
                         Download all your personal data in a standard format
                       </p>
-                      <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition">
+                      <button className={secondaryButton}>
                         📥 Download Data
                       </button>
                     </div>
@@ -345,7 +342,7 @@ export default function SettingsPage() {
                       <p className="text-sm text-gray-600 mb-4">
                         Permanently delete your account and all data
                       </p>
-                      <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition">
+                      <button className={dangerButton}>
                         🗑️ Delete Account
                       </button>
                     </div>
@@ -388,7 +385,7 @@ export default function SettingsPage() {
                       <p className="text-sm text-gray-600 mb-4">
                         Update your password to keep your account secure
                       </p>
-                      <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition">
+                      <button className={secondaryButton}>
                         🔑 Change Password
                       </button>
                     </div>
@@ -397,7 +394,7 @@ export default function SettingsPage() {
                       <p className="font-semibold text-red-900 mb-2">Sign Out</p>
                       <button
                         onClick={handleSignOut}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition"
+                        className={dangerButton}
                       >
                         🚪 Sign Out Now
                       </button>

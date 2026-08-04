@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 
 export default function CounterOfferPage() {
   const params = useParams()
@@ -126,12 +127,7 @@ export default function CounterOfferPage() {
               <h1 className="text-3xl font-bold text-gray-900">Send Counter Offer</h1>
               <p className="text-gray-600 mt-1">{property.address}</p>
             </div>
-            <Link
-              href={`/agent/property/${propertyId}/offerors`}
-              className="text-gray-600 hover:text-gray-900 font-semibold"
-            >
-              ← Back
-            </Link>
+            <BackButton href={`/agent/property/${propertyId}/offerors`}>Back to offerors</BackButton>
           </div>
         </div>
       </div>
