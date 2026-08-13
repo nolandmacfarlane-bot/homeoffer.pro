@@ -13,20 +13,14 @@ export async function signUp(email: string, password: string, userData: {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
+    options: { data: userData },
   })
 
   if (error) throw error
 
-  const { error: profileError } = await supabase
-    .from('users')
-    .insert({
-      id: data.user?.id,
-      email,
-      first_name: userData.first_name,
-      last_name: userData.last_name,
-      user_type: userData.user_type,
-      sms_opt_in: userData.sms_opt_in ?? false,
-    })
+  if (!data.user) throw new Error('Account creation did not return a user')
+
+  const { error: profileError } = await supabase.rpc('ensure_user_profile')
 
   if (profileError) throw profileError
 
@@ -74,14 +68,11 @@ export async function signInWithOAuth(provider: 'google' | 'facebook') {
   try {
     // Cast provider to any to avoid TypeScript issues with facebook provider
     const providerType = provider === 'facebook' ? ('facebook' as any) : ('google' as any)
-    const configuredSiteUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '')
     const browserOrigin = typeof window !== 'undefined' ? window.location.origin : ''
-    const isLocalDevelopment =
-      browserOrigin.startsWith('http://localhost:') ||
-      browserOrigin.startsWith('http://127.0.0.1:')
-    const siteOrigin = isLocalDevelopment
-      ? browserOrigin
-      : configuredSiteUrl || 'https://homeoffer.pro'
+    // PKCE stores its verifier in browser storage. Redirecting from a Vercel
+    // hostname to the custom domain loses that verifier and causes a login loop.
+    // Always return to the exact origin where sign-in began.
+    const siteOrigin = browserOrigin || 'https://homeoffer.pro'
     
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: providerType,

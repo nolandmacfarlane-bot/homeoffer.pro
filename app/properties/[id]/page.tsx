@@ -19,6 +19,13 @@ import {
 } from '@/lib/offers'
 import { supabase } from '@/lib/supabase'
 
+async function authenticatedFetch(input: string, init?: RequestInit) {
+  const { data } = await supabase.auth.getSession()
+  const token = data.session?.access_token
+  if (!token) throw new Error('Please sign in again.')
+  return fetch(input, { ...init, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...init?.headers } })
+}
+
 const money = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value)
 
 type Property = {
@@ -51,11 +58,12 @@ export default function PropertyDetailPage() {
       ])
       setUser(currentUser); setProperty(prop); setSummary(publicSummary); setHistory(publicHistory)
       if (currentUser?.id) {
-        const [{ data: approval }, status] = await Promise.all([
-          supabase.from('agent_approvals').select('approved').eq('property_id', propertyId).eq('buyer_id', currentUser.id).maybeSingle(),
+        const [approvalResponse, status] = await Promise.all([
+          authenticatedFetch(`/api/approvals?propertyId=${encodeURIComponent(propertyId)}`),
           getMyOfferStatus(propertyId),
         ])
-        setApproved(Boolean(approval?.approved)); setMyStatus(status)
+        const approvalPayload = await approvalResponse.json()
+        setApproved(Boolean(approvalPayload.approval?.approved)); setMyStatus(status)
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not load this property.')
@@ -70,11 +78,9 @@ export default function PropertyDetailPage() {
     if (!user?.id) { window.location.href = `/login?next=/properties/${propertyId}`; return }
     if (!property) { setError('This property is unavailable.'); return }
     setError('')
-    const { data: existing } = await supabase.from('agent_approvals').select('id').eq('property_id', propertyId).eq('buyer_id', user.id).maybeSingle()
-    const { error: requestError } = existing
-      ? await supabase.from('agent_approvals').update({ approved: false }).eq('id', existing.id)
-      : await supabase.from('agent_approvals').insert({ property_id: propertyId, buyer_id: user.id, listing_agent_id: property.listing_agent_id, approved: false })
-    if (requestError) setError(requestError.message)
+    const response = await authenticatedFetch('/api/approvals', { method: 'POST', body: JSON.stringify({ propertyId }) })
+    const payload = await response.json()
+    if (!response.ok) setError(payload.error || 'Unable to request approval.')
     else setNotice('Your approval request was sent to the listing agent.')
   }
 

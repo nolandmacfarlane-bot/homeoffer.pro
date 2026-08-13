@@ -35,39 +35,9 @@ export default function AuthCallbackPage() {
           throw new Error('We could not finish signing you in. Please try again.')
         }
 
-        const authUser = sessionData.session.user
-        const intendedRole: AccountRole = 'buyer'
-
-        const { data: existingProfile, error: lookupError } = await supabase
-          .from('users')
-          .select('id, user_type')
-          .eq('id', authUser.id)
-          .maybeSingle()
-
-        if (lookupError) throw lookupError
-
-        let accountRole = existingProfile?.user_type as AccountRole | null
-
-        if (!existingProfile) {
-          const fullName =
-            authUser.user_metadata?.full_name ||
-            authUser.user_metadata?.name ||
-            authUser.email?.split('@')[0] ||
-            'User'
-          const [firstName, ...lastNameParts] = fullName.trim().split(/\s+/)
-          accountRole = intendedRole
-
-          const { error: insertError } = await supabase.from('users').insert({
-            id: authUser.id,
-            email: authUser.email,
-            first_name: firstName || 'User',
-            last_name: lastNameParts.join(' '),
-            user_type: accountRole,
-            sms_opt_in: false,
-          })
-
-          if (insertError) throw insertError
-        }
+        const { data: profile, error: profileError } = await supabase.rpc('ensure_user_profile')
+        if (profileError) throw profileError
+        const accountRole = (Array.isArray(profile) ? profile[0]?.user_type : profile?.user_type) as AccountRole | null
 
         if (accountRole === 'agent') {
           const sponsorCode = window.localStorage.getItem('homeoffer_sponsor_code')
