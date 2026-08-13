@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import AgentEarningsCalculator from '@/components/AgentEarningsCalculator'
 import NetworkContinuity from '@/components/NetworkContinuity'
+import OfferLink from '@/components/OfferLink'
 
 const listings = [
   { slug: '8575-hidden-lakes-drive', city: 'Granite Bay, CA', address: '8575 Hidden Lakes Drive', beds: 5, baths: 4, sqft: '4,218', offer: 612500, time: '18h 42m', hours: 18, crop: 'object-[70%_center]' },
@@ -88,7 +89,7 @@ export default async function HomePage({
 
                   <div className="mt-4 flex items-center justify-between gap-3">
                     <Link href={`/listing/${home.slug}`} className="font-black text-blue-700 hover:text-blue-900">View property →</Link>
-                    <Link href="/login" className="rounded-full bg-red-600 px-4 py-2 text-sm font-black text-white transition hover:bg-red-700">Submit offer</Link>
+                    <OfferLink slug={home.slug} address={home.address} className="rounded-full bg-red-600 px-4 py-2 text-sm font-black text-white transition hover:bg-red-700">Submit offer</OfferLink>
                   </div>
                 </div>
               </article>

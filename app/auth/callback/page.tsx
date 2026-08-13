@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { buildLoginPath, getSafeNextPath } from '@/lib/auth-redirect'
 
 type AccountRole = 'buyer' | 'seller' | 'agent'
 
 export default function AuthCallbackPage() {
   const router = useRouter()
   const [error, setError] = useState('')
+  const [loginHref, setLoginHref] = useState('/login')
 
   useEffect(() => {
     let active = true
@@ -17,6 +19,8 @@ export default function AuthCallbackPage() {
     async function completeSignIn() {
       try {
         const params = new URLSearchParams(window.location.search)
+        const nextPath = getSafeNextPath(params.get('next'))
+        setLoginHref(buildLoginPath(nextPath))
         const providerError = params.get('error_description') || params.get('error')
         if (providerError) throw new Error(providerError)
 
@@ -35,9 +39,39 @@ export default function AuthCallbackPage() {
           throw new Error('We could not finish signing you in. Please try again.')
         }
 
-        const { data: profile, error: profileError } = await supabase.rpc('ensure_user_profile')
-        if (profileError) throw profileError
-        const accountRole = (Array.isArray(profile) ? profile[0]?.user_type : profile?.user_type) as AccountRole | null
+        const authUser = sessionData.session.user
+        const intendedRole: AccountRole = 'buyer'
+
+        const { data: existingProfile, error: lookupError } = await supabase
+          .from('users')
+          .select('id, user_type')
+          .eq('id', authUser.id)
+          .maybeSingle()
+
+        if (lookupError) throw lookupError
+
+        let accountRole = existingProfile?.user_type as AccountRole | null
+
+        if (!existingProfile) {
+          const fullName =
+            authUser.user_metadata?.full_name ||
+            authUser.user_metadata?.name ||
+            authUser.email?.split('@')[0] ||
+            'User'
+          const [firstName, ...lastNameParts] = fullName.trim().split(/\s+/)
+          accountRole = intendedRole
+
+          const { error: insertError } = await supabase.from('users').insert({
+            id: authUser.id,
+            email: authUser.email,
+            first_name: firstName || 'User',
+            last_name: lastNameParts.join(' '),
+            user_type: accountRole,
+            sms_opt_in: false,
+          })
+
+          if (insertError) throw insertError
+        }
 
         if (accountRole === 'agent') {
           const sponsorCode = window.localStorage.getItem('homeoffer_sponsor_code')
@@ -52,7 +86,8 @@ export default function AuthCallbackPage() {
         window.localStorage.removeItem('homeoffer_signup_role')
 
         if (!active) return
-        router.replace('/')
+        router.replace(nextPath)
+        router.refresh()
       } catch (err: any) {
         if (active) setError(err.message || 'Unable to complete sign in.')
       }
@@ -72,7 +107,7 @@ export default function AuthCallbackPage() {
             <h1 className="text-2xl font-black text-slate-950">Sign in could not be completed</h1>
             <p className="mt-3 leading-7 text-slate-600">{error}</p>
             <Link
-              href="/login"
+              href={loginHref}
               className="mt-6 inline-flex rounded-full bg-blue-600 px-6 py-3 font-black text-white hover:bg-blue-700"
             >
               Return to sign in

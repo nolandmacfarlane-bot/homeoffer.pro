@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { signIn, signInWithOAuth } from '@/lib/auth'
+import { getSafeNextPath } from '@/lib/auth-redirect'
+import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { primaryButton, secondaryButton } from '@/lib/ui-styles'
@@ -14,6 +16,19 @@ export default function LoginPage() {
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [nextPath, setNextPath] = useState('/')
+
+  useEffect(() => {
+    const destination = getSafeNextPath(new URLSearchParams(window.location.search).get('next'))
+    setNextPath(destination)
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        router.replace(destination)
+        router.refresh()
+      }
+    })
+  }, [router])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -22,7 +37,8 @@ export default function LoginPage() {
 
     try {
       await signIn(formData.email, formData.password)
-      router.push('/select-role')
+      router.replace(nextPath)
+      router.refresh()
     } catch (err: any) {
       setError(err.message || 'Failed to sign in. Please check your credentials.')
     } finally {
@@ -35,7 +51,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      await signInWithOAuth(provider)
+      await signInWithOAuth(provider, nextPath)
       // Supabase will redirect automatically
     } catch (err: any) {
       setError(err.message || `Failed to sign in with ${provider === 'facebook' ? 'Meta' : provider}`)
@@ -141,7 +157,7 @@ export default function LoginPage() {
 
         <p className="text-center text-gray-600 mt-6 text-sm">
           Don't have an account?{' '}
-          <Link href="/signup" className="text-indigo-600 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-600 rounded px-1">
+          <Link href={nextPath === '/' ? '/signup' : `/signup?next=${encodeURIComponent(nextPath)}`} className="text-indigo-600 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-600 rounded px-1">
             Sign up
           </Link>
         </p>
