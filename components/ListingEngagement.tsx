@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useEffect, useState } from 'react'
-import Link from 'next/link'
+import OfferLink from '@/components/OfferLink'
 
 type Preferences = {
   email: boolean
@@ -59,7 +59,7 @@ export default function ListingEngagement({ slug, address }: { slug: string; add
             <p className="mt-1 text-sm leading-6 text-slate-600">The offer period is still active. Review the latest price and deadline before it ends.</p>
           </div>
           <div className="flex shrink-0 gap-2">
-            <Link href="/login" className="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-black text-white hover:bg-blue-700">Continue offering</Link>
+            <OfferLink slug={slug} address={address} className="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-black text-white hover:bg-blue-700">Continue offering</OfferLink>
             <button type="button" onClick={() => setShowReturnReminder(false)} className="rounded-full border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-700 hover:bg-slate-100">Dismiss</button>
           </div>
         </div>
