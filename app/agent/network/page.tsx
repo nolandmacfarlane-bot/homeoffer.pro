@@ -212,14 +212,7 @@ export default function AgentNetworkPage() {
 
     setMessage('')
     setSponsorSearching(true)
-    const firstTerm = term.split(/\s+/)[0].replace(/[,%()]/g, '')
-    const { data, error } = await supabase
-      .from('users')
-      .select('id, first_name, last_name, phone_number, dre_license_number')
-      .eq('user_type', 'agent')
-      .neq('id', user.id)
-      .or(`first_name.ilike.%${firstTerm}%,last_name.ilike.%${firstTerm}%`)
-      .limit(12)
+    const { data, error } = await supabase.rpc('search_agent_sponsors', { p_search: term })
 
     setSponsorSearching(false)
     if (error) {
@@ -227,12 +220,7 @@ export default function AgentNetworkPage() {
       return
     }
 
-    const normalized = term.toLowerCase()
-    const matches = (data || []).filter((agent) =>
-      `${agent.first_name || ''} ${agent.last_name || ''}`.toLowerCase().includes(normalized)
-      || (agent.first_name || '').toLowerCase().includes(normalized)
-      || (agent.last_name || '').toLowerCase().includes(normalized)
-    )
+    const matches = data || []
     setSponsorResults(matches as SponsorCandidate[])
     if (matches.length === 0) setMessage('No matching agents were found.')
   }
@@ -246,15 +234,9 @@ export default function AgentNetworkPage() {
     if (!confirmed) return
 
     setMessage('')
-    const { data, error } = await supabase
-      .from('users')
-      .update({ referred_by_agent_id: selectedSponsor.id })
-      .eq('id', user.id)
-      .is('referred_by_agent_id', null)
-      .select('referred_by_agent_id')
-      .single()
+    const { error } = await supabase.rpc('select_agent_sponsor', { p_sponsor_id: selectedSponsor.id })
 
-    if (error || !data) {
+    if (error) {
       setMessage('Your sponsor could not be saved. It may already be selected.')
       return
     }

@@ -4,6 +4,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import BackButton from '@/components/BackButton'
 import Navbar from '@/components/Navbar'
+import { supabase } from '@/lib/supabase'
 
 type OpenHouse = {
   date: string
@@ -32,16 +33,20 @@ export default function AgentListingBuilder() {
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    const stored = window.localStorage.getItem('homeoffer:agent-listing-draft')
-    if (!stored) return
-    try {
-      const draft = JSON.parse(stored)
+    async function loadDraft() {
+      const { data } = await supabase.auth.getSession()
+      const accessToken = data.session?.access_token
+      if (!accessToken) return
+      const response = await fetch('/api/listing-drafts', { headers: { Authorization: `Bearer ${accessToken}` } })
+      if (!response.ok) return
+      const result = await response.json()
+      const draft = result.draft
+      if (!draft) return
       setForm({ ...emptyForm, ...draft.form })
       setOpenHouses(draft.openHouses?.length ? draft.openHouses : [{ date: '', startTime: '', endTime: '' }])
       setPhotoNames(draft.photoNames || [])
-    } catch {
-      window.localStorage.removeItem('homeoffer:agent-listing-draft')
     }
+    void loadDraft()
   }, [])
 
   useEffect(() => {
@@ -74,15 +79,22 @@ export default function AgentListingBuilder() {
     setSaved(false)
   }
 
-  function saveDraft(event: FormEvent) {
+  async function saveDraft(event: FormEvent) {
     event.preventDefault()
-    window.localStorage.setItem('homeoffer:agent-listing-draft', JSON.stringify({
+    const { data } = await supabase.auth.getSession()
+    const accessToken = data.session?.access_token
+    if (!accessToken) return
+    const response = await fetch('/api/listing-drafts', {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
       form,
       openHouses,
       photoNames,
       savedAt: new Date().toISOString(),
-    }))
-    setSaved(true)
+      }),
+    })
+    if (response.ok) setSaved(true)
   }
 
   const inputClass = 'mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-950 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100'
