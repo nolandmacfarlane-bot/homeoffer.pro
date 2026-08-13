@@ -136,7 +136,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
         </div>
 
         <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1fr_420px]">
-          <div>
+          <div className="lg:col-start-1 lg:row-start-1">
             <p className="text-sm font-black uppercase tracking-[0.14em] text-blue-600">Open for offers</p>
             <h1 className="mt-2 text-4xl font-black tracking-[-0.04em] sm:text-5xl">{home.address}</h1>
             <p className="mt-2 text-lg font-semibold text-slate-600">{home.city} {home.zip}</p>
@@ -147,27 +147,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
               <span>{home.sqft} sq ft</span>
             </div>
 
-            <section className="py-8">
-              <h2 className="text-2xl font-black">About this property</h2>
-              <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{home.description}</p>
-            </section>
-
-            <section className="border-t border-slate-200 py-8">
-              <h2 className="text-2xl font-black">Property highlights</h2>
-              <ul className="mt-5 grid gap-3 sm:grid-cols-2">
-                {home.features.map((feature) => (
-                  <li key={feature} className="rounded-xl border border-slate-200 bg-white px-4 py-3 font-bold">✓ {feature}</li>
-                ))}
-              </ul>
-            </section>
-
-            <section className="border-t border-slate-200 py-8">
-              <h2 className="text-2xl font-black">Offer process</h2>
-              <p className="mt-3 text-base leading-7 text-slate-600">Offers increase in $500 increments. Review the property information, become approved to participate and submit your offer before the timer ends.</p>
-            </section>
           </div>
 
-          <aside className="space-y-6">
+          <aside className="lg:col-start-2 lg:row-start-1">
             <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-lg shadow-slate-950/5">
               <span className="inline-flex rounded-lg bg-blue-600 px-4 py-2.5 text-base font-black text-white">◷ {home.time} left</span>
             <dl className="mt-7 space-y-4 text-base">
@@ -179,7 +161,14 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
               <p className="mt-4 text-center text-sm font-bold leading-6 text-slate-700">The seller reserves the right to accept, reject or counter any offer.</p>
               <p className="mt-3 text-center text-sm leading-6 text-slate-500">Property details shown are for the current marketplace preview and should be independently verified.</p>
             </section>
+          </aside>
 
+          <section className="border-t border-slate-200 py-8 lg:col-start-1 lg:row-start-2">
+            <h2 className="text-2xl font-black">About this property</h2>
+            <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{home.description}</p>
+          </section>
+
+          <aside className="space-y-6 lg:col-start-2 lg:row-start-2">
             <OfferHistory address={home.address} />
 
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
