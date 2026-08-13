@@ -5,6 +5,7 @@ import { signUp, signInWithOAuth } from '@/lib/auth'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { primaryButton, secondaryButton } from '@/lib/ui-styles'
+import { getSafeNextPath } from '@/lib/auth-redirect'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -19,6 +20,12 @@ export default function SignupPage() {
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [nextPath, setNextPath] = useState('/')
+
+  useEffect(() => {
+    setNextPath(getSafeNextPath(new URLSearchParams(window.location.search).get('next')))
+  }, [])
+
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
     setError('')
@@ -41,7 +48,8 @@ export default function SignupPage() {
       })
 
       window.localStorage.removeItem('homeoffer_signup_role')
-      router.push('/')
+      router.replace(nextPath)
+      router.refresh()
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -54,7 +62,7 @@ export default function SignupPage() {
     setLoading(true)
 
     try {
-      await signInWithOAuth(provider)
+      await signInWithOAuth(provider, nextPath)
       // Supabase will redirect automatically
     } catch (err: any) {
       setError(err.message || `Failed to sign up with ${provider === 'facebook' ? 'Meta' : provider}`)
@@ -262,7 +270,7 @@ export default function SignupPage() {
 
         <p className="text-center text-gray-600 mt-6 text-sm">
           Already have an account?{' '}
-          <Link href="/login" className="text-indigo-600 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-600 rounded px-1">
+          <Link href={`/login?next=${encodeURIComponent(nextPath)}`} className="text-indigo-600 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-600 rounded px-1">
             Sign in
           </Link>
         </p>
