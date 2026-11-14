@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from './supabase-admin'
+import { getSupabaseAdmin, getSupabaseUserClient } from './supabase-admin'
 
 export async function requireUser(request: Request) {
   const token = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
@@ -7,7 +7,12 @@ export async function requireUser(request: Request) {
     return { error: 'Authentication required', status: 401 } as const
   }
 
-  const admin = getSupabaseAdmin()
+  let admin
+  try {
+    admin = getSupabaseAdmin()
+  } catch {
+    admin = getSupabaseUserClient(token)
+  }
   const { data: authData, error: authError } = await admin.auth.getUser(token)
 
   if (authError || !authData.user) {
