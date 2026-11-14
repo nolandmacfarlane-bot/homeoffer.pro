@@ -39,7 +39,7 @@ export default function OfferLink({ slug, address, className, children }: {
       window.location.assign(buildLoginPath(returnPath))
       return null
     }
-    if (lookupError || !match?.id) throw new Error('This listing is not ready for approval yet.')
+    if (lookupError || !match?.id) throw new Error('This listing is a preview and is not connected to an active bidding record. The listing agent must publish it before approval requests can be submitted.')
     return { session: auth.session, property: match as PropertyMatch }
   }
 
@@ -62,25 +62,16 @@ export default function OfferLink({ slug, address, className, children }: {
     try {
       const result = await getSessionAndProperty()
       if (!result) return
-      const { data: existing, error: lookupError } = await supabase
-        .from('agent_approvals')
-        .select('id')
-        .eq('property_id', result.property.id)
-        .eq('buyer_id', result.session.user.id)
-        .maybeSingle()
-      if (lookupError) throw lookupError
-      if (!existing) {
-        const { error: insertError } = await supabase.from('agent_approvals').insert({
-          property_id: result.property.id,
-          buyer_id: result.session.user.id,
-          listing_agent_id: result.property.listing_agent_id,
-          approved: false,
-          approved_at: null,
-          status: 'pending',
-        })
-        if (insertError) throw insertError
-      }
-      setNotice('Your approval request was sent to the listing agent.')
+      const response = await fetch('/api/approvals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${result.session.access_token}` },
+        body: JSON.stringify({ propertyId: result.property.id }),
+      })
+      const payload = await response.json()
+      if (!response.ok) throw new Error(payload.error || 'Unable to send approval request.')
+      setNotice(payload.notificationSent
+        ? 'Your approval request was sent, and the listing agent was emailed.'
+        : 'Your approval request was saved. Email notification has not been confirmed.')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to request approval.')
     } finally { setSubmitting(null) }
