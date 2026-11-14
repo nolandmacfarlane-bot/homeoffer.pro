@@ -74,6 +74,29 @@ export default function PropertyDetailPage() {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { void load() }, [load])
 
+  useEffect(() => {
+    let active = true
+    async function syncApproval() {
+      const { data } = await supabase.auth.getSession()
+      if (!data.session) return
+      try {
+        const response = await fetch(`/api/approvals?propertyId=${encodeURIComponent(propertyId)}`, {
+          headers: { Authorization: `Bearer ${data.session.access_token}` },
+          cache: 'no-store',
+        })
+        if (!response.ok) return
+        const payload = await response.json()
+        if (active) setApproved(Boolean(payload.approval?.approved))
+      } catch {
+        // Retry at the next interval.
+      }
+    }
+    void syncApproval()
+    const interval = window.setInterval(() => void syncApproval(), 4000)
+    window.addEventListener('focus', syncApproval)
+    return () => { active = false; window.clearInterval(interval); window.removeEventListener('focus', syncApproval) }
+  }, [propertyId])
+
   async function requestApproval() {
     if (!user?.id) { window.location.href = `/login?next=/properties/${propertyId}`; return }
     if (!property) { setError('This property is unavailable.'); return }
