@@ -167,7 +167,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
               <div className="flex justify-between gap-4"><dt className="font-bold text-slate-600">Buyer&apos;s premium (3%)</dt><dd className="font-black">{money(premium)}</dd></div>
               <div className="flex justify-between gap-4 border-t border-slate-200 pt-4 text-lg"><dt className="font-black">Total price</dt><dd className="font-black text-blue-700">{money(total)}</dd></div>
             </dl>
-            <div className="mt-7 flex w-full justify-center">\n                <OfferLink slug={slug} address={home.address} className="w-full max-w-[290px] rounded-full bg-red-600 px-6 py-4 text-center text-lg font-black text-white transition hover:bg-red-700">Get approved to offer</OfferLink>\n              </div>
+            <div className="mt-7 flex w-full justify-center">
+                <OfferLink slug={slug} address={home.address} className="w-full max-w-[290px] rounded-full bg-red-600 px-6 py-4 text-center text-lg font-black text-white transition hover:bg-red-700">Get approved to offer</OfferLink>
+              </div>
               <p className="mt-4 text-center text-sm font-bold leading-6 text-slate-700">The seller reserves the right to accept, reject or counter any offer.</p>
               <p className="mt-3 text-center text-sm leading-6 text-slate-500">Property details shown are for the current marketplace preview and should be independently verified.</p>
             </section>
