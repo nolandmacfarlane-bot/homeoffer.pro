@@ -39,8 +39,9 @@ export async function GET(request: NextRequest) {
     const propertyId = session.metadata?.property_id || null
     if (verified && propertyId) {
       await auth.admin.from('card_verifications').upsert({
-        user_id: auth.user.id, property_id: propertyId, stripe_session_id: session.id,
-        stripe_setup_intent_id: String(session.setup_intent), verified_at: new Date().toISOString(),
+        user_id: auth.user.id, property_id: propertyId, stripe_checkout_session_id: session.id,
+        stripe_customer_id: session.customer ? String(session.customer) : null,
+        verified_at: new Date().toISOString(),
       }, { onConflict: 'user_id,property_id' })
       const { data: property } = await auth.admin.from('properties').select('listing_agent_id').eq('id', propertyId).single()
       if (property) await auth.admin.from('agent_approvals').upsert({
