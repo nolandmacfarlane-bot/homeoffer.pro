@@ -9,6 +9,7 @@ type Approval = {
   id: string
   buyer_id: string
   status: string
+  approved: boolean
   created_at: string
   buyer: { first_name: string | null; last_name: string | null; email: string | null; user_type: string | null } | null
 }
