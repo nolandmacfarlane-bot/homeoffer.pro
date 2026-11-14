@@ -15,3 +15,13 @@ export function getSupabaseAdmin() {
     },
   })
 }
+
+export function getSupabaseUserClient(accessToken: string) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://uokoedtpzehkryjpcbyy.supabase.co'
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_Lu4jrFjKQDRdT_uhPSihYA_iNltLogE'
+
+  return createClient(url, key, {
+    global: { headers: { Authorization: `Bearer ${accessToken}` } },
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+}
