@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { buildLoginPath } from '@/lib/auth-redirect'
 import { supabase } from '@/lib/supabase'
 
-type PropertyMatch = { id: string }
+type PropertyMatch = { id: string; listing_agent_id: string }
 
 export default function OfferLink({ slug, address, className, children }: {
   slug: string
@@ -33,7 +33,7 @@ export default function OfferLink({ slug, address, className, children }: {
   async function getSessionAndProperty() {
     const [{ data: auth }, { data: match, error: lookupError }] = await Promise.all([
       supabase.auth.getSession(),
-      supabase.from('properties').select('id').ilike('address', address.trim()).limit(1).maybeSingle(),
+      supabase.from('properties').select('id, listing_agent_id').ilike('address', address.trim()).limit(1).maybeSingle(),
     ])
     if (!auth.session) {
       window.location.assign(buildLoginPath(returnPath))
@@ -62,13 +62,24 @@ export default function OfferLink({ slug, address, className, children }: {
     try {
       const result = await getSessionAndProperty()
       if (!result) return
-      const response = await fetch('/api/approvals', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${result.session.access_token}` },
-        body: JSON.stringify({ propertyId: result.property.id }),
-      })
-      const payload = await response.json()
-      if (!response.ok) throw new Error(payload.error || 'Unable to request approval.')
+      const { data: existing, error: lookupError } = await supabase
+        .from('agent_approvals')
+        .select('id')
+        .eq('property_id', result.property.id)
+        .eq('buyer_id', result.session.user.id)
+        .maybeSingle()
+      if (lookupError) throw lookupError
+      if (!existing) {
+        const { error: insertError } = await supabase.from('agent_approvals').insert({
+          property_id: result.property.id,
+          buyer_id: result.session.user.id,
+          listing_agent_id: result.property.listing_agent_id,
+          approved: false,
+          approved_at: null,
+          status: 'pending',
+        })
+        if (insertError) throw insertError
+      }
       setNotice('Your approval request was sent to the listing agent.')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to request approval.')
