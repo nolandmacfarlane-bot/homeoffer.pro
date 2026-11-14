@@ -110,7 +110,7 @@ const money = (amount: number) => amount.toLocaleString('en-US', {
 export default async function ListingDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const home = homes[slug]
-  if (!home) notFound()
+  if (!home || !['8575-hidden-lakes-drive', '1642-poppy-circle'].includes(slug)) notFound()
 
   const premium = home.offer * 0.03
   const total = home.offer + premium
