@@ -132,12 +132,12 @@ export async function POST(request: NextRequest) {
             body: JSON.stringify({
               from: 'HomeOffer.pro <approvalrequest@homeoffer.pro>',
               to: [buyer.email],
-              subject: `Congratulations! You're approved to bid on ${escapeSubject(address)}`,
-              html: `<h2>Congratulations, ${escapeHtml(name)}!</h2>
-                <p>Your request to bid on <strong>${escapeHtml(address)}</strong> has been approved by the listing agent.</p>
-                <p>You can now sign in and submit your offer for this property.</p>
+              subject: `Your request to submit an offer has been approved — ${escapeSubject(address)}`,
+              html: `<h2>Your request has been approved, ${escapeHtml(name)}!</h2>
+                <p>The listing agent has approved your request to submit an offer on <strong>${escapeHtml(address)}</strong>.</p>
+                <p>You can now sign in to HomeOffer.pro and submit an offer for this property.</p>
                 <p style="margin:24px 0"><a href="${listingUrl}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 22px;border-radius:8px;text-decoration:none;font-weight:bold">Submit an offer</a></p>
-                <p>Approval to bid does not mean an offer has been accepted.</p>
+                <p>Approval to submit an offer does not mean your offer has been accepted.</p>
                 <p>— HomeOffer.pro</p>`,
             }),
           })
