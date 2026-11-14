@@ -54,7 +54,7 @@ export default function SellerDashboard() {
           properties:property_id (address, city, state)
         `)
         .eq('listing_agent_id', currentUser.id)
-        .eq('approved', false)
+        .eq('status', 'pending')
         .order('created_at', { ascending: false })
 
       if (error) {
@@ -74,9 +74,13 @@ export default function SellerDashboard() {
     setApprovingId(approvalId)
 
     try {
+      const { data: authData } = await supabase.auth.getSession()
       const response = await fetch('/api/approvals', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authData.session?.access_token || ''}`,
+        },
         body: JSON.stringify({ approvalId, approved }),
       })
 
