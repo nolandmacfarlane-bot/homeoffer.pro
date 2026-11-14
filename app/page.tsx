@@ -8,10 +8,6 @@ import OfferLink from '@/components/OfferLink'
 const listings = [
   { slug: '8575-hidden-lakes-drive', city: 'Granite Bay, CA', address: '8575 Hidden Lakes Drive', beds: 5, baths: 4, sqft: '4,218', offer: 612500, time: '18h 42m', hours: 18, crop: 'object-[70%_center]' },
   { slug: '1642-poppy-circle', city: 'Rocklin, CA', address: '1642 Poppy Circle', beds: 5, baths: 3, sqft: '2,729', offer: 438000, time: '2d 08h', hours: 56, crop: 'object-[82%_center]' },
-  { slug: '1064-empire-mine-road', city: 'Folsom, CA', address: '1064 Empire Mine Road', beds: 3, baths: 3, sqft: '2,184', offer: 526500, time: '4d 14h', hours: 110, crop: 'object-center' },
-  { slug: '2289-pleasant-grove-blvd', city: 'Roseville, CA', address: '2289 Pleasant Grove Blvd', beds: 4, baths: 3, sqft: '2,956', offer: 574000, time: '6d 03h', hours: 147, crop: 'object-[60%_center]' },
-  { slug: '6120-colwell-lane', city: 'Loomis, CA', address: '6120 Colwell Lane', beds: 4, baths: 4, sqft: '3,604', offer: 697500, time: '8d 19h', hours: 211, crop: 'object-[75%_center]' },
-  { slug: '3390-vista-robles-way', city: 'Auburn, CA', address: '3390 Vista Robles Way', beds: 3, baths: 2, sqft: '2,310', offer: 459000, time: '10d 11h', hours: 251, crop: 'object-left' },
 ].sort((a, b) => a.hours - b.hours)
 
 const money = (amount: number) => amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
@@ -40,7 +36,7 @@ export default async function HomePage({
       <section id="homes" className="scroll-mt-24 mx-auto max-w-7xl px-5 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-col gap-4 border-b border-slate-200 pb-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="text-2xl font-black tracking-[-0.035em] text-slate-950">Live <span className="text-blue-600">listings</span></h1>
+            <h1 className="text-2xl font-black tracking-[-0.035em] text-slate-950">Available <span className="text-blue-600">property previews</span></h1>
             <div className="mt-4 flex flex-wrap gap-2">
             <Link href="/?sort=ending#homes" className={sortLinkClass('ending')} aria-current={sort === 'ending' ? 'true' : undefined}>Ending soon</Link>
             <Link href="/?sort=newest#homes" className={sortLinkClass('newest')} aria-current={sort === 'newest' ? 'true' : undefined}>Newly listed</Link>
@@ -52,7 +48,7 @@ export default async function HomePage({
               <span>• $500 increments</span>
               <span>• Free to submit offers</span>
             </div>
-            <Link href="/properties" className="inline-flex items-center justify-center rounded-full border-2 border-blue-600 bg-blue-600 px-6 py-3 text-sm font-black text-white transition hover:border-blue-700 hover:bg-blue-700">View all properties →</Link>
+            <Link href="/properties" className="inline-flex items-center justify-center rounded-full border-2 border-blue-600 bg-blue-600 px-6 py-3 text-sm font-black text-white transition hover:border-blue-700 hover:bg-blue-700">Browse published properties →</Link>
           </div>
         </div>
 
