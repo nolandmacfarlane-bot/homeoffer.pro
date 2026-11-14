@@ -206,7 +206,7 @@ export default function AgentNetworkPage() {
   async function searchForSponsor() {
     const term = sponsorSearch.trim()
     if (term.length < 2) {
-      setMessage('Enter at least two letters of the agent’s name.')
+      setMessage('Enter at least two characters from the agent’s name or DRE number.')
       return
     }
 
@@ -411,7 +411,7 @@ export default function AgentNetworkPage() {
             <article className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
               <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">Your sponsor</p>
               <h2 className="mt-2 text-2xl font-black text-slate-950">Select the agent who introduced you</h2>
-              <p className="mt-3 text-slate-600">Search by first or last name, then verify the agent using their DRE number and phone number.</p>
+              <p className="mt-3 text-slate-600">Search by first name, last name or DRE number, then verify the agent using their DRE number and phone number.</p>
 
               {publicPreview ? (
                 <p className="mt-5 rounded-xl bg-slate-100 p-4 font-bold text-slate-700">Sign in to search the agent directory.</p>
@@ -429,7 +429,7 @@ export default function AgentNetworkPage() {
                       onKeyDown={(event) => {
                         if (event.key === 'Enter') searchForSponsor()
                       }}
-                      placeholder="Enter the agent’s first or last name"
+                      placeholder="Enter the agent’s first name, last name, or DRE number"
                       className="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-slate-950"
                     />
                     <button
