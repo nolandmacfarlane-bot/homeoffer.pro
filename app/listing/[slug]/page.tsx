@@ -154,15 +154,6 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             </section>
 
             <section className="border-t border-slate-200 py-8">
-              <h2 className="text-2xl font-black">Property highlights</h2>
-              <ul className="mt-5 grid gap-3 sm:grid-cols-2">
-                {home.features.map((feature) => (
-                  <li key={feature} className="rounded-xl border border-slate-200 bg-white px-4 py-3 font-bold">✓ {feature}</li>
-                ))}
-              </ul>
-            </section>
-
-            <section className="border-t border-slate-200 py-8">
               <h2 className="text-2xl font-black">Offer process</h2>
               <p className="mt-3 text-base leading-7 text-slate-600">Offers increase in $500 increments. Review the property information, become approved to participate and submit your offer before the timer ends.</p>
             </section>
