@@ -20,6 +20,8 @@ export default function OfferLink({ slug, address, className, children }: {
   const [submitting, setSubmitting] = useState<'agent' | 'instant' | null>(null)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [approvalState, setApprovalState] = useState<'approved' | 'pending' | 'denied' | null>(null)
+  const [approvedPropertyId, setApprovedPropertyId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open) return
@@ -29,6 +31,43 @@ export default function OfferLink({ slug, address, className, children }: {
     document.addEventListener('keydown', closeOnEscape)
     return () => document.removeEventListener('keydown', closeOnEscape)
   }, [open])
+
+  useEffect(() => {
+    let active = true
+    let checking = false
+    async function syncApproval() {
+      if (checking || document.visibilityState === 'hidden') return
+      checking = true
+      try {
+        const { data: auth } = await supabase.auth.getSession()
+        if (!auth.session) {
+          if (active) { setApprovalState(null); setApprovedPropertyId(null) }
+          return
+        }
+        const { data: match } = await supabase.from('properties')
+          .select('id').ilike('address', address.trim()).limit(1).maybeSingle()
+        if (!match?.id) return
+        const response = await fetch(`/api/approvals?propertyId=${encodeURIComponent(match.id)}`, {
+          headers: { Authorization: `Bearer ${auth.session.access_token}` },
+          cache: 'no-store',
+        })
+        if (!response.ok) return
+        const payload = await response.json()
+        if (!active) return
+        const status = payload.approval?.status
+        setApprovalState(payload.approval?.approved || status === 'approved' ? 'approved' : status === 'pending' ? 'pending' : status === 'denied' ? 'denied' : null)
+        setApprovedPropertyId(match.id)
+        if (payload.approval?.approved || status === 'approved') setOpen(false)
+      } catch {
+        // Keep the current button until approval status can be verified.
+      } finally { checking = false }
+    }
+    void syncApproval()
+    const interval = window.setInterval(() => void syncApproval(), 4000)
+    const onFocus = () => void syncApproval()
+    window.addEventListener('focus', onFocus)
+    return () => { active = false; window.clearInterval(interval); window.removeEventListener('focus', onFocus) }
+  }, [address])
 
   async function getSessionAndProperty() {
     const [{ data: auth }, { data: match, error: lookupError }] = await Promise.all([
@@ -44,6 +83,16 @@ export default function OfferLink({ slug, address, className, children }: {
   }
 
   async function showApproval() {
+    if (approvalState === 'approved' && approvedPropertyId) {
+      window.location.assign(`/properties/${approvedPropertyId}`)
+      return
+    }
+    if (approvalState === 'pending') {
+      setError('')
+      setNotice('Your approval request is pending. The listing agent has been notified.')
+      setOpen(true)
+      return
+    }
     setError('')
     try {
       const result = await getSessionAndProperty()
@@ -90,6 +139,13 @@ export default function OfferLink({ slug, address, className, children }: {
       const response = await postWithFreshSession('/api/approvals', result.property.id)
       const payload = await response.json()
       if (!response.ok) throw new Error(payload.error || 'Unable to send approval request.')
+      if (payload.approval?.approved || payload.approval?.status === 'approved') {
+        setApprovalState('approved')
+        setApprovedPropertyId(result.property.id)
+        setOpen(false)
+        return
+      }
+      setApprovalState('pending')
       setNotice(payload.notificationSent
         ? 'Your approval request was sent, and the listing agent was emailed.'
         : 'Your approval request was saved. Email notification has not been confirmed.')
@@ -115,7 +171,7 @@ export default function OfferLink({ slug, address, className, children }: {
   }
 
   return <>
-    <button type="button" onClick={showApproval} className={className}>{children}</button>
+    <button type="button" onClick={showApproval} className={className}>{approvalState === 'approved' ? 'Submit offer' : approvalState === 'pending' ? 'Approval pending' : children}</button>
     {open && <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/65 p-4" role="dialog" aria-modal="true" aria-labelledby="bidding-approval-title">
       <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between bg-blue-800 px-6 py-5 text-white">
@@ -133,10 +189,10 @@ export default function OfferLink({ slug, address, className, children }: {
           </label>
           {error && <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 font-bold text-red-700">{error}</p>}
           {notice && <p className="mt-4 rounded-lg bg-green-50 px-4 py-3 font-bold text-green-800">{notice}</p>}
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          {approvalState === 'pending' ? <p className="mt-6 text-center font-bold text-blue-800">Your approval request is pending. This page updates automatically when the agent responds.</p> : <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <button type="button" disabled={Boolean(submitting) || Boolean(notice)} onClick={requestAgentApproval} className="rounded-xl border-2 border-blue-700 px-5 py-3 font-black text-blue-800 disabled:opacity-50">{submitting === 'agent' ? 'Sending…' : 'Request listing agent approval'}</button>
             <button type="button" disabled={Boolean(submitting) || Boolean(notice)} onClick={startInstantApproval} className="rounded-xl bg-blue-600 px-5 py-3 font-black text-white disabled:opacity-50">{submitting === 'instant' ? 'Opening verification…' : 'Approve me for bidding'}</button>
-          </div>
+          </div>}
           {property && <p className="mt-4 text-center text-xs text-slate-400">Approval is linked to this property only.</p>}
         </div>
       </div>
