@@ -20,10 +20,16 @@ export async function POST(request: NextRequest) {
     if (body.propertyId && body.approved === undefined) {
       const { data: property, error: propertyError } = await auth.admin.from('properties').select('id, address, listing_agent_id').eq('id', body.propertyId).single()
       if (propertyError || !property) return NextResponse.json({ error: 'Property not found' }, { status: 404 })
-      const { data, error } = await auth.admin.from('agent_approvals').upsert({
+      const { data: existing } = await auth.admin.from('agent_approvals')
+        .select('id, approved, status')
+        .eq('property_id', property.id)
+        .eq('buyer_id', auth.user.id)
+        .maybeSingle()
+      if (existing) return NextResponse.json({ success: true, approval: existing, notificationSent: false })
+      const { data, error } = await auth.admin.from('agent_approvals').insert({
         property_id: property.id, buyer_id: auth.user.id, listing_agent_id: property.listing_agent_id,
         approved: false, approved_at: null, status: 'pending',
-      }, { onConflict: 'property_id,buyer_id' }).select('id, approved, status').single()
+      }).select('id, approved, status').single()
       if (error) return NextResponse.json({ error: 'Unable to send approval request' }, { status: 500 })
       let notificationSent = false
       const resendKey = process.env.RESEND_API_KEY
