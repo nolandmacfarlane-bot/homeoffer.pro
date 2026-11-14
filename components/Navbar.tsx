@@ -101,9 +101,9 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-[92px] items-center justify-between gap-5">
-          {/* Logo - always clickable to go home/dashboard */}
+          {/* Logo always returns to the public homepage; dashboard is in the account menu. */}
           <Link 
-            href={dashboardLink}
+            href="/"
             className="flex shrink-0 items-center transition hover:opacity-75"
             aria-label="HomeOffer.pro home"
           >
