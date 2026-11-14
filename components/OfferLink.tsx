@@ -171,7 +171,7 @@ export default function OfferLink({ slug, address, className, children }: {
   }
 
   return <>
-    <button type="button" onClick={showApproval} className={approvalState === 'approved' ? `${className ?? ''} !bg-green-600 hover:!bg-green-700 !text-white` : className}>{approvalState === 'approved' ? 'Submit offer' : approvalState === 'pending' ? 'Approval pending' : children}</button>
+    <button type="button" onClick={showApproval} className={className} style={approvalState === 'approved' ? { backgroundColor: '#16a34a', color: '#ffffff' } : undefined}>{approvalState === 'approved' ? 'Submit offer' : approvalState === 'pending' ? 'Approval pending' : children}</button>
     {open && <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/65 p-4" role="dialog" aria-modal="true" aria-labelledby="bidding-approval-title">
       <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between bg-blue-800 px-6 py-5 text-white">
