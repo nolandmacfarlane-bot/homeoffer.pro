@@ -9,6 +9,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import { getListingAgentBidderDetails, getListingAgentBidHistory, getPublicOfferSummary } from '@/lib/offers'
 import CountdownTimer from '@/components/CountdownTimer'
+import AgentPrivateListingTabs from '@/components/AgentPrivateListingTabs'
 import type { ListingAgentBidEvent, ListingAgentBidder } from '@/lib/offers'
 
 const money = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value)
@@ -75,6 +76,7 @@ export default function AgentDashboard() {
             <div className="space-y-4">{property.isActive && <CountdownTimer endDate={property.offer_end_date} size="small"/>}<div className="rounded-xl bg-gray-100 p-4"><p><strong>{property.bidders.length}</strong> bidders</p><p><strong>{property.events.length}</strong> visible bid steps</p><p><strong>{property.isActive ? 'Active' : 'Closed'}</strong></p></div><Link href={`/agent/property/${property.id}/offerors`} className={`${primaryButton} w-full`}>Private bidder details</Link><Link href={`/properties/${property.id}`} className={`${secondaryButton} w-full`}>View public listing</Link></div>
             <div><h3 className="text-xl font-black">Bidder overview</h3><p className="mb-4 text-sm text-gray-600">Private maximums are visible only here to you as this property’s listing agent.</p><div className="space-y-3">{property.bidders.slice(0,5).map(bidder => <div key={bidder.bidder_id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4"><div><strong>{bidder.full_name}</strong><p className="text-sm text-gray-600">{bidder.email} · {bidder.phone_number || 'No phone'}</p></div><div className="text-right"><p className="text-sm text-gray-600">Private maximum</p><strong>{money(bidder.maximum_amount)}</strong></div></div>)}{!property.bidders.length && <p className="rounded-xl border border-dashed p-6 text-center text-gray-500">No bids yet.</p>}</div></div>
           </div>
+          <AgentPrivateListingTabs propertyId={property.id} bidders={property.bidders} events={property.events} />
         </article>)}
         {!properties.length && <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center"><h2 className="text-2xl font-black">No listings yet</h2><Link href="/agent/listing-builder" className={`${primaryButton} mt-5`}>Create your first listing</Link></div>}
       </section>
