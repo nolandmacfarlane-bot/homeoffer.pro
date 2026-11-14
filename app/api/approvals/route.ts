@@ -6,6 +6,25 @@ export async function GET(request: NextRequest) {
   if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status })
   const propertyId = request.nextUrl.searchParams.get('propertyId')
   if (!propertyId) return NextResponse.json({ error: 'Property is required' }, { status: 400 })
+  if (request.nextUrl.searchParams.get('scope') === 'agent') {
+    if (auth.user.user_type !== 'agent') return NextResponse.json({ error: 'Agent access required' }, { status: 403 })
+    const { data: listing } = await auth.admin.from('properties').select('id').eq('id', propertyId).eq('listing_agent_id', auth.user.id).maybeSingle()
+    if (!listing) return NextResponse.json({ error: 'Not your listing' }, { status: 403 })
+    const { data: approvals, error: approvalError } = await auth.admin.from('agent_approvals')
+      .select('id, buyer_id, status, approved, created_at, approved_at')
+      .eq('property_id', propertyId).eq('listing_agent_id', auth.user.id)
+      .order('created_at', { ascending: false })
+    if (approvalError) return NextResponse.json({ error: 'Unable to load buyer approvals' }, { status: 500 })
+    const ids = [...new Set((approvals || []).map(row => row.buyer_id))]
+    const { data: buyers, error: buyerError } = ids.length
+      ? await auth.admin.from('users').select('id, first_name, last_name, email, user_type').in('id', ids)
+      : { data: [], error: null }
+    if (buyerError) return NextResponse.json({ error: 'Unable to load buyer contacts' }, { status: 500 })
+    const profiles = new Map((buyers || []).map(buyer => [buyer.id, buyer]))
+    return NextResponse.json({ approvals: (approvals || []).map(row => ({
+      ...row, buyer: profiles.get(row.buyer_id) || null,
+    })) }, { headers: { 'Cache-Control': 'no-store' } })
+  }
   const { data, error } = await auth.admin.from('agent_approvals').select('id, approved, approved_at, status').eq('property_id', propertyId).eq('buyer_id', auth.user.id).maybeSingle()
   if (error) return NextResponse.json({ error: 'Unable to load approval status' }, { status: 500 })
   return NextResponse.json({ approval: data })
