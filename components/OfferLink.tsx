@@ -56,17 +56,38 @@ export default function OfferLink({ slug, address, className, children }: {
     }
   }
 
+  async function postWithFreshSession(url: string, propertyId: string) {
+    async function send(token: string) {
+      return fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ propertyId }),
+      })
+    }
+
+    const { data: initial, error: sessionError } = await supabase.auth.getSession()
+    if (sessionError || !initial.session) {
+      throw new Error('Your sign-in has expired. Please sign in again before requesting approval.')
+    }
+
+    let response = await send(initial.session.access_token)
+    if (response.status === 401) {
+      const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession()
+      if (refreshError || !refreshed.session) {
+        throw new Error('Your sign-in has expired. Please sign in again before requesting approval.')
+      }
+      response = await send(refreshed.session.access_token)
+    }
+    return response
+  }
+
   async function requestAgentApproval() {
     if (!acknowledged) { setError('Please confirm the buyer’s premium before continuing.'); return }
     setSubmitting('agent'); setError(''); setNotice('')
     try {
       const result = await getSessionAndProperty()
       if (!result) return
-      const response = await fetch('/api/approvals', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${result.session.access_token}` },
-        body: JSON.stringify({ propertyId: result.property.id }),
-      })
+      const response = await postWithFreshSession('/api/approvals', result.property.id)
       const payload = await response.json()
       if (!response.ok) throw new Error(payload.error || 'Unable to send approval request.')
       setNotice(payload.notificationSent
@@ -83,11 +104,7 @@ export default function OfferLink({ slug, address, className, children }: {
     try {
       const result = await getSessionAndProperty()
       if (!result) return
-      const response = await fetch('/api/card-verification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${result.session.access_token}` },
-        body: JSON.stringify({ propertyId: result.property.id }),
-      })
+      const response = await postWithFreshSession('/api/card-verification', result.property.id)
       const payload = await response.json()
       if (!response.ok || !payload.url) throw new Error(payload.error || 'Unable to start instant approval.')
       window.location.assign(payload.url)
