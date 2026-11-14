@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/lib/server-auth'
 
+const escapeHtml = (value: string) => value.replace(/[&<>"']/g, char =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!)
+const escapeSubject = (value: string) => value.replace(/[\r\n]/g, ' ').trim()
+
 export async function GET(request: NextRequest) {
   const auth = await requireUser(request)
   if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status })
@@ -85,15 +89,72 @@ export async function POST(request: NextRequest) {
 
     if (!body.approvalId || typeof body.approved !== 'boolean') return NextResponse.json({ error: 'Missing approval request or status' }, { status: 400 })
     if (auth.user.user_type !== 'agent') return NextResponse.json({ error: 'Agent access required' }, { status: 403 })
-    const { data: approval } = await auth.admin.from('agent_approvals').select('id, listing_agent_id').eq('id', body.approvalId).single()
+    const { data: approval } = await auth.admin.from('agent_approvals')
+      .select('id, listing_agent_id, property_id, buyer_id, status')
+      .eq('id', body.approvalId).single()
     if (!approval || approval.listing_agent_id !== auth.user.id) return NextResponse.json({ error: 'You cannot manage this approval request' }, { status: 403 })
+
+    // Only a pending request can transition. This also prevents repeated notification emails
+    // when an agent revisits the confirmation link or clicks twice.
+    if (approval.status !== 'pending') {
+      return NextResponse.json({ success: true, alreadyDecided: true, status: approval.status })
+    }
     const { data, error } = await auth.admin.from('agent_approvals').update({
       approved: body.approved,
       approved_at: body.approved ? new Date().toISOString() : null,
       status: body.approved ? 'approved' : 'denied',
-    }).eq('id', body.approvalId).select().single()
+    }).eq('id', body.approvalId).eq('status', 'pending').select().maybeSingle()
     if (error) return NextResponse.json({ error: 'Failed to update approval' }, { status: 500 })
-    return NextResponse.json({ success: true, data })
+    if (!data) return NextResponse.json({ success: true, alreadyDecided: true })
+
+    // Approval is saved regardless of email-provider availability.
+    let notificationSent = false
+    if (body.approved) {
+      const [buyerResult, propertyResult] = await Promise.all([
+        auth.admin.from('users').select('first_name, email').eq('id', approval.buyer_id).maybeSingle(),
+        auth.admin.from('properties').select('address, city, state').eq('id', approval.property_id).maybeSingle(),
+      ])
+      const buyer = buyerResult.data
+      const property = propertyResult.data
+      const resendKey = process.env.RESEND_API_KEY
+      if (resendKey && buyer?.email && property) {
+        const address = [property.address, property.city, property.state].filter(Boolean).join(', ')
+        const listingUrl = `https://homeoffer.pro/properties/${encodeURIComponent(approval.property_id)}`
+        const name = buyer.first_name?.trim() || 'there'
+        try {
+          const emailResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${resendKey}`,
+              'Content-Type': 'application/json',
+              'Idempotency-Key': `buyer-approved-${approval.id}`,
+            },
+            body: JSON.stringify({
+              from: 'HomeOffer.pro <approvalrequest@homeoffer.pro>',
+              to: [buyer.email],
+              subject: `Congratulations! You're approved to bid on ${escapeSubject(address)}`,
+              html: `<h2>Congratulations, ${escapeHtml(name)}!</h2>
+                <p>Your request to bid on <strong>${escapeHtml(address)}</strong> has been approved by the listing agent.</p>
+                <p>You can now sign in and submit your offer for this property.</p>
+                <p style="margin:24px 0"><a href="${listingUrl}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 22px;border-radius:8px;text-decoration:none;font-weight:bold">Submit an offer</a></p>
+                <p>Approval to bid does not mean an offer has been accepted.</p>
+                <p>— HomeOffer.pro</p>`,
+            }),
+          })
+          notificationSent = emailResponse.ok
+          if (notificationSent) {
+            await auth.admin.from('agent_approvals').update({ buyer_approval_email_sent_at: new Date().toISOString() }).eq('id', approval.id)
+          } else {
+            console.error('Buyer approval email rejected', emailResponse.status, await emailResponse.text())
+          }
+        } catch (emailError) {
+          console.error('Buyer approval email failed', emailError)
+        }
+      } else {
+        console.error('Buyer approval email could not be sent: missing sender configuration, buyer address, or property')
+      }
+    }
+    return NextResponse.json({ success: true, data, notificationSent })
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal server error' }, { status: 500 })
   }
