@@ -26,16 +26,12 @@ export async function POST(request: NextRequest) {
         .eq('buyer_id', auth.user.id)
         .maybeSingle()
       if (existing) return NextResponse.json({ success: true, approval: existing, alreadyExists: true, notificationSent: false, message: 'You have already requested approval for this property.' })
-      let data = existing
-      if (!data) {
-        const { data: created, error } = await auth.admin.from('agent_approvals').insert({
-          property_id: property.id, buyer_id: auth.user.id, listing_agent_id: property.listing_agent_id,
-          approved: false, approved_at: null, status: 'pending',
-        }).select('id, approved, status').single()
-        if (error?.code === '23505') return NextResponse.json({ success: true, alreadyExists: true, notificationSent: false, message: 'You have already requested approval for this property.' })
-        if (error) return NextResponse.json({ error: 'Unable to save approval request' }, { status: 500 })
-        data = created
-      }
+      const { data, error } = await auth.admin.from('agent_approvals').insert({
+        property_id: property.id, buyer_id: auth.user.id, listing_agent_id: property.listing_agent_id,
+        approved: false, approved_at: null, status: 'pending',
+      }).select('id, approved, status').single()
+      if (error?.code === '23505') return NextResponse.json({ success: true, alreadyExists: true, notificationSent: false, message: 'You have already requested approval for this property.' })
+      if (error || !data) return NextResponse.json({ error: 'Unable to save approval request' }, { status: 500 })
       let notificationSent = false
       let notificationError: string | null = null
       const resendKey = process.env.RESEND_API_KEY
