@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
             method: 'POST',
             headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              from: 'HomeOffer.pro <notifications@homeoffer.pro>',
+              from: 'HomeOffer.pro <approvalrequest@homeoffer.pro>',
               to: [agent.email],
               subject: `Bidding approval requested for ${property.address}`,
               html: `<h2>Bidding approval requested</h2><p>${buyerName || 'A buyer'} requested approval to bid on <strong>${property.address}</strong>.</p><p style="margin:24px 0"><a href="https://homeoffer.pro/approvals/review?id=${encodeURIComponent(data.id)}&decision=approve" style="display:inline-block;background:#166534;color:white;padding:14px 22px;border-radius:8px;text-decoration:none;font-weight:bold;margin-right:12px">Approve</a><a href="https://homeoffer.pro/approvals/review?id=${encodeURIComponent(data.id)}&decision=decline" style="display:inline-block;background:#b91c1c;color:white;padding:14px 22px;border-radius:8px;text-decoration:none;font-weight:bold">Decline</a></p><p>Sign in as the listing agent to confirm your decision.</p><p>— HomeOffer.pro</p>`,
