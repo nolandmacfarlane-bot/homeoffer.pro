@@ -212,7 +212,14 @@ export default function AgentNetworkPage() {
 
     setMessage('')
     setSponsorSearching(true)
-    const { data, error } = await supabase.rpc('search_agent_sponsors', { p_search: term })
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, first_name, last_name, phone_number, dre_license_number')
+      .eq('user_type', 'agent')
+      .or(`first_name.ilike.%${term}%,last_name.ilike.%${term}%,dre_license_number.ilike.%${term}%`)
+      .order('last_name')
+      .order('first_name')
+      .limit(12)
 
     setSponsorSearching(false)
     if (error) {
