@@ -75,10 +75,10 @@ export default function SelectRolePage() {
     try {
       const { data: agents } = await supabase
         .from('users')
-        .select('id, first_name, last_name, email, phone_number')
+        .select('id, first_name, last_name, email, phone_number, dre_license_number')
         .eq('user_type', 'agent')
         .eq('dre_verified', true)
-        .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%`)
+        .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%,dre_license_number.ilike.%${query}%`)
         .limit(10)
 
       setAgentResults(agents || [])
@@ -234,7 +234,7 @@ export default function SelectRolePage() {
                     setAgentSearch(e.target.value)
                     searchAgents(e.target.value)
                   }}
-                  placeholder="Search agent by name..."
+                  placeholder="Search by agent name or DRE number..."
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6"
                 />
 
@@ -250,7 +250,7 @@ export default function SelectRolePage() {
                         <p className="font-bold text-gray-900">
                           {agent.first_name} {agent.last_name}
                         </p>
-                        <p className="text-sm text-gray-600">{agent.email}</p>
+                        <p className="text-sm text-gray-600">DRE #{agent.dre_license_number || 'Not provided'} · {agent.phone_number || 'Phone not provided'}</p>
                       </button>
                     ))}
                   </div>
