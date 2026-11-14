@@ -25,13 +25,18 @@ export async function POST(request: NextRequest) {
         .eq('property_id', property.id)
         .eq('buyer_id', auth.user.id)
         .maybeSingle()
-      if (existing) return NextResponse.json({ success: true, approval: existing, alreadyExists: true, notificationSent: false })
-      const { data, error } = await auth.admin.from('agent_approvals').insert({
-        property_id: property.id, buyer_id: auth.user.id, listing_agent_id: property.listing_agent_id,
-        approved: false, approved_at: null, status: 'pending',
-      }).select('id, approved, status').single()
-      if (error) return NextResponse.json({ error: 'Unable to send approval request' }, { status: 500 })
+      if (existing && existing.status !== 'pending') return NextResponse.json({ success: true, approval: existing, alreadyExists: true, notificationSent: false })
+      let data = existing
+      if (!data) {
+        const { data: created, error } = await auth.admin.from('agent_approvals').insert({
+          property_id: property.id, buyer_id: auth.user.id, listing_agent_id: property.listing_agent_id,
+          approved: false, approved_at: null, status: 'pending',
+        }).select('id, approved, status').single()
+        if (error) return NextResponse.json({ error: 'Unable to save approval request' }, { status: 500 })
+        data = created
+      }
       let notificationSent = false
+      let notificationError: string | null = null
       const resendKey = process.env.RESEND_API_KEY
       if (resendKey) {
         const { data: agent } = await auth.admin.from('users').select('email, first_name').eq('id', property.listing_agent_id).single()
@@ -39,7 +44,7 @@ export async function POST(request: NextRequest) {
         if (agent?.email) {
           const emailResponse = await fetch('https://api.resend.com/emails', {
             method: 'POST',
-            headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+            headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json', 'Idempotency-Key': `approval-${data.id}-${Math.floor(Date.now() / 3600000)}` },
             body: JSON.stringify({
               from: 'HomeOffer.pro <approvalrequest@homeoffer.pro>',
               to: [agent.email],
@@ -48,9 +53,18 @@ export async function POST(request: NextRequest) {
             }),
           })
           notificationSent = emailResponse.ok
+          if (!emailResponse.ok) {
+            const details = await emailResponse.text()
+            console.error('Resend approval email failed', { status: emailResponse.status, details })
+            notificationError = 'Email provider rejected the notification'
+          }
+        } else {
+          notificationError = 'Listing agent email is missing'
         }
+      } else {
+        notificationError = 'Email service is not configured'
       }
-      return NextResponse.json({ success: true, approval: data, notificationSent })
+      return NextResponse.json({ success: true, approval: data, alreadyExists: Boolean(existing), notificationSent, notificationError })
     }
 
     if (!body.approvalId || typeof body.approved !== 'boolean') return NextResponse.json({ error: 'Missing approval request or status' }, { status: 400 })
