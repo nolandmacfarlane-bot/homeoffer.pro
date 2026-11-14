@@ -130,7 +130,10 @@ as $$
   where u.id <> auth.uid()
     and u.user_type = 'agent'
     and coalesce(u.account_status, 'active') = 'active'
-    and concat_ws(' ', u.first_name, u.last_name) ilike '%' || trim(p_search) || '%'
+    and (
+      concat_ws(' ', u.first_name, u.last_name) ilike '%' || trim(p_search) || '%'
+      or coalesce(u.dre_license_number, '') ilike '%' || trim(p_search) || '%'
+    )
   order by u.last_name, u.first_name
   limit 12;
 $$;
