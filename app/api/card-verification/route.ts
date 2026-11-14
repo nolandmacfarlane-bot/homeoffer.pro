@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       const { data: property } = await auth.admin.from('properties').select('listing_agent_id').eq('id', propertyId).single()
       if (property) await auth.admin.from('agent_approvals').upsert({
         property_id: propertyId, buyer_id: auth.user.id, listing_agent_id: property.listing_agent_id,
-        approved: true, approved_at: new Date().toISOString(),
+        approved: true, approved_at: new Date().toISOString(), status: 'approved',
       }, { onConflict: 'property_id,buyer_id' })
     }
     return NextResponse.json({ verified, propertyId })
