@@ -33,12 +33,17 @@ export async function submitMaximumOffer(propertyId: string, maximumAmount: numb
   if (!Number.isSafeInteger(maximumAmount) || maximumAmount <= 0 || maximumAmount % 500 !== 0) {
     throw new Error('Your maximum must be entered in exact $500 increments.')
   }
-  const { data, error } = await supabase.rpc('place_max_offer', {
-    p_property_id: propertyId,
-    p_maximum_amount: maximumAmount,
+  const { data: sessionData } = await supabase.auth.getSession()
+  const token = sessionData.session?.access_token
+  if (!token) throw new Error('Please sign in to submit an offer.')
+  const response = await fetch('/api/offers', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ propertyId, maximumAmount }),
   })
-  if (error) throw error
-  return data?.[0]
+  const payload = await response.json()
+  if (!response.ok) throw new Error(payload.error || 'Unable to submit your offer.')
+  return payload.offer
 }
 
 export async function submitOffer(propertyId: string, _buyerId: string, amount: number) {
