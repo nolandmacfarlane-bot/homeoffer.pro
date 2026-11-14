@@ -93,7 +93,7 @@ export default function Navbar() {
     { label: 'Homes', href: '/' },
     { label: 'How It Works', href: '/how-it-works' },
     { label: 'List a Property', href: '/list-property' },
-    { label: 'Grow Your Network', href: '/grow-your-network' },
+    { label: 'Grow Your Network', href: '/agent/network' },
     { label: 'FAQ', href: '/#faq' },
   ]
 
