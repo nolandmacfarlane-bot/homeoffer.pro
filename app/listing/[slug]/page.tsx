@@ -7,6 +7,7 @@ import ListingEngagement from '@/components/ListingEngagement'
 import AddToCalendar from '@/components/AddToCalendar'
 import OfferHistory from '@/components/OfferHistory'
 import OfferLink from '@/components/OfferLink'
+import ListingCountdown from '@/components/ListingCountdown'
 
 const homes: Record<string, {
   address: string
@@ -156,7 +157,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                 <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-100">Offer overview</p>
                 <h2 className="mt-2 text-3xl font-black tracking-tight">Make your strongest offer</h2>
               </div>
-              <span className="inline-flex rounded-full bg-white/15 px-4 py-2 text-sm font-black ring-1 ring-white/20">◷ {home.time} left</span>
+              <ListingCountdown address={home.address} fallback={home.time} />
             </div>
 
             <dl className="mt-8 grid gap-3 sm:grid-cols-2">
