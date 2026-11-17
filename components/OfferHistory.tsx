@@ -23,7 +23,7 @@ const dateTime = new Intl.DateTimeFormat('en-US', {
   minute: '2-digit',
 })
 
-export default function OfferHistory({ address }: { address: string }) {
+export default function OfferHistory({ address, className = '' }: { address: string; className?: string }) {
   const [entries, setEntries] = useState<OfferRow[]>([])
   const [loading, setLoading] = useState(true)
   const [unavailable, setUnavailable] = useState(false)
@@ -85,7 +85,7 @@ export default function OfferHistory({ address }: { address: string }) {
   }, [address])
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <section className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-950">Offer history</h2>
