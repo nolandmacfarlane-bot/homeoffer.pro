@@ -205,11 +205,10 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Listed by</p>
               <div className="mt-4 flex items-center gap-4">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-blue-50 text-2xl font-black text-blue-700" aria-hidden="true">NM</div>
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-blue-50 text-2xl font-black text-blue-700" aria-hidden="true">HO</div>
                 <div>
-                  <h2 className="text-xl font-black text-slate-950">Nolan MacFarlane</h2>
-                  <p className="mt-1 text-sm font-bold text-slate-600">eXp Realty of Northern California, Inc.</p>
-                  <p className="mt-1 text-xs font-semibold text-slate-500">CA DRE #02231070</p>
+                  <h2 className="text-xl font-black text-slate-950">HomeOffer.pro Listing Team</h2>
+                  <p className="mt-1 text-sm font-bold text-slate-600">Listing contact details are available to registered participants.</p>
                 </div>
               </div>
               <Link href={`/login?next=/listing/${slug}`} className="mt-5 block rounded-full border-2 border-blue-600 px-5 py-3 text-center font-black text-blue-700 hover:bg-blue-50">Contact listing agent</Link>
