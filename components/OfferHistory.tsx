@@ -85,72 +85,63 @@ export default function OfferHistory({ address, className = '' }: { address: str
   }, [address])
 
   return (
-    <section className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
-      <div className="flex items-start justify-between gap-4">
+    <section className={`overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
+      <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
         <div>
-          <h2 className="text-2xl font-black text-slate-950">Offer history</h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Bidder identities and private maximums are never shown publicly.
-          </p>
+          <h2 className="text-lg font-bold text-slate-950">Offer history</h2>
+          <p className="mt-0.5 text-xs text-slate-500">Maximum offers are never shown publicly.</p>
         </div>
         {!loading && !unavailable && (
-          <span className="shrink-0 rounded-full bg-blue-50 px-3 py-1 text-sm font-black text-blue-700">
+          <span className="shrink-0 text-xs font-semibold text-slate-500">
             {entries.length} {entries.length === 1 ? 'offer' : 'offers'}
           </span>
         )}
       </div>
 
       {loading ? (
-        <p className="mt-5 text-sm font-semibold text-slate-500">
-          Loading offer history…
-        </p>
+        <p className="px-5 py-6 text-sm text-slate-500">Loading offer history…</p>
       ) : unavailable ? (
-        <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm font-semibold text-slate-600">
+        <p className="m-4 rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
           Offer history is temporarily unavailable.
         </p>
       ) : entries.length === 0 ? (
-        <div className="mt-5 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5">
-          <p className="font-black text-slate-950">
-            No offers have been submitted yet.
-          </p>
-          <p className="mt-1 text-sm text-slate-600">
-            Be the first to submit an offer on this property.
-          </p>
+        <div className="px-5 py-6">
+          <p className="text-sm font-semibold text-slate-900">No offers yet</p>
+          <p className="mt-1 text-sm text-slate-500">Be the first to submit an offer.</p>
         </div>
       ) : (
-        <ol className="mt-5 max-h-[360px] divide-y divide-slate-200 overflow-y-auto">
-          {entries.map((entry) => (
-            <li
-              key={entry.sequence_number}
-              className="flex items-center gap-3 py-4 first:pt-0 last:pb-0"
-            >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-black text-blue-700">
-                B
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-black text-slate-950">
+        <div className="max-h-[280px] overflow-y-auto">
+          <div className="sticky top-0 grid grid-cols-[1fr_1.1fr_auto] gap-3 border-b border-slate-200 bg-slate-50 px-5 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500">
+            <span>Buyer</span>
+            <span>Submitted</span>
+            <span className="text-right">Offer</span>
+          </div>
+          <ol className="divide-y divide-slate-100">
+            {entries.map((entry) => (
+              <li
+                key={entry.sequence_number}
+                className="grid grid-cols-[1fr_1.1fr_auto] items-center gap-3 px-5 py-3 text-sm"
+              >
+                <div className="min-w-0">
+                  <p className="truncate font-semibold text-slate-900">
                     {entry.masked_bidder || `Buyer ${entry.sequence_number}`}
                   </p>
                   {entry.sequence_number === entries[0]?.sequence_number && (
-                    <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[11px] font-black uppercase tracking-wide text-white">
+                    <span className="text-[11px] font-bold uppercase tracking-wide text-blue-700">
                       Leading
                     </span>
                   )}
                 </div>
-                <time
-                  className="text-sm text-slate-500"
-                  dateTime={entry.created_at}
-                >
+                <time className="text-xs text-slate-500" dateTime={entry.created_at}>
                   {dateTime.format(new Date(entry.created_at))}
                 </time>
-              </div>
-              <p className="text-lg font-black text-slate-950">
-                {money.format(Number(entry.amount))}
-              </p>
-            </li>
-          ))}
-        </ol>
+                <p className="text-right font-bold tabular-nums text-slate-950">
+                  {money.format(Number(entry.amount))}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
       )}
     </section>
   )
