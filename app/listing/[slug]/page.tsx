@@ -114,32 +114,61 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-6 lg:px-8">
         <BackButton href="/#homes">Back to live listings</BackButton>
 
-        <header className="mt-5">
-          <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-700">Open for offers</p>
-          <h1 className="mt-2 text-4xl font-black tracking-[-0.04em] text-slate-950 sm:text-5xl">{home.address}</h1>
-          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-base font-semibold text-slate-600">
-            <span>{home.city} {home.zip}</span>
-            <span>{home.beds} beds</span>
-            <span>{home.baths} baths</span>
-            <span>{home.sqft} sq ft</span>
+        <div className="mt-5 flex items-center justify-between gap-4">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-sm ring-1 ring-slate-200">
+            <span className="h-2.5 w-2.5 rounded-full bg-red-500" aria-hidden="true" />
+            Open for offers
           </div>
-        </header>
+          <p className="hidden text-sm font-semibold text-slate-500 sm:block">Transparent offer activity</p>
+        </div>
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-[2fr_1fr]">
-          <div className="relative min-h-[360px] overflow-hidden rounded-2xl bg-slate-200 lg:min-h-[560px]">
-            <Image src="/homeoffer-hero.webp" alt={home.address} fill priority sizes="(max-width: 1024px) 100vw, 67vw" className={`object-cover ${home.crop}`} />
+        <div className="mt-4 grid gap-2 overflow-hidden rounded-2xl bg-white lg:h-[570px] lg:grid-cols-[1.7fr_1fr]">
+          <div className="relative min-h-[360px] overflow-hidden bg-slate-200">
+            <Image
+              src="/homeoffer-hero.webp"
+              alt={home.address}
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 64vw"
+              className={`object-cover ${home.crop}`}
+            />
           </div>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
-            <div className="relative min-h-44 overflow-hidden rounded-2xl bg-slate-200">
-              <Image src="/homeoffer-hero.webp" alt={`${home.address} exterior view`} fill sizes="(max-width: 1024px) 50vw, 33vw" className="object-cover object-left" />
-            </div>
-            <div className="relative min-h-44 overflow-hidden rounded-2xl bg-slate-200">
-              <Image src="/homeoffer-hero.webp" alt={`${home.address} additional view`} fill sizes="(max-width: 1024px) 50vw, 33vw" className="object-cover object-right" />
-            </div>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              ['object-left', 'wide exterior view'],
+              ['object-right', 'front exterior view'],
+              ['object-[35%_center]', 'property view'],
+              ['object-[65%_center]', 'additional property view'],
+            ].map(([position, label], index) => (
+              <div key={label} className="relative min-h-40 overflow-hidden bg-slate-200">
+                <Image
+                  src="/homeoffer-hero.webp"
+                  alt={`${home.address} ${label}`}
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 18vw"
+                  className={`object-cover ${position}`}
+                />
+                {index === 3 && (
+                  <span className="absolute bottom-4 right-4 rounded-lg bg-white px-4 py-2 text-sm font-black text-slate-950 shadow-lg">
+                    View all photos
+                  </span>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
-        <ListingStatsBar address={home.address} slug={slug} fallbackOffer={home.offer} fallbackTime={home.time} />
+        <ListingStatsBar
+          address={home.address}
+          city={home.city}
+          zip={home.zip}
+          beds={home.beds}
+          baths={home.baths}
+          sqft={home.sqft}
+          slug={slug}
+          fallbackOffer={home.offer}
+          fallbackTime={home.time}
+        />
 
         <div className="mt-8 grid items-start gap-6 lg:grid-cols-[1fr_420px]">
           <section className="rounded-[28px] bg-white p-7 shadow-sm sm:p-9">
