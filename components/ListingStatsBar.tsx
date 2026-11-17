@@ -18,11 +18,21 @@ const money = new Intl.NumberFormat('en-US', {
 
 export default function ListingStatsBar({
   address,
+  city = '',
+  zip = '',
+  beds = 0,
+  baths = 0,
+  sqft = '',
   slug,
   fallbackOffer,
   fallbackTime,
 }: {
   address: string
+  city?: string
+  zip?: string
+  beds?: number
+  baths?: number
+  sqft?: string
   slug: string
   fallbackOffer: number
   fallbackTime: string
@@ -85,23 +95,57 @@ export default function ListingStatsBar({
     return () => window.clearInterval(interval)
   }, [stats.endDate])
 
-  const total = stats.currentAmount * 1.03
+  const premium = stats.currentAmount * 0.03
+  const total = stats.currentAmount + premium
 
   return (
-    <section className="mt-4 grid overflow-hidden rounded-2xl bg-[#102f5c] text-white shadow-lg shadow-blue-950/10 lg:grid-cols-[1fr_1fr_.7fr_1fr_auto]">
-      {[
-        ['Time left', countdown],
-        ['Leading offer', money.format(stats.currentAmount)],
-        ['Offers', String(stats.bidCount)],
-        ['Total price', money.format(total)],
-      ].map(([label, value]) => (
-        <div key={label} className="border-b border-white/10 px-5 py-4 lg:border-b-0 lg:border-r">
-          <p className="text-xs font-black uppercase tracking-[0.12em] text-blue-200">{label}</p>
-          <p className="mt-1 text-lg font-black">{value}</p>
+    <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="grid items-stretch lg:grid-cols-[1fr_auto_320px]">
+        <div className="px-6 py-6 sm:px-7">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Leading offer</p>
+          <p className="mt-1 text-4xl font-black tracking-tight text-slate-950">{money.format(stats.currentAmount)}</p>
+          <p className="mt-2 text-base font-medium text-slate-700">{address}, {city} {zip}</p>
         </div>
-      ))}
-      <div className="flex items-center p-3">
-        <OfferLink slug={slug} address={address} className="w-full whitespace-nowrap rounded-xl bg-red-600 px-6 py-3 text-center font-black text-white transition hover:bg-red-500">Get approved</OfferLink>
+
+        <dl className="grid grid-cols-3 border-y border-slate-200 lg:border-x lg:border-y-0">
+          {[
+            [String(beds), 'beds'],
+            [String(baths), 'baths'],
+            [sqft, 'sq ft'],
+          ].map(([value, label]) => (
+            <div key={label} className="flex min-w-24 flex-col justify-center px-5 py-5 text-center">
+              <dt className="order-2 mt-1 text-sm font-medium text-slate-500">{label}</dt>
+              <dd className="order-1 text-2xl font-black text-slate-950">{value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <div className="flex flex-col justify-center bg-slate-50 px-6 py-5">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-sm font-semibold text-slate-600">Time left</span>
+            <span className="font-black tabular-nums text-slate-950">{countdown}</span>
+          </div>
+          <OfferLink
+            slug={slug}
+            address={address}
+            className="mt-4 block rounded-xl bg-blue-700 px-6 py-3.5 text-center font-black text-white transition hover:bg-blue-600"
+          >
+            Get approved to offer
+          </OfferLink>
+        </div>
+      </div>
+
+      <div className="grid border-t border-slate-200 bg-slate-50 sm:grid-cols-3">
+        {[
+          ["Buyer's premium (3%)", money.format(premium)],
+          ['Total purchase price', money.format(total)],
+          ['Offers received', String(stats.bidCount)],
+        ].map(([label, value]) => (
+          <div key={label} className="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-3 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
+            <span className="text-sm font-medium text-slate-500">{label}</span>
+            <span className="font-bold text-slate-950">{value}</span>
+          </div>
+        ))}
       </div>
     </section>
   )
