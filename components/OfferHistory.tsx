@@ -89,7 +89,7 @@ export default function OfferHistory({ address, className = '' }: { address: str
       <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
         <div>
           <h2 className="text-lg font-bold text-slate-950">Offer history</h2>
-          <p className="mt-0.5 text-xs text-slate-500">Maximum offers are never shown publicly.</p>
+
         </div>
         {!loading && !unavailable && (
           <span className="shrink-0 text-xs font-semibold text-slate-500">
