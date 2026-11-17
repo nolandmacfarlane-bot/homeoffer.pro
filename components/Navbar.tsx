@@ -123,7 +123,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`whitespace-nowrap rounded-lg px-4 py-3 text-base font-extrabold transition ${
+                className={`whitespace-nowrap rounded-full px-4 py-3 text-base font-extrabold transition ${
                   pathname === link.href
                     ? 'bg-blue-50 text-blue-600'
                     : 'text-slate-950 hover:bg-slate-100'
@@ -137,7 +137,7 @@ export default function Navbar() {
           {/* Right side - Sign Out / Sign In */}
           <div className="flex items-center gap-3">
             {loading ? (
-              <div className="w-10 h-10 animate-pulse bg-gray-300 rounded-lg" />
+              <div className="h-10 w-10 animate-pulse rounded-full bg-gray-300" />
             ) : user ? (
               <div className="relative hidden sm:block">
                 <button
@@ -155,9 +155,9 @@ export default function Navbar() {
                 </button>
                 {accountMenuOpen && (
                   <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white p-2 shadow-xl" role="menu">
-                    <Link href={dashboardLink} onClick={() => setAccountMenuOpen(false)} className="block rounded-lg px-4 py-3 text-sm font-bold text-slate-900 hover:bg-slate-100" role="menuitem">Dashboard</Link>
-                    <Link href={user.user_type === 'agent' ? '/agent/profile' : '/settings'} onClick={() => setAccountMenuOpen(false)} className="block rounded-lg px-4 py-3 text-sm font-bold text-slate-900 hover:bg-slate-100" role="menuitem">Profile &amp; settings</Link>
-                    <button onClick={handleSignOut} className="block w-full rounded-lg px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-100" role="menuitem">Sign out</button>
+                    <Link href={dashboardLink} onClick={() => setAccountMenuOpen(false)} className="block rounded-full px-4 py-3 text-sm font-bold text-slate-900 hover:bg-slate-100" role="menuitem">Dashboard</Link>
+                    <Link href={user.user_type === 'agent' ? '/agent/profile' : '/settings'} onClick={() => setAccountMenuOpen(false)} className="block rounded-full px-4 py-3 text-sm font-bold text-slate-900 hover:bg-slate-100" role="menuitem">Profile &amp; settings</Link>
+                    <button onClick={handleSignOut} className="block w-full rounded-full px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-100" role="menuitem">Sign out</button>
                   </div>
                 )}
               </div>
@@ -175,7 +175,7 @@ export default function Navbar() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-gray-100 lg:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100 lg:hidden"
               aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={menuOpen}
               aria-controls="mobile-navigation"
@@ -189,7 +189,7 @@ export default function Navbar() {
         {menuOpen && (
           <div id="mobile-navigation" className="space-y-2 border-t border-gray-200 pb-4 pt-4 lg:hidden">
             {publicLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="block rounded-lg px-4 py-3 font-bold text-slate-900 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>{link.label}</Link>
+              <Link key={link.href} href={link.href} className="block rounded-full px-4 py-3 font-bold text-slate-900 hover:bg-slate-100" onClick={() => setMenuOpen(false)}>{link.label}</Link>
             ))}
             {/* User info - Mobile */}
             {user && (
@@ -204,7 +204,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-semibold text-sm transition"
+                className="block rounded-full px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}
@@ -215,7 +215,7 @@ export default function Navbar() {
             {user && (
               <button
                 onClick={handleSignOut}
-                className="w-full text-left px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg font-semibold text-sm transition mt-4"
+                className="mt-4 w-full rounded-full bg-red-600 px-4 py-2 text-left text-sm font-semibold text-white transition hover:bg-red-700"
               >
                 Sign Out
               </button>
