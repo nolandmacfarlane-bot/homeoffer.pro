@@ -139,7 +139,7 @@ export default function PropertyDetailPage() {
           {property.description && <><h2 className="text-2xl font-black">About this property</h2><p className="mt-3 text-lg leading-8 text-gray-700">{property.description}</p></>}
 
           <section className="mt-10 rounded-2xl border bg-white p-6">
-            <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-sm font-bold uppercase tracking-wider text-blue-700">Public activity</p><h2 className="text-2xl font-black">Offer history</h2></div><p className="text-sm text-gray-600">Every visible change is recorded in exact $500 steps.</p></div>
+            <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-sm font-bold uppercase tracking-wider text-blue-700">Public activity</p><h2 className="text-2xl font-black">Offer history</h2></div><p className="text-sm text-gray-600">Every offer increases in $500 increments until it reaches the maximum limit you set.</p></div>
             <div className="mt-5 divide-y">
               {history.length ? history.map(item => <div key={item.sequence_number} className="grid grid-cols-[1fr_auto] gap-4 py-4"><div><strong>{item.masked_bidder}</strong><p className="text-sm text-gray-500">{new Date(item.created_at).toLocaleString()}</p></div><strong className="text-lg">{money(item.amount)}</strong></div>) : <p className="py-6 text-gray-600">No offers yet.</p>}
             </div>
