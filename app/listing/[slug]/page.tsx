@@ -7,7 +7,7 @@ import ListingEngagement from '@/components/ListingEngagement'
 import AddToCalendar from '@/components/AddToCalendar'
 import OfferHistory from '@/components/OfferHistory'
 import OfferLink from '@/components/OfferLink'
-import ListingCountdown from '@/components/ListingCountdown'
+import ListingStatsBar from '@/components/ListingStatsBar'
 
 const homes: Record<string, {
   address: string
@@ -102,19 +102,10 @@ const homes: Record<string, {
   },
 }
 
-const money = (amount: number) => amount.toLocaleString('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  maximumFractionDigits: 0,
-})
-
 export default async function ListingDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const home = homes[slug]
   if (!home || !['8575-hidden-lakes-drive', '1642-poppy-circle'].includes(slug)) notFound()
-
-  const premium = home.offer * 0.03
-  const total = home.offer + premium
 
   return (
     <main className="min-h-screen bg-[#f6f8fb] text-slate-950">
@@ -122,6 +113,17 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
 
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-6 lg:px-8">
         <BackButton href="/#homes">Back to live listings</BackButton>
+
+        <header className="mt-5">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-700">Open for offers</p>
+          <h1 className="mt-2 text-4xl font-black tracking-[-0.04em] text-slate-950 sm:text-5xl">{home.address}</h1>
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-base font-semibold text-slate-600">
+            <span>{home.city} {home.zip}</span>
+            <span>{home.beds} beds</span>
+            <span>{home.baths} baths</span>
+            <span>{home.sqft} sq ft</span>
+          </div>
+        </header>
 
         <div className="mt-5 grid gap-3 lg:grid-cols-[2fr_1fr]">
           <div className="relative min-h-[360px] overflow-hidden rounded-2xl bg-slate-200 lg:min-h-[560px]">
@@ -137,69 +139,24 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
           </div>
         </div>
 
-        <header className="mt-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-700">Open for offers</p>
-            <h1 className="mt-2 text-4xl font-black tracking-[-0.04em] text-slate-950 sm:text-5xl">{home.address}</h1>
-            <p className="mt-2 text-lg font-semibold text-slate-600">{home.city} {home.zip}</p>
-          </div>
-          <div className="flex flex-wrap gap-2 text-sm font-black text-slate-700">
-            <span className="rounded-full bg-white px-4 py-2 shadow-sm">{home.beds} beds</span>
-            <span className="rounded-full bg-white px-4 py-2 shadow-sm">{home.baths} baths</span>
-            <span className="rounded-full bg-white px-4 py-2 shadow-sm">{home.sqft} sq ft</span>
-          </div>
-        </header>
-
-        <section id="offer-process" className="mt-8 grid gap-5 lg:grid-cols-[1.15fr_.85fr]">
-          <div className="overflow-hidden rounded-[28px] bg-gradient-to-br from-[#102f5c] via-[#17477d] to-[#1d5b9a] p-7 text-white shadow-xl shadow-blue-950/15 sm:p-9">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-100">Offer overview</p>
-                <h2 className="mt-2 text-3xl font-black tracking-tight">Make your strongest offer</h2>
-              </div>
-              <ListingCountdown address={home.address} fallback={home.time} />
-            </div>
-
-            <dl className="mt-8 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl bg-white/10 p-5 ring-1 ring-white/15">
-                <dt className="text-sm font-bold text-blue-100">Leading offer</dt>
-                <dd className="mt-2 text-3xl font-black">{money(home.offer)}</dd>
-              </div>
-              <div className="rounded-2xl bg-white/10 p-5 ring-1 ring-white/15">
-                <dt className="text-sm font-bold text-blue-100">Buyer&apos;s premium (3%)</dt>
-                <dd className="mt-2 text-3xl font-black">{money(premium)}</dd>
-              </div>
-              <div className="rounded-2xl bg-emerald-400 p-5 text-emerald-950 sm:col-span-2">
-                <div className="flex flex-wrap items-end justify-between gap-2">
-                  <dt className="text-sm font-black uppercase tracking-[0.12em]">Total purchase price</dt>
-                  <dd className="text-4xl font-black tracking-tight">{money(total)}</dd>
-                </div>
-              </div>
-            </dl>
-
-            <div className="mt-7 grid items-center gap-4 sm:grid-cols-[minmax(0,280px)_1fr]">
-              <OfferLink slug={slug} address={home.address} className="rounded-full bg-red-600 px-6 py-4 text-center text-lg font-black text-white shadow-lg shadow-red-950/20 transition hover:bg-red-500">Get approved to offer</OfferLink>
-              <p className="text-sm leading-6 text-blue-100">Every offer increases in $500 increments until it reaches the maximum limit you set.</p>
-            </div>
-            <p className="mt-5 border-t border-white/15 pt-5 text-sm font-semibold text-blue-100">The seller reserves the right to accept, reject or counter any offer.</p>
-          </div>
-
-          <OfferHistory address={home.address} className="h-full rounded-[28px] border-0 shadow-lg shadow-slate-950/5" />
-        </section>
+        <ListingStatsBar address={home.address} slug={slug} fallbackOffer={home.offer} fallbackTime={home.time} />
 
         <div className="mt-8 grid items-start gap-6 lg:grid-cols-[1fr_420px]">
           <section className="rounded-[28px] bg-white p-7 shadow-sm sm:p-9">
             <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-700">Property details</p>
             <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">About this home</h2>
             <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">{home.description}</p>
-            <div className="mt-8 rounded-2xl bg-blue-50 p-6">
+            <div id="offer-process" className="mt-8 rounded-2xl bg-blue-50 p-6">
               <h3 className="text-xl font-black text-slate-950">How the offer process works</h3>
-              <p className="mt-2 leading-7 text-slate-600">Review the property information, become approved to participate and submit your offer before the timer ends. Your private maximum is never shown publicly.</p>
+              <p className="mt-2 leading-7 text-slate-600">Every offer increases in $500 increments until it reaches the maximum limit you set. Review the property information, become approved and submit your offer before the timer ends. Your private maximum is never shown publicly.</p>
+              <OfferLink slug={slug} address={home.address} className="mt-5 inline-flex rounded-full bg-red-600 px-6 py-3 font-black text-white transition hover:bg-red-500">Get approved to offer</OfferLink>
             </div>
             <p className="mt-6 text-sm leading-6 text-slate-500">Property details shown are for the current marketplace preview and should be independently verified.</p>
           </section>
 
           <aside className="space-y-6">
+            <OfferHistory address={home.address} className="rounded-[28px] border-0 shadow-sm" />
+
             <section className="rounded-[28px] bg-white p-6 shadow-sm">
               <h2 className="text-2xl font-black text-slate-950">Open houses</h2>
               <p className="mt-1 text-sm text-slate-500">{home.address}, {home.city} {home.zip}</p>
