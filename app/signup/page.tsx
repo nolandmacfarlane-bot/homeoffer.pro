@@ -19,6 +19,7 @@ export default function SignupPage() {
   const [smsOptIn, setSmsOptIn] = useState(false)
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [nextPath, setNextPath] = useState('/')
 
@@ -29,6 +30,7 @@ export default function SignupPage() {
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    setSuccess('')
     setLoading(true)
 
     try {
@@ -40,7 +42,7 @@ export default function SignupPage() {
         throw new Error('Password must be at least 8 characters')
       }
 
-      await signUp(formData.email, formData.password, {
+      const signupData = await signUp(formData.email, formData.password, {
         first_name: formData.first_name,
         last_name: formData.last_name,
         user_type: 'buyer',
@@ -48,6 +50,17 @@ export default function SignupPage() {
       })
 
       window.localStorage.removeItem('homeoffer_signup_role')
+
+      if (!signupData.session) {
+        setSuccess('Account created. Check your email and click the confirmation link to sign in.')
+        setFormData((current) => ({
+          ...current,
+          password: '',
+          password_confirm: '',
+        }))
+        return
+      }
+
       router.replace(nextPath)
       router.refresh()
     } catch (err: any) {
@@ -123,6 +136,11 @@ export default function SignupPage() {
 
         {/* Email/Password Form */}
         <form onSubmit={handleSignup} className="space-y-4">
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded text-sm" role="status">
+              {success}
+            </div>
+          )}
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm" role="alert">
               {error}
